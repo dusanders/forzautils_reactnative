@@ -49,7 +49,7 @@ function withStyles(theme: IThemeElements) {
     },
     appNameTxt: {
       fontSize: 33,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary.onPrimary,
       textAlign: 'center',
     }
   });

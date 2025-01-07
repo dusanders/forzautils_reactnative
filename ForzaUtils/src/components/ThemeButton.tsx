@@ -30,7 +30,7 @@ function themeStyles(theme: IThemeElements) {
       elevation: theme.sizes.button.elevation,
       margin: theme.sizes.button.margin,
       backgroundColor: 'none',
-      borderRadius: theme.sizes.button.borderRadius,
+      borderRadius: theme.sizes.borderRadius,
       minHeight: theme.sizes.button.size,
       minWidth: theme.sizes.button.size
     }

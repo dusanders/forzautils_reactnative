@@ -21,13 +21,12 @@ export function Card(props: CardProps) {
 function themeStyles(theme: IThemeElements) {
   return StyleSheet.create({
     root: {
-      backgroundColor: theme.colors.background.onPrimary,
       padding: theme.sizes.paper.padding,
       marginTop: theme.sizes.paper.spacingY / 2,
       marginBottom: theme.sizes.paper.spacingY / 2,
       marginLeft: theme.sizes.paper.spacingX / 2,
       marginRight: theme.sizes.paper.spacingX / 2,
-      borderColor: '#333',
+      borderColor: theme.colors.background.onPrimary,
       borderWidth: 0.8,
       justifyContent: 'center',
       alignItems: 'center',

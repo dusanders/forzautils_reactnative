@@ -87,8 +87,10 @@ export function NavigationProvider(props: NavigatorProps) {
   }
 
   const doGoBack = () => {
+    const previous = state.backStack.pop() || props.initialRoute;
+    console.log(`goback: ${previous}`)
     setState({
-      route: state.backStack.pop() || props.initialRoute,
+      route: previous,
       backStack: state.backStack,
       isBackPress: true
     })

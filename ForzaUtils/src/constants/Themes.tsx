@@ -3,10 +3,22 @@ import React from "react";
 export interface IThemeElements {
   colors: {
     text: {
-      primary: string;
-      secondary: string;
-      warning: string;
-      error: string;
+      primary: {
+        onPrimary: string;
+        onSecondary: string;
+      }
+      secondary: {
+        onPrimary: string;
+        onSecondary: string;
+      }
+      warning: {
+        onPrimary: string;
+        onSecondary: string;
+      }
+      error: {
+        onPrimary: string;
+        onSecondary: string;
+      }
     };
     background: {
       primary: string;
@@ -16,7 +28,7 @@ export interface IThemeElements {
     };
     card: {
       borderColor: string;
-    }
+    };
   }
   sizes: {
     font: {
@@ -26,7 +38,6 @@ export interface IThemeElements {
     }
     paper: {
       padding: number;
-      borderRadius: number;
       spacingY: number;
       spacingX: number;
     }
@@ -34,17 +45,16 @@ export interface IThemeElements {
       elevation: number;
       padding: number;
       margin: number;
-      borderRadius: number;
       size: number;
     }
     icon: number,
-    navBar: number
+    navBar: number,
+    borderRadius: number;
   }
 }
 
 const defaultPaper: IThemeElements['sizes']['paper'] = {
   padding: 20,
-  borderRadius: 12,
   spacingX: 0,
   spacingY: 0
 }
@@ -59,31 +69,44 @@ const defaultButton: IThemeElements['sizes']['button'] = {
   padding: 20,
   elevation: 0,
   margin: 10,
-  borderRadius: 12,
   size: 75
 }
 
+export type TextOnBackground = 'onPrimary' | 'onSecondary';
 export const LighColors: IThemeElements = {
   colors: {
     text: {
-      primary: "rgba(33,33,33,1)",
-      secondary: "rgba(100,100,100,1)",
-      warning: 'rgb(225, 158, 1)',
-      error: "rgb(162, 0, 0)"
+      primary: {
+        onPrimary: "rgba(33,33,33,1)",
+        onSecondary: 'rgba(243,254, 243,1)'
+      },
+      secondary: {
+        onPrimary: "rgba(242,242,242,1)",
+        onSecondary: 'rgba(242,242,242,1)'
+      },
+      warning: {
+        onPrimary: 'rgb(225, 158, 1)',
+        onSecondary: 'rgb(255,158,1)'
+      },
+      error: {
+        onPrimary: "rgb(162, 0, 0)",
+        onSecondary: 'rgb(162, 0, 0)'
+      }
     },
     background: {
-      primary: 'rgb(207, 207, 207)',
-      onPrimary: 'rgb(181, 180, 180)',
-      secondary: 'rgb(125, 144, 252)',
-      onSecondary: 'rgb(245, 199, 199)'
+      primary: 'rgb(255, 255, 255)',
+      onPrimary: 'rgb(242,242,242)',
+      secondary: 'rgb(34,40,44)',
+      onSecondary: 'rgb(57,61,65)'
     },
     card: {
-      borderColor: 'rgb(52,58,62)'
-    }
+      borderColor: 'rgb(223,218,220)'
+    },
   },
   sizes: {
-    icon: 20,
+    icon: 25,
     navBar: 70,
+    borderRadius: 12,
     font: defaultFont,
     paper: defaultPaper,
     button: defaultButton
@@ -92,24 +115,37 @@ export const LighColors: IThemeElements = {
 export const DarkColors: IThemeElements = {
   colors: {
     text: {
-      primary: "rgba(253,251,249,1)",
-      secondary: "rgba(150,150,150,1)",
-      warning: 'rgb(225, 158, 1)',
-      error: "rgb(162, 0, 0)"
+      primary: {
+        onPrimary: "rgba(253,251,249,1)",
+        onSecondary: 'rgba(0,0,0,1)'
+      },
+      secondary: {
+        onPrimary: "rgba(120,120,120,1)",
+        onSecondary: 'rgba(120,120,120,1)'
+      },
+      warning: {
+        onPrimary: 'rgb(225, 158, 1)',
+        onSecondary: 'rgba(255,158,1)'
+      },
+      error: {
+        onPrimary: "rgb(162, 0, 0)",
+        onSecondary: 'rgb(162,0,0)'
+      }
     },
     background: {
       primary: 'rgb(34, 40, 44)',
-      onPrimary: 'rgb(52,58,62)',
-      secondary: 'rgb(64, 36, 110)',
-      onSecondary: 'rgba(0, 0, 0, 0)'
+      onPrimary: 'rgb(57,61,65)',
+      secondary: 'rgb(253, 243, 255)',
+      onSecondary: 'rgba(220, 220, 220,1)'
     },
     card: {
       borderColor: 'rgb(52,58,62)'
-    }
+    },
   },
   sizes: {
-    icon: 20,
+    icon: 25,
     navBar: 70,
+    borderRadius: 12,
     font: defaultFont,
     paper: defaultPaper,
     button: defaultButton

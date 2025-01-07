@@ -44,7 +44,7 @@ function CircleCheckIcon(props: CircleCheckIconProps) {
       alignItems: 'center',
     }}>
       <View style={{
-        borderColor: theme.theme.colors.text.primary,
+        borderColor: theme.theme.colors.text.primary.onPrimary,
         borderRadius: 100,
         borderWidth: 0.8,
         position: 'absolute',
@@ -107,11 +107,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
   const styles = themeStyles(theme.theme);
   const navigation = useNavigation();
   const forza = useForzaData();
-  const netInfo = useNetInfo();
-  let ipString = '';
-  if (netInfo.type == NetInfoStateType.wifi) {
-    console.log(`${netInfo.details.bssid} - ${netInfo.details.ssid}`)
-  }
+
   return (
     <View style={styles.root}>
       <View style={styles.content}>

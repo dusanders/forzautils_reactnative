@@ -12,7 +12,9 @@
   "dependencies": {
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-vector-icons/common": "^11.0.0",
+    "@react-native-vector-icons/feather": "^4.29.2",
     "@react-native-vector-icons/material-design-icons": "^7.4.47",
+    "@react-native-vector-icons/material-icons": "^0.0.1",
     "ForzaTelemetryApi": "../ForzaTelemetryApi",
     "react": "18.3.1",
     "react-native": "0.76.5"
