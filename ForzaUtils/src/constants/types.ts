@@ -2,6 +2,7 @@
 export type StateHandler<T> = (prev: T, next: Partial<T>) => T;
 
 export enum AppRoutes {
+  SPLASH,
   IP_INFO,
   DATA
 }

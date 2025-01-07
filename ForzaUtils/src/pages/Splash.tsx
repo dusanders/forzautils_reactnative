@@ -1,21 +1,23 @@
-import React from "react";
+import React, {  } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { ILocaleContext } from "../../context/withLocale";
-import { ThemeType, withTheme } from "../../hooks/withTheme";
-import { IColorDefinitions } from "../../constants/Colors";
+import { useTheme } from "../hooks/useTheme";
+import { IThemeElements } from "../constants/Themes";
+import { useLocale } from "../hooks/useLocale";
+import { INavigationTarget } from "../context/Navigator";
 
-export interface SplashProps {
-  locale: ILocaleContext;
-  theme: ThemeType
+export interface SplashProps extends INavigationTarget {
+
 }
 
 export function Splash(props: SplashProps) {
-  const style = withStyles(withTheme(props.theme));
+  const locale = useLocale();
+
+  const style = withStyles(useTheme().theme);
   return (
     <View style={style.root}>
       <Text
         style={style.appNameTxt}>
-        {props.locale.strings.appName}
+        {locale.strings.appName}
       </Text>
       <ActivityIndicator
         size={'large'}
@@ -23,7 +25,7 @@ export function Splash(props: SplashProps) {
     </View>
   )
 }
-function withStyles(theme: IColorDefinitions) {
+function withStyles(theme: IThemeElements) {
   return StyleSheet.create({
     root: {
       height: '100%',
@@ -32,7 +34,7 @@ function withStyles(theme: IColorDefinitions) {
       alignItems: 'center',
       display: 'flex',
       flexDirection: 'column',
-      backgroundColor: theme.background
+      backgroundColor: theme.colors.background.primary
     },
     spinner: {
       marginTop: 40,
@@ -47,7 +49,7 @@ function withStyles(theme: IColorDefinitions) {
     },
     appNameTxt: {
       fontSize: 33,
-      color: theme.text.primary,
+      color: theme.colors.text.primary,
       textAlign: 'center',
     }
   });
