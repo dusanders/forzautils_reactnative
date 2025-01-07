@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Pressable, StyleSheet, Switch, View } from "react-native";
+import { Pressable, StyleSheet, Switch, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "./ThemeText";
@@ -10,60 +10,89 @@ import { ThemeSwitch } from "./ThemeSwitch";
 
 export interface AppBarProps {
   title?: string;
-  withSettings?: boolean;
+  hideSettings?: boolean;
+  hideBack?: boolean;
   onBack?: () => void;
 }
 
+function AppBarButton(props: { children?: any }) {
+
+}
 export function AppBar(props: AppBarProps) {
-  const [showSettings, setShowSettings] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
   const theme = useTheme();
   const style = themeStyles(theme.theme);
-
+  let doShowSettingsButton = true;
+  if (props.hideSettings != undefined) {
+    doShowSettingsButton = !props.hideSettings
+  }
+  let doShowBackButton = true;
+  if (props.hideBack != undefined) {
+    doShowBackButton = !props.hideBack
+  }
   return (
-    <View style={style.root}>
-      <ThemeText style={style.titleText}
-        fontFamily={'bold'}>
-        {props.title}
-      </ThemeText>
-      <Pressable style={style.backIconView}
-        onPress={() => {
-          if (props.onBack) {
-            console.log(`back press`)
-            props.onBack()
-          } else {
-            console.log(`no back prop`)
-          }
-        }}>
-        <ThemeIcon name={'chevron-left'}
-          size={theme.theme.sizes.icon} />
-      </Pressable>
-      <Pressable style={style.settingIconView}
-        onPress={() => {
-          setShowSettings(!showSettings)
-        }}>
-        <ThemeIcon name={'settings'}
-          size={theme.theme.sizes.icon} />
-      </Pressable>
+    <>
       {showSettings && (
-        <Container
-          variant={'secondary'}
-          style={style.settingsFlyoutView}>
-          <View style={style.settingsFlyoutContent}>
-            <ThemeText 
-            variant={'primary'} 
-            onBackground={'onSecondary'}>
-              Dark Mode
-            </ThemeText>
-            <ThemeSwitch
-              onPalette={'secondary'}
-              onValueChange={(val) => {
-                theme.changeTheme(val ? 'dark' : 'light')
-              }}
-              value={theme.current === 'dark'} />
-          </View>
-        </Container>
+        <TouchableOpacity
+          style={style.settingsFlyoutOutsideTouchable}
+          onPress={() => {
+            setShowSettings(false)
+          }} />
       )}
-    </View>
+      <View style={style.root}>
+        <ThemeText style={style.titleText}
+          fontFamily={'bold'}>
+          {props.title}
+        </ThemeText>
+
+        {doShowBackButton && (
+          <Pressable style={style.backIconView}
+            onPress={() => {
+              if (props.onBack) {
+                console.log(`back press`)
+                props.onBack()
+              } else {
+                console.log(`no back prop`)
+              }
+            }}>
+            <ThemeIcon name={'chevron-left'}
+              size={theme.theme.sizes.icon} />
+          </Pressable>
+        )}
+
+        <View style={{ flexGrow: 1 }} />
+
+        {doShowSettingsButton && (
+          <Pressable style={style.settingIconView}
+            onPress={() => {
+              setShowSettings(!showSettings)
+            }}>
+            <ThemeIcon name={'settings'}
+              size={theme.theme.sizes.icon} />
+          </Pressable>
+        )}
+
+        {showSettings && (
+          <Container
+            variant={'secondary'}
+            style={style.settingsFlyoutView}>
+            <View style={style.settingsFlyoutContent}>
+              <ThemeText
+                variant={'primary'}
+                onBackground={'onSecondary'}>
+                Dark Mode
+              </ThemeText>
+              <ThemeSwitch
+                onPalette={'secondary'}
+                onValueChange={(val) => {
+                  theme.changeTheme(val ? 'dark' : 'light')
+                }}
+                value={theme.current === 'dark'} />
+            </View>
+          </Container>
+        )}
+      </View>
+    </>
   )
 }
 
@@ -93,6 +122,12 @@ function themeStyles(theme: IThemeElements) {
       width: '100%',
       display: 'flex',
       flexDirection: 'row'
+    },
+    settingsFlyoutOutsideTouchable: {
+      position: 'absolute',
+      height: '100%',
+      width: '100%',
+      zIndex: 2
     },
     settingIconView: {
       padding: 5,

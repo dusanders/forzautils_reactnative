@@ -42,11 +42,9 @@ function themeStyles(theme: IThemeElements) {
     },
     titleText: {
       fontSize: 34,
-      color: theme.colors.text.error
     },
     descText: {
       fontSize: 14,
-      color: theme.colors.text.secondary,
       width: '70%',
       textAlign: 'center',
       fontWeight: 700

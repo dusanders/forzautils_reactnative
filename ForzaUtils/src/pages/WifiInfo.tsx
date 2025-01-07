@@ -11,6 +11,7 @@ import { useForzaData } from "../hooks/useForzaData";
 import { Card } from "../components/Card";
 import { ThemeButton } from "../components/ThemeButton";
 import { ThemeIcon } from "../components/ThemeIcon";
+import { AppBar } from "../components/AppBar";
 
 export interface WifiInfoProps extends INavigationTarget {
 
@@ -110,6 +111,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
 
   return (
     <View style={styles.root}>
+      <AppBar hideBack />
       <View style={styles.content}>
         <View style={styles.messageView}>
           <TitleText allcaps>
