@@ -3,7 +3,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { useLocale } from "../hooks/useLocale";
 import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
-import { ThemeText } from "./ThemeText";
+import { ThemeText } from "../components/ThemeText";
+import { Container } from "../components/Container";
 
 export interface WifiErrorProps {
 
@@ -15,7 +16,7 @@ export function WifiError(props: WifiErrorProps) {
   const styles = themeStyles(theme.theme);
 
   return (
-    <View style={styles.root}>
+    <Container style={styles.root}>
       <ThemeText variant={'error'} style={styles.titleText}>
         ERROR
       </ThemeText>
@@ -28,7 +29,7 @@ export function WifiError(props: WifiErrorProps) {
         Forza. Also ensure the app is given the correct permissions to access
         WiFi information!
       </ThemeText>
-    </View>
+    </Container>
   )
 }
 
@@ -38,7 +39,8 @@ function themeStyles(theme: IThemeElements) {
       height: '100%',
       width: '100%',
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
+      borderRadius: 0
     },
     titleText: {
       fontSize: 34,

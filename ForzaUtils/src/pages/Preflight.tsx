@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Splash } from "./Splash";
 import { addEventListener, NetInfoState, NetInfoStateType, NetInfoSubscription } from "@react-native-community/netinfo";
-import { WifiError } from "../components/WifiError";
+import { WifiError } from "./WifiError";
 import { useTheme } from "../hooks/useTheme";
 import { useColorScheme } from "react-native";
 import { AppRoutes } from "../constants/types";
