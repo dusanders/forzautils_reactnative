@@ -9,6 +9,7 @@ import { Container } from "../components/Container";
 import { useTheme } from "../hooks/useTheme";
 import { AppBar } from "../components/AppBar";
 import { Card } from "../components/Card";
+import { AppBarContainer } from "../components/AppBarContainer";
 
 export interface DataChooserProps extends INavigationTarget {
 
@@ -55,61 +56,58 @@ export function DataChooser(props: DataChooserProps) {
   const forzaData = useForzaData();
 
   return (
-    <Container
-      style={styles.root}
-      flex={'column'}
-      fill={'parent'}>
-      <AppBar
-        title="Data Chooser"
-        onBack={() => {
-          navigation.goBack()
-        }} />
-      <FlatList
-        style={styles.listRoot}
-        data={options}
-        numColumns={2}
-        renderItem={(info) => {
-          return (
-            <Card
-              id={info.item.id}
-              key={info.item.id}
-              style={{
-                width: '50%',
-              }}
-              allcapsTitle
-              centerContent
-              title={info.item.name}
-              body={info.item.description}
-              titleStyle={{
-                fontSize: theme.theme.sizes.font.medium,
-                width: '100%',
-                textAlign: 'center'
-              }}
-              bodyStyle={{
-                width: '100%',
-                textAlign: 'center',
-                fontSize: theme.theme.sizes.font.small
-              }}
-              onPress={(id) => {
-                for (const i of options) {
-                  if (i.id === id) {
-                    navigation.navigateTo(i.route)
+    <AppBarContainer
+      title="Data Chooser"
+      onBack={() => {
+        navigation.goBack();
+      }}>
+      <View style={{
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <FlatList
+          style={styles.listRoot}
+          data={options}
+          numColumns={2}
+          renderItem={(info) => {
+            return (
+              <Card
+                id={info.item.id}
+                key={info.item.id}
+                style={{
+                  width: '50%',
+                }}
+                allcapsTitle
+                centerContent
+                title={info.item.name}
+                body={info.item.description}
+                titleStyle={{
+                  fontSize: theme.theme.sizes.font.medium,
+                  width: '100%',
+                  textAlign: 'center'
+                }}
+                bodyStyle={{
+                  width: '100%',
+                  textAlign: 'center',
+                  fontSize: theme.theme.sizes.font.small
+                }}
+                onPress={(id) => {
+                  for (const i of options) {
+                    if (i.id === id) {
+                      navigation.navigateTo(i.route)
+                    }
                   }
-                }
-              }} />
-          )
-        }} />
-    </Container>
+                }} />
+            )
+          }} />
+      </View>
+    </AppBarContainer>
   )
 }
 
 function themeStyles(theme: IThemeElements) {
   return StyleSheet.create({
-    root: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 0
-    },
     listRoot: {
       flexGrow: 0,
       margin: 0,

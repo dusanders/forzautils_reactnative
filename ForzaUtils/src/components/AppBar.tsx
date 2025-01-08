@@ -14,9 +14,6 @@ export interface AppBarProps {
   onBack?: () => void;
 }
 
-function AppBarButton(props: { children?: any }) {
-
-}
 export function AppBar(props: AppBarProps) {
   const [showSettings, setShowSettings] = useState(false);
   const theme = useTheme();
@@ -101,6 +98,7 @@ function themeStyles(theme: IThemeElements) {
       position: 'absolute',
       top: 0,
       width: '100%',
+      height: theme.sizes.navBar + theme.sizes.borderRadius,
       backgroundColor: theme.colors.background.primary,
       display: 'flex',
       flexDirection: 'row',
@@ -109,7 +107,7 @@ function themeStyles(theme: IThemeElements) {
       overflow: 'visible'
     },
     settingsFlyoutView: {
-      width: '40%',
+      width: '45%',
       bottom: -(theme.sizes.icon + 8 + 12),
       right: theme.sizes.borderRadius,
       position: 'absolute',
@@ -120,7 +118,9 @@ function themeStyles(theme: IThemeElements) {
     settingsFlyoutContent: {
       width: '100%',
       display: 'flex',
-      flexDirection: 'row'
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center'
     },
     settingsFlyoutOutsideTouchable: {
       position: 'absolute',

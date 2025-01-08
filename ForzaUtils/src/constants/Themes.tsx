@@ -107,7 +107,7 @@ export const LighColors: IThemeElements = {
   },
   sizes: {
     icon: 25,
-    navBar: 70,
+    navBar: 50,
     borderRadius: 12,
     font: defaultFont,
     paper: defaultPaper,
@@ -146,7 +146,7 @@ export const DarkColors: IThemeElements = {
   },
   sizes: {
     icon: 25,
-    navBar: 70,
+    navBar: 50,
     borderRadius: 12,
     font: defaultFont,
     paper: defaultPaper,

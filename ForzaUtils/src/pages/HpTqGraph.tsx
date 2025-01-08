@@ -12,6 +12,7 @@ import { Paper } from "../components/Paper";
 import { LineChart } from "react-native-chart-kit";
 import { LineChartData } from "react-native-chart-kit/dist/line-chart/LineChart";
 import { Dataset } from "react-native-chart-kit/dist/HelperTypes";
+import { AppBarContainer } from "../components/AppBarContainer";
 
 export interface HpTqGraphProps {
   viewModel: IHpTqGraphViewModel;
@@ -30,38 +31,34 @@ export function HptqGraph(props: HpTqGraphProps) {
 
   const sets: Dataset[] = [
     {
-      data: [43, 54, 65, 76],
+      data: [43, 54, 65, 76, 89, 98, 78, 65, 54, 32],
       color: () => theme.theme.colors.text.primary.onPrimary,
       strokeWidth: 2 // optional
     },
     {
-      data: [23, 34, 72, 89],
+      data: [23, 34, 72, 89, 98, 102, 87, 76, 67],
       color: () => theme.theme.colors.text.secondary.onPrimary
     }
   ]
   const data: LineChartData = {
-    labels: ['1234', '1345', '1451', '1512'],
+    labels: ['1234', '1345', '1451', '1512', '1654', '1896', '1932'],
     datasets: sets,
     legend: ['Torque', 'Horsepower']
   }
   return (
-    <Container
-      fill={'parent'}
-      flex={'column'}>
-      <AppBar title="Hp / Tq Graph"
-        onBack={() => {
-          navigation.goBack()
-        }} />
+    <AppBarContainer title="Hp / Tq Graph"
+      onBack={() => {
+        navigation.goBack()
+      }}>
       <Paper
-      onLayout={(ev) => {
-        ev.target.measure((x, y, width, height) => {
-          setGraphWidth(width)
-        })
-      }}
-        centerContent
-        style={{
-          marginTop: 50,
-        }}>
+        onLayout={(ev) => {
+          ev.target.measure((x, y, width, height, pageX, pageY) => {
+            const adjusted = width - 22;
+            console.log(`graph with ${width} -> ${adjusted} ${pageX}`);
+            setGraphWidth(adjusted)
+          })
+        }}
+        centerContent>
         <LineChart
           data={data}
           width={graphWidth}
@@ -78,7 +75,7 @@ export function HptqGraph(props: HpTqGraphProps) {
             backgroundGradientToOpacity: 0
           }} />
       </Paper>
-    </Container>
+    </AppBarContainer>
   )
 }
 

@@ -11,6 +11,7 @@ import { Card } from "../components/Card";
 import { ThemeButton } from "../components/ThemeButton";
 import { ThemeIcon } from "../components/ThemeIcon";
 import { AppBar } from "../components/AppBar";
+import { AppBarContainer } from "../components/AppBarContainer";
 
 export interface WifiInfoProps extends INavigationTarget {
 
@@ -64,8 +65,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
   const forza = useForzaData();
 
   return (
-    <View style={styles.root}>
-      <AppBar hideBack />
+    <AppBarContainer hideBack>
       <View style={styles.content}>
         <View style={styles.messageView}>
           <TitleText allcaps>
@@ -137,19 +137,12 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
           Done
         </ThemeText>
       </ThemeButton>
-    </View>
+    </AppBarContainer>
   )
 }
 
 function themeStyles(theme: IThemeElements) {
   return StyleSheet.create({
-    root: {
-      backgroundColor: theme.colors.background.primary,
-      height: '100%',
-      width: '100%',
-      justifyContent: 'center',
-      alignItems: 'center'
-    },
     content: {
       justifyContent: 'center',
       alignItems: 'center'
