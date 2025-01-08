@@ -14,6 +14,7 @@ import { NavigationProvider } from './src/context/Navigator';
 import { Splash } from './src/pages/Splash';
 import { DataChooser } from './src/pages/DataChooser';
 import { HptqGraph } from './src/pages/HpTqGraph';
+import { HpTqGraphViewModel, HpTqGraphViewModelContext } from './src/context/HpTqGraphViewModel';
 
 
 function App(): React.JSX.Element {
@@ -35,7 +36,14 @@ function App(): React.JSX.Element {
               <Splash route={AppRoutes.SPLASH} />
               <WifiInfo route={AppRoutes.IP_INFO} />
               <DataChooser route={AppRoutes.DATA} />
-              <HptqGraph route={AppRoutes.HP_TQ_GRAPH} />
+              <HpTqGraphViewModel route={AppRoutes.HP_TQ_GRAPH}>
+                <HpTqGraphViewModelContext.Consumer >
+                  {viewModel => (
+                    <HptqGraph
+                      viewModel={viewModel}/>
+                  )}
+                </HpTqGraphViewModelContext.Consumer>
+              </HpTqGraphViewModel>
             </NavigationProvider>
           </Preflight>
         </ThemeProvider>

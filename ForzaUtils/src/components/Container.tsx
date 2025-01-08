@@ -40,7 +40,7 @@ export function Container(props: ContainerProps) {
       break;
   }
   return (
-    <View style={[baseStyle, props.style]}>
+    <View {...props} style={[baseStyle, props.style]}>
       {props.children}
     </View>
   )

@@ -24,7 +24,7 @@ function Row(props: RowProps) {
     <View style={{
       display: 'flex',
       flexDirection: 'row',
-      justifyContent: 'space-evenly'
+      width: '100%'
     }}>
       {props.children}
     </View>
@@ -85,24 +85,40 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
         </View>
         <Row>
           <Card
+            style={{
+              width: '50%'
+            }}
             allcapsLabel
             allcapsTitle
+            centerContent
             title={forza.ip}
             body="IP Address" />
           <Card
+            style={{
+              width: '50%'
+            }}
             allcapsLabel
             allcapsTitle
+            centerContent
             title={`${forza.port}`}
             body="Port" />
         </Row>
         <Row>
           <Card
+            style={{
+              width: '50%'
+            }}
             allcapsLabel
+            centerContent
             title={forza.ssid}
             body="WiFi Name" />
           <Card
+            style={{
+              width: '50%'
+            }}
             allcapsLabel
             allcapsTitle
+            centerContent
             title="dash"
             body="Telemetry format" />
         </Row>

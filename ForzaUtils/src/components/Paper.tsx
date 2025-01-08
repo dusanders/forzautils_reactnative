@@ -1,40 +1,53 @@
 import React from "react";
-import { StyleSheet, ViewProps } from "react-native";
-import { BackgroundVariantType, IThemeElements } from "../constants/Themes";
-import { Container, ContainerProps } from "./Container";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { IThemeElements } from "../constants/Themes";
+import { ContainerProps } from "./Container";
 import { useTheme } from "../hooks/useTheme";
 
 
 export interface PaperProps extends ContainerProps {
-
+  centerContent?: boolean;
 }
 
 export function Paper(props: PaperProps) {
   const theme = useTheme();
   const styles = themeStyles(theme.theme);
-  let rootStyle = styles.root;
-  if (props.variant) {
-    rootStyle.backgroundColor = theme.theme.colors.background[props.variant]
+  let variantStyle: StyleProp<ViewStyle> = {
+    backgroundColor: theme.theme.colors.background.onPrimary
   }
+  if (props.variant) {
+    variantStyle.backgroundColor = theme.theme.colors.background[props.variant]
+  }
+
+  let centerContentStyle: StyleProp<ViewStyle> = {};
+  if(props.centerContent) {
+    centerContentStyle = {
+      justifyContent: 'center',
+      alignItems: 'center'
+    }
+  }
+
   return (
-    <Container
-      variant={props.variant}
-      style={styles.root}
-      {...props}>
+    <View
+      {...props}
+      style={[
+        styles.root,
+        variantStyle,
+        centerContentStyle,
+        props.style]}>
       {props.children}
-    </Container>
+    </View>
   )
 }
 
 function themeStyles(theme: IThemeElements) {
   return StyleSheet.create({
     root: {
-      flexGrow: 1,
       padding: theme.sizes.borderRadius,
       borderRadius: theme.sizes.borderRadius,
       backgroundColor: theme.colors.background.onPrimary,
-      justifyContent: 'center',
-      alignItems: 'center'
+      width: '100%',
+      overflow: 'hidden'
     },
   })
 }

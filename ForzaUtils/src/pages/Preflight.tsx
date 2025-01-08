@@ -26,14 +26,13 @@ export function Preflight(props: PreflightProps) {
       logger.error(tag, `Failed to get NetInfo! ${JSON.stringify(netInfo)}`);
       return false
     };
-    console.log(`wifi ${netInfo.type === NetInfoStateType.wifi}`)
+    
     return netInfo.type === NetInfoStateType.wifi;
   }
 
   // didMount initial logic
   useEffect(() => {
     let netInfoSub: NetInfoSubscription = addEventListener((state) => {
-      logger.debug(tag, `System sent ${JSON.stringify(state)}`);
       setNetInfo(state);
     });
 

@@ -1,10 +1,11 @@
 import React from "react";
-import { StyleProp, StyleSheet, TextStyle, View, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { useTheme } from "../hooks/useTheme";
 import { LabelText, ThemeText, TitleText } from "./ThemeText";
 
 export interface CardProps {
+  id?: string;
   children?: any;
   style?: StyleProp<ViewStyle>;
   titleStyle?: StyleProp<TextStyle>;
@@ -13,14 +14,31 @@ export interface CardProps {
   bodyStyle?: StyleProp<TextStyle>;
   allcapsTitle?: boolean;
   allcapsLabel?: boolean;
+  centerContent?: boolean;
+  onPress?: (id?: string) => void;
 }
 
 export function Card(props: CardProps) {
   const theme = useTheme().theme;
   const styles = themeStyles(theme);
-
+  const centerContentStyle: StyleProp<ViewStyle> = {
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
   return (
-    <View style={[styles.root, props.style]}>
+    <TouchableOpacity
+      disabled={!Boolean(props.onPress)}
+      style={[
+        styles.root,
+        props.centerContent
+          ? centerContentStyle
+          : {},
+        props.style]}
+      onPress={() => {
+        if (props.onPress) {
+          props.onPress(props.id)
+        }
+      }}>
       {props.title && (
         <TitleText
           style={props.titleStyle}
@@ -37,7 +55,7 @@ export function Card(props: CardProps) {
         </LabelText>
       )}
       {props.children}
-    </View>
+    </TouchableOpacity>
   )
 }
 
@@ -51,11 +69,8 @@ function themeStyles(theme: IThemeElements) {
       marginRight: theme.sizes.paper.spacingX / 2,
       borderColor: theme.colors.background.onPrimary,
       borderWidth: 0.8,
-      justifyContent: 'center',
-      alignItems: 'center',
       display: 'flex',
       flexDirection: 'column',
-      width: '50%'
     }
   })
 }

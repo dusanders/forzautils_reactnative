@@ -1,7 +1,7 @@
 import React from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import { INavigationTarget } from "../context/Navigator";
-import { randomKey } from "../constants/types";
+import { AppRoutes, randomKey } from "../constants/types";
 import { useNavigation } from "../hooks/useNavigation";
 import { useForzaData } from "../hooks/useForzaData";
 import { IThemeElements } from "../constants/Themes";
@@ -16,6 +16,7 @@ export interface DataChooserProps extends INavigationTarget {
 
 interface DataOption {
   id: string;
+  route: AppRoutes;
   name: string;
   description: string;
 }
@@ -23,21 +24,25 @@ interface DataOption {
 const options: DataOption[] = [
   {
     id: randomKey(),
+    route: AppRoutes.HP_TQ_GRAPH,
     name: 'HP / TQ Graph',
     description: 'Graph horsepower and torque'
   },
   {
     id: randomKey(),
+    route: AppRoutes.HP_TQ_GRAPH,
     name: 'Suspension Travel',
     description: 'Graph suspension travel'
   },
   {
     id: randomKey(),
+    route: AppRoutes.HP_TQ_GRAPH,
     name: 'Tire Temps',
     description: 'Graph tire temps'
   },
   {
     id: randomKey(),
+    route: AppRoutes.HP_TQ_GRAPH,
     name: 'Grip',
     description: 'Compare tire slip, steering angle, throttle, and brake'
   }
@@ -65,10 +70,14 @@ export function DataChooser(props: DataChooserProps) {
         numColumns={2}
         renderItem={(info) => {
           return (
-            <Card key={info.item.id} style={{
-              width: '50%',
-            }}
+            <Card
+              id={info.item.id}
+              key={info.item.id}
+              style={{
+                width: '50%',
+              }}
               allcapsTitle
+              centerContent
               title={info.item.name}
               body={info.item.description}
               titleStyle={{
@@ -80,6 +89,13 @@ export function DataChooser(props: DataChooserProps) {
                 width: '100%',
                 textAlign: 'center',
                 fontSize: theme.theme.sizes.font.small
+              }}
+              onPress={(id) => {
+                for (const i of options) {
+                  if (i.id === id) {
+                    navigation.navigateTo(i.route)
+                  }
+                }
               }} />
           )
         }} />
