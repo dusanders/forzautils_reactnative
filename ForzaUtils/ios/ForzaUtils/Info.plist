@@ -49,6 +49,7 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
+  <string>MaterialIcons.ttf</string>
 		<string>Geologica_Auto-Light.ttf</string>
 		<string>Geologica_Auto-Regular.ttf</string>
 		<string>Geologica_Auto-SemiBold.ttf</string>
