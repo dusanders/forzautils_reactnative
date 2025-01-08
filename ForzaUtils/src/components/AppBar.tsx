@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Pressable, StyleSheet, Switch, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "./ThemeText";
-import Icon from '@react-native-vector-icons/feather';
 import { ThemeIcon } from "./ThemeIcon";
 import { Container } from "./Container";
 import { ThemeSwitch } from "./ThemeSwitch";

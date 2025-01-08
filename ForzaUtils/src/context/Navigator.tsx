@@ -54,7 +54,6 @@ export function NavigationProvider(props: NavigatorProps) {
       ...next
     }
   }, initialState);
-  console.log(`load page: ${state.route}`);
 
   const onHardwareBack = () => {
     console.log(`backstack: ${JSON.stringify(state)}`);

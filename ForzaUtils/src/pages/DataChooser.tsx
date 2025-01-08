@@ -1,16 +1,13 @@
 import React from "react";
-import { Dimensions, FlatList, Pressable, StyleSheet, View } from "react-native";
-import { ThemeText } from "../components/ThemeText";
+import { FlatList, StyleSheet } from "react-native";
 import { INavigationTarget } from "../context/Navigator";
-import { AppRoutes, randomKey } from "../constants/types";
+import { randomKey } from "../constants/types";
 import { useNavigation } from "../hooks/useNavigation";
 import { useForzaData } from "../hooks/useForzaData";
 import { IThemeElements } from "../constants/Themes";
 import { Container } from "../components/Container";
 import { useTheme } from "../hooks/useTheme";
-import { ThemeButton } from "../components/ThemeButton";
 import { AppBar } from "../components/AppBar";
-import { Paper } from "../components/Paper";
 import { Card } from "../components/Card";
 
 export interface DataChooserProps extends INavigationTarget {

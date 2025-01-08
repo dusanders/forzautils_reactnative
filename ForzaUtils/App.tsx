@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -13,6 +13,7 @@ import { WifiInfo } from './src/pages/WifiInfo';
 import { NavigationProvider } from './src/context/Navigator';
 import { Splash } from './src/pages/Splash';
 import { DataChooser } from './src/pages/DataChooser';
+import { HptqGraph } from './src/pages/HpTqGraph';
 
 
 function App(): React.JSX.Element {
@@ -34,6 +35,7 @@ function App(): React.JSX.Element {
               <Splash route={AppRoutes.SPLASH} />
               <WifiInfo route={AppRoutes.IP_INFO} />
               <DataChooser route={AppRoutes.DATA} />
+              <HptqGraph route={AppRoutes.HP_TQ_GRAPH} />
             </NavigationProvider>
           </Preflight>
         </ThemeProvider>

@@ -6,6 +6,7 @@ import { useTheme } from "../hooks/useTheme";
 import { useColorScheme } from "react-native";
 import { AppRoutes } from "../constants/types";
 import { ForzaDataProvider } from "../context/ForzaData";
+import { useLogger } from "../context/Logger";
 
 export interface PreflightProps {
   children?: any;
@@ -13,6 +14,7 @@ export interface PreflightProps {
 
 export function Preflight(props: PreflightProps) {
   const tag = "Preflight.tsx";
+  const logger = useLogger();
   const [loaded, setLoaded] = useState(false);
   const [netInfo, setNetInfo] = useState<NetInfoState>();
   const colorScheme = useColorScheme();
@@ -20,29 +22,30 @@ export function Preflight(props: PreflightProps) {
   const isDarkMode = colorScheme === 'dark';
 
   const isWifiConnected = (netInfo: NetInfoState | undefined) => {
-    if (!netInfo) return false;
+    if (!netInfo) {
+      logger.error(tag, `Failed to get NetInfo! ${JSON.stringify(netInfo)}`);
+      return false
+    };
     console.log(`wifi ${netInfo.type === NetInfoStateType.wifi}`)
     return netInfo.type === NetInfoStateType.wifi;
   }
 
+  // didMount initial logic
   useEffect(() => {
-    let netInfoSub: NetInfoSubscription;
-    if (loaded) {
-      netInfoSub = addEventListener((state) => {
-        setNetInfo(state);
-      });
-    }
+    let netInfoSub: NetInfoSubscription = addEventListener((state) => {
+      logger.debug(tag, `System sent ${JSON.stringify(state)}`);
+      setNetInfo(state);
+    });
+
+    // DEBUG - let the user see the animation
+    setTimeout(() => {
+      setLoaded(true);
+    }, 3000);
     return () => {
       if (netInfoSub) {
         netInfoSub();
       }
     }
-  }, [loaded]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setLoaded(true);
-    }, 3000);
   }, []);
 
   return loaded

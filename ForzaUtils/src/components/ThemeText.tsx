@@ -1,6 +1,6 @@
 import React from "react";
-import { IThemeElements, TextOnBackgroundVariant, TextVariantType } from "../constants/Themes";
-import { StyleProp, Text, TextProps, TextStyle } from "react-native";
+import { TextOnBackgroundVariant, TextVariantType } from "../constants/Themes";
+import { StyleProp, Text, TextStyle } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { Assets } from "../assets";
 
