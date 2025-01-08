@@ -52,6 +52,9 @@ export interface IThemeElements {
     borderRadius: number;
   }
 }
+export type TextVariantType = keyof IThemeElements['colors']['text'];
+export type TextOnBackgroundVariant = 'onPrimary' | 'onSecondary';
+export type BackgroundVariantType = keyof IThemeElements['colors']['background'];
 
 const defaultPaper: IThemeElements['sizes']['paper'] = {
   padding: 20,
@@ -72,7 +75,6 @@ const defaultButton: IThemeElements['sizes']['button'] = {
   size: 75
 }
 
-export type TextOnBackground = 'onPrimary' | 'onSecondary';
 export const LighColors: IThemeElements = {
   colors: {
     text: {

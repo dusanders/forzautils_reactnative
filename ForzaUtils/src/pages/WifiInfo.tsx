@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
-import { ThemeText } from "../components/ThemeText";
+import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
 import { INavigationTarget } from "../context/Navigator";
 import { AppRoutes } from "../constants/types";
 import { useNavigation } from "../hooks/useNavigation";
@@ -58,51 +58,6 @@ function CircleCheckIcon(props: CircleCheckIconProps) {
   )
 }
 
-function TitleText(props: { children?: any; allcaps?: boolean }) {
-  return (
-    <ThemeText
-      fontFamily={'bold'}
-      style={{
-        fontSize: 18,
-        textTransform: props.allcaps ? 'uppercase' : 'none',
-      }}>
-      {props.children}
-    </ThemeText>
-  )
-}
-function LabelText(props: { children?: any; allcaps?: boolean }) {
-  return (
-    <ThemeText
-      fontFamily={'light'}
-
-      style={{
-        marginTop: 0,
-        textTransform: props.allcaps ? 'uppercase' : 'none',
-        letterSpacing: 1,
-        opacity: 0.5
-      }}>
-      {props.children}
-    </ThemeText>
-  )
-}
-interface DataCardProps {
-  value: string;
-  label: string;
-  allcapsTitle?: boolean;
-  allcapsLabel?: boolean;
-}
-function DataCard(props: DataCardProps) {
-  return (
-    <Card style={{ width: '50%' }}>
-      <TitleText allcaps={props.allcapsTitle ?? true}>
-        {props.value}
-      </TitleText>
-      <LabelText allcaps={props.allcapsLabel ?? true}>
-        {props.label}
-      </LabelText>
-    </Card>
-  )
-}
 export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps> {
   const theme = useTheme();
   const styles = themeStyles(theme.theme);
@@ -117,7 +72,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
           <TitleText allcaps>
             Forward Forza Telemetry
           </TitleText>
-          <LabelText allcaps>
+          <LabelText>
             Setup Forza's Telemetry output to go to the below IP and Port. Use DASH format.
           </LabelText>
         </View>
@@ -125,26 +80,32 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
           <TitleText allcaps>
             important!
           </TitleText>
-          <LabelText allcaps>
+          <LabelText>
             If using SimHub, configure SimHub to forward the data to the device instead of adjusting in-game values.
           </LabelText>
         </View>
         <Row>
-          <DataCard
-            value={forza.ip}
-            label="IP Address" />
-          <DataCard
-            value={`${forza.port}`}
-            label="Port" />
+          <Card
+            allcapsLabel
+            allcapsTitle
+            title={forza.ip}
+            body="IP Address" />
+          <Card
+            allcapsLabel
+            allcapsTitle
+            title={`${forza.port}`}
+            body="Port" />
         </Row>
         <Row>
-          <DataCard
-            allcapsTitle={false}
-            value={forza.ssid}
-            label="WiFi Name" />
-          <DataCard
-            value="dash"
-            label="Telemetry format" />
+          <Card
+            allcapsLabel
+            title={forza.ssid}
+            body="WiFi Name" />
+          <Card
+            allcapsLabel
+            allcapsTitle
+            title="dash"
+            body="Telemetry format" />
         </Row>
       </View>
       <ThemeButton
@@ -153,7 +114,11 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
           navigation.navigateTo(AppRoutes.DATA);
         }}>
         <CircleCheckIcon />
-        <ThemeText style={{ fontWeight: 700, marginTop: 10 }}>
+        <ThemeText
+          style={{
+            fontWeight: 700,
+            marginTop: 10
+          }}>
           Done
         </ThemeText>
       </ThemeButton>

@@ -105,14 +105,14 @@ function themeStyles(theme: IThemeElements) {
       backgroundColor: theme.colors.background.primary,
       display: 'flex',
       flexDirection: 'row',
-      padding: 8,
+      padding: theme.sizes.borderRadius,
       justifyContent: 'space-between',
       overflow: 'visible'
     },
     settingsFlyoutView: {
       width: '40%',
       bottom: -(theme.sizes.icon + 8 + 12),
-      right: 5,
+      right: theme.sizes.borderRadius,
       position: 'absolute',
       backgroundColor: theme.colors.background.secondary,
       elevation: 10,

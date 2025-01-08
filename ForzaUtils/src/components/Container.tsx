@@ -1,14 +1,13 @@
 import React from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
-import { IThemeElements } from "../constants/Themes";
+import { BackgroundVariantType, IThemeElements } from "../constants/Themes";
 import { useTheme } from "../hooks/useTheme";
 
-export type ContainerVariant = 'primary' | 'secondary';
 export type ContainerFlex = 'row' | 'column';
 export type ContainerFill = 'parent' | 'width' | 'height';
 
 export interface ContainerProps extends ViewProps {
-  variant?: ContainerVariant;
+  variant?: BackgroundVariantType;
   flex?: ContainerFlex;
   fill?: ContainerFill;
 }
@@ -50,13 +49,14 @@ export function Container(props: ContainerProps) {
 function themeStyles(theme: IThemeElements) {
   return StyleSheet.create({
     rootPrimary: {
-      backgroundColor: theme.colors.background.primary
+      backgroundColor: theme.colors.background.primary,
+      borderRadius: theme.sizes.borderRadius,
+      padding: 10,
     },
     rootSecondary: {
       backgroundColor: theme.colors.background.secondary,
       borderRadius: theme.sizes.borderRadius,
       padding: 10,
-      color: theme.colors.text.secondary.onPrimary
     },
     flexRow: {
       display: 'flex',
