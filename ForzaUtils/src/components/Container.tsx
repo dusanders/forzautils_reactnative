@@ -50,7 +50,6 @@ function themeStyles(theme: IThemeElements) {
   return StyleSheet.create({
     rootPrimary: {
       backgroundColor: theme.colors.background.primary,
-      borderRadius: theme.sizes.borderRadius,
       padding: 10,
     },
     rootSecondary: {

@@ -55,6 +55,12 @@ export function ThemeText(props: ThemeTextProps) {
       fontSize: fontSize,
       fontFamily: fontFamily,
       textTransform: doCaps ? 'uppercase' : 'none',
+      fontWeight: props.fontFamily === 'bold'
+        ? 700
+        : props.fontFamily === 'light'
+          ? 100
+          : 400,
+      letterSpacing: props.fontFamily === 'bold' ? 0.6 : 0
     }, props.style]}>
       {props.children}
     </Text>

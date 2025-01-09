@@ -130,8 +130,8 @@ export const DarkColors: IThemeElements = {
         onSecondary: 'rgba(255,158,1)'
       },
       error: {
-        onPrimary: "rgb(162, 0, 0)",
-        onSecondary: 'rgb(162,0,0)'
+        onPrimary: "rgb(245, 58, 58)",
+        onSecondary: 'rgb(132, 0, 0)'
       }
     },
     background: {

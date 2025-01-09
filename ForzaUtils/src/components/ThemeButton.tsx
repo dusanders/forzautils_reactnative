@@ -12,7 +12,7 @@ export function ThemeButton(props: ThemeButtonProps) {
 
   return (
     <Pressable
-      style={[styles.root, props.style as any]}
+      style={{ ...styles.root, ...props.style as any }}
       onPress={(ev) => {
         if (props.onPress) {
           props.onPress(ev);
