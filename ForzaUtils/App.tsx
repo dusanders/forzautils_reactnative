@@ -13,8 +13,8 @@ import { WifiInfo } from './src/pages/WifiInfo';
 import { NavigationProvider } from './src/context/Navigator';
 import { Splash } from './src/pages/Splash';
 import { DataChooser } from './src/pages/DataChooser';
-import { HptqGraph } from './src/pages/HpTqGraph';
-import { HpTqGraphViewModel, HpTqGraphViewModelContext } from './src/context/HpTqGraphViewModel';
+import { HptqGraph } from './src/pages/fragments/HpTqGraph';
+import { ViewModelStore, ViewModelStore_Hoc } from './src/context/ViewModelStore';
 
 
 function App(): React.JSX.Element {
@@ -31,20 +31,20 @@ function App(): React.JSX.Element {
       <LocaleContextHoc>
         <ThemeProvider initialMode={colorScheme}>
           <Preflight>
-            <NavigationProvider
-              initialRoute={AppRoutes.IP_INFO}>
-              <Splash route={AppRoutes.SPLASH} />
-              <WifiInfo route={AppRoutes.IP_INFO} />
-              <DataChooser route={AppRoutes.DATA} />
-              <HpTqGraphViewModel route={AppRoutes.HP_TQ_GRAPH}>
-                <HpTqGraphViewModelContext.Consumer >
-                  {viewModel => (
-                    <HptqGraph
-                      viewModel={viewModel}/>
-                  )}
-                </HpTqGraphViewModelContext.Consumer>
-              </HpTqGraphViewModel>
-            </NavigationProvider>
+            <ViewModelStore_Hoc>
+              <ViewModelStore.Consumer>
+                {viewModelStore => (
+                  <NavigationProvider
+                    initialRoute={AppRoutes.IP_INFO}>
+                    <Splash route={AppRoutes.SPLASH} />
+                    <WifiInfo route={AppRoutes.IP_INFO} />
+                    <DataChooser route={AppRoutes.DATA} />
+                    <HptqGraph route={AppRoutes.HP_TQ_GRAPH}
+                      viewModel={viewModelStore.hpTqGraph} />
+                  </NavigationProvider>
+                )}
+              </ViewModelStore.Consumer>
+            </ViewModelStore_Hoc>
           </Preflight>
         </ThemeProvider>
       </LocaleContextHoc>

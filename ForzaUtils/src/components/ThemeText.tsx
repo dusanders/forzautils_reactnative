@@ -58,7 +58,7 @@ export function ThemeText(props: ThemeTextProps) {
       fontWeight: props.fontFamily === 'bold'
         ? 700
         : props.fontFamily === 'light'
-          ? 100
+          ? 200
           : 400,
       letterSpacing: props.fontFamily === 'bold' ? 0.6 : 0
     }, props.style]}>

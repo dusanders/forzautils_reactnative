@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useReducer } from "react";
 import { INavigationTarget } from "./Navigator";
 import { useForzaData } from "../hooks/useForzaData";
 import { useLogger } from "./Logger";
-import { StateHandler } from "../constants/types";
+import { delay, StateHandler } from "../constants/types";
 
 export interface HpTqGraphViewModelProps extends INavigationTarget {
   children?: any;
@@ -10,7 +10,8 @@ export interface HpTqGraphViewModelProps extends INavigationTarget {
 
 export interface IHpTqGraphViewModel {
   data?: DataEvent
-  gears: Map<number, GearData>;
+  gears: GearData[];
+  DEBUG_StartStream(): void;
 }
 
 export interface GearData {
@@ -26,52 +27,121 @@ export interface DataEvent {
 
 export const HpTqGraphViewModelContext = createContext({} as IHpTqGraphViewModel);
 
+
+const debugData: DataEvent[] = [
+  {
+    rpm: 1234,
+    hp: 43,
+    tq: 23,
+    gear: 1
+  },
+  {
+    rpm: 1345,
+    hp: 54,
+    tq: 34,
+    gear: 1
+  },
+  {
+    rpm: 1451,
+    hp: 65,
+    tq: 72,
+    gear: 1
+  },
+  {
+    rpm: 1512,
+    hp: 89,
+    tq: 98,
+    gear: 1
+  },
+  {
+    rpm: 1645,
+    hp: 98,
+    tq: 102,
+    gear: 1
+  },
+  {
+    rpm: 1896,
+    hp: 78,
+    tq: 87,
+    gear: 1
+  },
+  {
+    rpm: 1932,
+    hp: 65,
+    tq: 76,
+    gear: 1
+  }
+]
+
 interface HpTqGraphViewModelState {
-  gearMap: Map<number, GearData>;
-  data?: DataEvent;
+  allData: GearData[]
+  lastData?: DataEvent;
 }
 export function HpTqGraphViewModel(props: HpTqGraphViewModelProps) {
   const tag = 'HpTqGraphViewModel';
   const initialState: HpTqGraphViewModelState = {
-    gearMap: new Map(),
+    allData: [],
   }
   const logger = useLogger();
   const forza = useForzaData();
 
+  const DEBUG_Stream = async () => {
+    for(const data of debugData) {
+      setState({
+        lastData: {
+          gear: data.gear,
+          hp: data.hp,
+          tq: data.tq,
+          rpm: data.rpm
+        }
+      });
+      await delay(100);
+    }
+  }
+
   const updateMap = (prev: HpTqGraphViewModelState, next: Partial<HpTqGraphViewModelState>) => {
-    if(!next.data) return;
-    next.gearMap = prev.gearMap;
-    if (!next.gearMap.has(next.data.gear)) {
-      next.gearMap.set(next.data.gear, {
-        gear: next.data.gear,
-        events: [next.data]
-      })
+    if (!next.lastData) return;
+    next.allData = prev.allData.sort((a, b) => a.gear - b.gear);
+    if (next.allData.length < next.lastData.gear) {
+      next.allData.push({
+        gear: next.lastData.gear,
+        events: [next.lastData]
+      });
     } else {
-      const gearInfo = next.gearMap.get(next.data.gear);
-      const found = gearInfo?.events.find(i => i.rpm === next.data?.rpm);
-      if (!found) {
-        gearInfo?.events.push(next.data);
+      const existingGear = next.allData[next.lastData.gear - 1];
+      const dataPoint = existingGear.events.find((val) => val.rpm === next.lastData?.rpm);
+      if (dataPoint) {
+        if (dataPoint.hp < next.lastData.hp) {
+          dataPoint.hp = next.lastData.hp;
+        }
+        if (dataPoint.tq < next.lastData.tq) {
+          dataPoint.tq = next.lastData.tq
+        }
       } else {
-        if (found.hp < next.data.hp) {
-          found.hp = next.data.hp;
-        }
-        if (found.tq < next.data.tq) {
-          found.tq = next.data.tq;
-        }
+        existingGear.events.push(next.lastData)
       }
     }
   }
 
   const [state, setState] = useReducer<StateHandler<HpTqGraphViewModelState>>((prev, next) => {
-    if (!next.data) {
-      logger.warn(tag, `undefined data packet`);
-    } else {
-      updateMap(prev, next);
-    }
-    return {
+    let result = {
       ...prev,
       ...next
     }
+    if (!next.lastData) {
+      logger.warn(tag, `undefined data packet`);
+      return result;
+    }
+    if (next.lastData.gear < 1) {
+      logger.warn(tag, `Ignore REVERSE gear!`);
+      return result;
+    }
+    updateMap(prev, next);
+    result = {
+      ...prev,
+      ...next
+    }
+    return result;
   }, initialState);
 
   useEffect(() => {
@@ -80,23 +150,20 @@ export function HpTqGraphViewModel(props: HpTqGraphViewModelProps) {
       return;
     }
     setState({
-      data: {
+      lastData: {
         gear: forza.packet.gear,
         hp: forza.packet.getHorsepower(),
         tq: forza.packet.torque,
         rpm: forza.packet.rpmData.current
       }
-    })
+    });
   }, [forza.packet]);
-
-  useEffect(() => {
-    
-  }, [])
 
   return (
     <HpTqGraphViewModelContext.Provider value={{
-      data: state.data,
-      gears: state.gearMap
+      data: state.lastData,
+      gears: state.allData,
+      DEBUG_StartStream: () => { DEBUG_Stream() }
     }}>
       {props.children}
     </HpTqGraphViewModelContext.Provider>

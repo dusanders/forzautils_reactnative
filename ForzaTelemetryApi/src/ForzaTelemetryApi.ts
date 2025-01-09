@@ -1,4 +1,4 @@
-import { RpmData, DirectionalData, TireData, CarInfo, Drivetrain, CarClass } from "types";
+import { RpmData, DirectionalData, TireData, CarInfo, Drivetrain, CarClass } from "./types";
 
 class Log {
   e(tag: string, msg: string) {

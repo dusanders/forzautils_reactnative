@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
@@ -66,77 +66,79 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
 
   return (
     <AppBarContainer hideBack>
-      <View style={styles.content}>
-        <View style={styles.messageView}>
-          <TitleText allcaps>
-            Forward Forza Telemetry
-          </TitleText>
-          <LabelText>
-            Setup Forza's Telemetry output to go to the below IP and Port. Use DASH format.
-          </LabelText>
+      <ScrollView bounces={false}>
+        <View style={styles.content}>
+          <View style={styles.messageView}>
+            <TitleText allcaps>
+              Forward Forza Telemetry
+            </TitleText>
+            <LabelText>
+              Setup Forza's Telemetry output to go to the below IP and Port. Use DASH format.
+            </LabelText>
+          </View>
+          <View style={styles.messageView}>
+            <TitleText allcaps>
+              important!
+            </TitleText>
+            <LabelText>
+              If using SimHub, configure SimHub to forward the data to the device instead of adjusting in-game values.
+            </LabelText>
+          </View>
+          <Row>
+            <Card
+              style={{
+                width: '50%'
+              }}
+              allcapsLabel
+              allcapsTitle
+              centerContent
+              title={forza.ip}
+              body="IP Address" />
+            <Card
+              style={{
+                width: '50%'
+              }}
+              allcapsLabel
+              allcapsTitle
+              centerContent
+              title={`${forza.port}`}
+              body="Port" />
+          </Row>
+          <Row>
+            <Card
+              style={{
+                width: '50%'
+              }}
+              allcapsLabel
+              centerContent
+              title={forza.ssid}
+              body="WiFi Name" />
+            <Card
+              style={{
+                width: '50%'
+              }}
+              allcapsLabel
+              allcapsTitle
+              centerContent
+              title="dash"
+              body="Telemetry format" />
+          </Row>
         </View>
-        <View style={styles.messageView}>
-          <TitleText allcaps>
-            important!
-          </TitleText>
-          <LabelText>
-            If using SimHub, configure SimHub to forward the data to the device instead of adjusting in-game values.
-          </LabelText>
-        </View>
-        <Row>
-          <Card
-            style={{
-              width: '50%'
-            }}
-            allcapsLabel
-            allcapsTitle
-            centerContent
-            title={forza.ip}
-            body="IP Address" />
-          <Card
-            style={{
-              width: '50%'
-            }}
-            allcapsLabel
-            allcapsTitle
-            centerContent
-            title={`${forza.port}`}
-            body="Port" />
-        </Row>
-        <Row>
-          <Card
-            style={{
-              width: '50%'
-            }}
-            allcapsLabel
-            centerContent
-            title={forza.ssid}
-            body="WiFi Name" />
-          <Card
-            style={{
-              width: '50%'
-            }}
-            allcapsLabel
-            allcapsTitle
-            centerContent
-            title="dash"
-            body="Telemetry format" />
-        </Row>
-      </View>
-      <ThemeButton
-        style={styles.doneBtn}
-        onPress={() => {
-          navigation.navigateTo(AppRoutes.DATA);
-        }}>
-        <CircleCheckIcon />
-        <ThemeText
-          style={{
-            fontWeight: 700,
-            marginTop: 10
+        <ThemeButton
+          style={styles.doneBtn}
+          onPress={() => {
+            navigation.navigateTo(AppRoutes.DATA);
           }}>
-          Done
-        </ThemeText>
-      </ThemeButton>
+          <CircleCheckIcon />
+          <ThemeText
+            style={{
+              fontWeight: 700,
+              marginTop: 10
+            }}>
+            Done
+          </ThemeText>
+        </ThemeButton>
+      </ScrollView>
     </AppBarContainer>
   )
 }
@@ -151,7 +153,7 @@ function themeStyles(theme: IThemeElements) {
       justifyContent: 'center',
       alignItems: 'center',
       alignSelf: 'center',
-      marginTop: '25%'
+      marginTop: Dimensions.get('window').height * 0.1
     },
     messageView: {
       justifyContent: 'center',

@@ -5,7 +5,7 @@ import { StyleProp, View, ViewStyle } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 
 export interface AppBarContainerProps extends ContainerProps, AppBarProps {
-
+  
 }
 
 export function AppBarContainer(props: AppBarContainerProps) {
