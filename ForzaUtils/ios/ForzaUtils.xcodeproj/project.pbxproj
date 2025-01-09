@@ -42,13 +42,13 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ForzaUtils/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = ForzaUtils/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-ForzaUtils-ForzaUtilsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ForzaUtils-ForzaUtilsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		1CA261596038451F9605A286 /* Geologica_Auto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Geologica_Auto-Regular.ttf"; path = "../src/assets/fonts/Geologica_Auto-Regular.ttf"; sourceTree = "<group>"; };
+		1CA261596038451F9605A286 /* Geologica_Auto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Geologica_Auto-Regular.ttf"; path = "../src/assets/fonts/Geologica_Auto-Regular.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-ForzaUtils.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ForzaUtils.debug.xcconfig"; path = "Target Support Files/Pods-ForzaUtils/Pods-ForzaUtils.debug.xcconfig"; sourceTree = "<group>"; };
-		56D42FD44D2F45D4BC5CF263 /* Geologica_Auto-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Geologica_Auto-Light.ttf"; path = "../src/assets/fonts/Geologica_Auto-Light.ttf"; sourceTree = "<group>"; };
+		56D42FD44D2F45D4BC5CF263 /* Geologica_Auto-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Geologica_Auto-Light.ttf"; path = "../src/assets/fonts/Geologica_Auto-Light.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-ForzaUtils.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ForzaUtils.release.xcconfig"; path = "Target Support Files/Pods-ForzaUtils/Pods-ForzaUtils.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-ForzaUtils-ForzaUtilsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ForzaUtils-ForzaUtilsTests.debug.xcconfig"; path = "Target Support Files/Pods-ForzaUtils-ForzaUtilsTests/Pods-ForzaUtils-ForzaUtilsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-ForzaUtils.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ForzaUtils.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6AEB6A8A9B3E467AB636435B /* Geologica_Auto-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Geologica_Auto-SemiBold.ttf"; path = "../src/assets/fonts/Geologica_Auto-SemiBold.ttf"; sourceTree = "<group>"; };
+		6AEB6A8A9B3E467AB636435B /* Geologica_Auto-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Geologica_Auto-SemiBold.ttf"; path = "../src/assets/fonts/Geologica_Auto-SemiBold.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ForzaUtils/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-ForzaUtils-ForzaUtilsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ForzaUtils-ForzaUtilsTests.release.xcconfig"; path = "Target Support Files/Pods-ForzaUtils-ForzaUtilsTests/Pods-ForzaUtils-ForzaUtilsTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -123,7 +123,6 @@
 				6AEB6A8A9B3E467AB636435B /* Geologica_Auto-SemiBold.ttf */,
 			);
 			name = Resources;
-			path = "";
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -493,6 +492,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = ForzaUtils/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Forza Utils";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.racing-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -520,6 +521,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = ForzaUtils/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Forza Utils";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.racing-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

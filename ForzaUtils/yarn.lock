@@ -5758,6 +5758,11 @@ react-native-chart-kit@^6.12.0:
     paths-js "^0.4.10"
     point-in-polygon "^1.0.1"
 
+react-native-permissions@^5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-5.2.2.tgz#1eb9849ef23500b4d618cf9c2049f40069fa6946"
+  integrity sha512-Mae5VKT8bjliksONZ+jMYTPf90wxuhn1H1FiH/kRfw0Y5tW5WIV1P8t/KiEHKZRvimnrInimuCr+EpRzK0IPWQ==
+
 react-native-svg@^15.10.1:
   version "15.10.1"
   resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-15.10.1.tgz#5df51fca80cb1912648d058b67903f05eac0b8a6"
