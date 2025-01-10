@@ -47,6 +47,8 @@ export function ThemeText(props: ThemeTextProps) {
   let fontColor = theme.theme.colors.text.primary.onPrimary;
   if (props.variant) {
     fontColor = getFontForBg(props.variant)
+  } else if(props.onBackground){
+    fontColor = getFontForBg('primary')
   }
 
   return (
@@ -86,9 +88,9 @@ export function LabelText(props: ThemeTextProps) {
       fontFamily={'light'}
       allcaps={props.allcaps}
       style={[{
-        marginTop: 0,
+        marginTop: 4,
         letterSpacing: 0.4,
-        opacity: 0.5
+        opacity: 0.7
       }, props.style]}>
       {props.children}
     </ThemeText>
