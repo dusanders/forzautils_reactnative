@@ -10,6 +10,7 @@ export interface HpTqGraphViewModelProps {
 export interface IHpTqGraphViewModel {
   data?: DataEvent
   gears: GearData[];
+  clearCache(): void;
   DEBUG_StartStream(): void;
 }
 
@@ -159,6 +160,12 @@ export function HpTqGraphViewModel(props: HpTqGraphViewModelProps) {
   return props.children({
     data: state.lastData,
     gears: state.allData,
+    clearCache: () => {
+      setState({
+        allData: [],
+        lastData: undefined
+      })
+    },
     DEBUG_StartStream: () => {
       DEBUG_Stream()
     }
