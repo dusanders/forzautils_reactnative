@@ -6,7 +6,8 @@ export enum AppRoutes {
   IP_INFO,
   DATA,
   HP_TQ_GRAPH,
-  SUSPENSION_GRAPH
+  SUSPENSION_GRAPH,
+  TIRE_TEMPS
 }
 export function delay(delay: number): Promise<void> {
   return new Promise((resolve, reject) => {

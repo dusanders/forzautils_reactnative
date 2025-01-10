@@ -37,7 +37,7 @@ const options: DataOption[] = [
   },
   {
     id: randomKey(),
-    route: AppRoutes.HP_TQ_GRAPH,
+    route: AppRoutes.TIRE_TEMPS,
     name: 'Tire Temps',
     description: 'Graph tire temps'
   },

@@ -43,9 +43,6 @@ export function HpTqCurves(props: HpTqCurvesProps) {
         data={lineData}
         width={props.width || 40}
         height={200}
-        style={{
-          backgroundColor: '#00000000'// theme.theme.colors.background.onPrimary
-        }}
         withInnerLines={false}
         chartConfig={{
           labelColor: () => theme.theme.colors.text.primary.onPrimary,

@@ -16,6 +16,7 @@ import { DataChooser } from './src/pages/DataChooser';
 import { ViewModelStore, ViewModelStore_Hoc } from './src/context/viewModels/ViewModelStore';
 import { HptqGraph } from './src/pages/HpTqGraph/HpTqGraph';
 import { SuspensionTravel } from './src/pages/SuspensionTravel/SuspensionTravel';
+import { TireTemps } from './src/pages/TireTemps/TireTemps';
 
 
 function App(): React.JSX.Element {
@@ -47,6 +48,8 @@ function App(): React.JSX.Element {
                       viewModel={viewModelStore.hpTqGraph} />
                     <SuspensionTravel route={AppRoutes.SUSPENSION_GRAPH}
                       viewModel={viewModelStore.suspensionGraph} />
+                    <TireTemps route={AppRoutes.TIRE_TEMPS}
+                      viewModel={viewModelStore.tireTemps} />
                   </NavigationProvider>
                 )}
               </ViewModelStore.Consumer>

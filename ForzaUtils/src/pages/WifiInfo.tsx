@@ -12,25 +12,12 @@ import { ThemeButton } from "../components/ThemeButton";
 import { ThemeIcon } from "../components/ThemeIcon";
 import { AppBar } from "../components/AppBar";
 import { AppBarContainer } from "../components/AppBarContainer";
+import { Row } from "../components/Row";
 
 export interface WifiInfoProps extends INavigationTarget {
 
 }
 
-interface RowProps {
-  children?: any;
-}
-function Row(props: RowProps) {
-  return (
-    <View style={{
-      display: 'flex',
-      flexDirection: 'row',
-      width: '100%'
-    }}>
-      {props.children}
-    </View>
-  )
-}
 interface CircleCheckIconProps {
 
 }
