@@ -4,7 +4,7 @@ import { useLogger } from "../Logger";
 import { delay, StateHandler } from "../../constants/types";
 
 export interface HpTqGraphViewModelProps {
-  children: (viewmodel: IHpTqGraphViewModel) => React.ReactElement;
+  children: (viewModel: IHpTqGraphViewModel) => React.ReactElement;
 }
 
 export interface IHpTqGraphViewModel {

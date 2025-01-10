@@ -28,15 +28,18 @@ function App(): React.JSX.Element {
       <StatusBar
         barStyle={isDarkTheme() ? 'light-content' : 'dark-content'}
       />
+      {/** Provide a Locale Context API */}
       <LocaleContextHoc>
+        {/** Provide a Theme Context API */}
         <ThemeProvider initialMode={colorScheme}>
+          {/** Preflight - check permissions, initial WiFi info, etc */}
           <Preflight>
+            {/** View model store to preserve states across page changes */}
             <ViewModelStore_Hoc>
               <ViewModelStore.Consumer>
                 {viewModelStore => (
                   <NavigationProvider
                     initialRoute={AppRoutes.IP_INFO}>
-                    <Splash route={AppRoutes.SPLASH} />
                     <WifiInfo route={AppRoutes.IP_INFO} />
                     <DataChooser route={AppRoutes.DATA} />
                     <HptqGraph route={AppRoutes.HP_TQ_GRAPH}

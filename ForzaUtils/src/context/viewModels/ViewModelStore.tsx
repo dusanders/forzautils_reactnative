@@ -12,6 +12,7 @@ export interface ViewModelStore_HocProps {
 }
 
 export function ViewModelStore_Hoc(props: ViewModelStore_HocProps) {
+  /** Provide a centralized HoC / Context that will track view models */
   return (
     <HpTqGraphViewModel>
         {hptqVm => (
