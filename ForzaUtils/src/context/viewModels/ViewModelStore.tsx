@@ -1,6 +1,6 @@
 import React, { createContext } from "react";
-import { HpTqGraphViewModel, IHpTqGraphViewModel } from "./HpTqGraphViewModel";
-import { ISuspensionGraphViewModel, SuspensionGraphViewModel } from "./SuspensionGraphViewModel";
+import { IHpTqGraphViewModel, useHpTqGraphViewModel } from "./HpTqGraphViewModel";
+import { ISuspensionGraphViewModel, useSuspensionGraphViewModel } from "./SuspensionGraphViewModel";
 
 export interface IViewModelStore {
   hpTqGraph: IHpTqGraphViewModel;
@@ -14,21 +14,15 @@ export interface ViewModelStore_HocProps {
 }
 
 export function ViewModelStore_Hoc(props: ViewModelStore_HocProps) {
+  const hpTqVM = useHpTqGraphViewModel();
+  const suspensionGraphVm = useSuspensionGraphViewModel();
   /** Provide a centralized HoC / Context that will track view models */
   return (
-    <HpTqGraphViewModel>
-      {hptqVm => (
-        <SuspensionGraphViewModel>
-          {suspensionVm => (
-            <ViewModelStore.Provider value={{
-              hpTqGraph: hptqVm,
-              suspensionGraph: suspensionVm
-            }}>
-              {props.children}
-            </ViewModelStore.Provider>
-          )}
-        </SuspensionGraphViewModel>
-      )}
-    </HpTqGraphViewModel>
+    <ViewModelStore.Provider value={{
+      hpTqGraph: hpTqVM,
+      suspensionGraph: suspensionGraphVm
+    }}>
+      {props.children}
+    </ViewModelStore.Provider>
   )
 }

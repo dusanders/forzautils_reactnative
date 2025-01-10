@@ -8,10 +8,6 @@ export interface ISuspensionGraphViewModel {
   rightRear: number[];
 }
 
-export interface SuspensionGraphViewModelProps {
-  children: (vm: ISuspensionGraphViewModel) => ReactElement;
-}
-
 interface SuspensionGraphViewModelState {
   leftFront: number[];
   leftRear: number[];
@@ -26,7 +22,7 @@ const initialState: SuspensionGraphViewModelState = {
   rightRear: []
 }
 
-export function SuspensionGraphViewModel(props: SuspensionGraphViewModelProps) {
+export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const [state, setState] = useReducer<StateHandler<SuspensionGraphViewModelState>>((prev, next) => {
     const result = {
       ...prev,
@@ -34,10 +30,10 @@ export function SuspensionGraphViewModel(props: SuspensionGraphViewModelProps) {
     }
     return result;
   }, initialState);
-  return props.children({
+  return {
     leftFront: state.leftFront,
     leftRear: state.leftRear,
     rightFront: state.rightFront,
     rightRear: state.rightRear
-  });
+  };
 }

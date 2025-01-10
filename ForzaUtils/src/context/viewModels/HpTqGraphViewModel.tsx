@@ -3,10 +3,6 @@ import { useForzaData } from "../../hooks/useForzaData";
 import { useLogger } from "../Logger";
 import { delay, StateHandler } from "../../constants/types";
 
-export interface HpTqGraphViewModelProps {
-  children: (viewModel: IHpTqGraphViewModel) => React.ReactElement;
-}
-
 export interface IHpTqGraphViewModel {
   data?: DataEvent
   gears: GearData[];
@@ -75,7 +71,7 @@ interface HpTqGraphViewModelState {
   allData: GearData[]
   lastData?: DataEvent;
 }
-export function HpTqGraphViewModel(props: HpTqGraphViewModelProps) {
+export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   const tag = 'HpTqGraphViewModel';
   const initialState: HpTqGraphViewModelState = {
     allData: [],
@@ -157,7 +153,7 @@ export function HpTqGraphViewModel(props: HpTqGraphViewModelProps) {
     });
   }, [forza.packet]);
 
-  return props.children({
+  return {
     data: state.lastData,
     gears: state.allData,
     clearCache: () => {
@@ -169,5 +165,5 @@ export function HpTqGraphViewModel(props: HpTqGraphViewModelProps) {
     DEBUG_StartStream: () => {
       DEBUG_Stream()
     }
-  })
+  }
 }
