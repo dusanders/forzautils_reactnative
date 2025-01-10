@@ -1,11 +1,10 @@
-import React, { createContext, useEffect, useReducer } from "react";
-import { INavigationTarget } from "./Navigator";
-import { useForzaData } from "../hooks/useForzaData";
-import { useLogger } from "./Logger";
-import { delay, StateHandler } from "../constants/types";
+import React, { useEffect, useReducer } from "react";
+import { useForzaData } from "../../hooks/useForzaData";
+import { useLogger } from "../Logger";
+import { delay, StateHandler } from "../../constants/types";
 
-export interface HpTqGraphViewModelProps extends INavigationTarget {
-  children?: any;
+export interface HpTqGraphViewModelProps {
+  children: (viewmodel: IHpTqGraphViewModel) => React.ReactElement;
 }
 
 export interface IHpTqGraphViewModel {
@@ -24,8 +23,6 @@ export interface DataEvent {
   rpm: number;
   gear: number;
 }
-
-export const HpTqGraphViewModelContext = createContext({} as IHpTqGraphViewModel);
 
 
 const debugData: DataEvent[] = [
@@ -86,7 +83,7 @@ export function HpTqGraphViewModel(props: HpTqGraphViewModelProps) {
   const forza = useForzaData();
 
   const DEBUG_Stream = async () => {
-    for(const data of debugData) {
+    for (const data of debugData) {
       setState({
         lastData: {
           gear: data.gear,
@@ -159,13 +156,11 @@ export function HpTqGraphViewModel(props: HpTqGraphViewModelProps) {
     });
   }, [forza.packet]);
 
-  return (
-    <HpTqGraphViewModelContext.Provider value={{
-      data: state.lastData,
-      gears: state.allData,
-      DEBUG_StartStream: () => { DEBUG_Stream() }
-    }}>
-      {props.children}
-    </HpTqGraphViewModelContext.Provider>
-  )
+  return props.children({
+    data: state.lastData,
+    gears: state.allData,
+    DEBUG_StartStream: () => {
+      DEBUG_Stream()
+    }
+  })
 }

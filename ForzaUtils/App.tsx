@@ -13,8 +13,8 @@ import { WifiInfo } from './src/pages/WifiInfo';
 import { NavigationProvider } from './src/context/Navigator';
 import { Splash } from './src/pages/Splash';
 import { DataChooser } from './src/pages/DataChooser';
-import { HptqGraph } from './src/pages/fragments/HpTqGraph';
-import { ViewModelStore, ViewModelStore_Hoc } from './src/context/ViewModelStore';
+import { ViewModelStore, ViewModelStore_Hoc } from './src/context/viewModels/ViewModelStore';
+import { HptqGraph } from './src/pages/HpTqGraph/HpTqGraph';
 
 
 function App(): React.JSX.Element {

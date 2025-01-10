@@ -1,6 +1,5 @@
 import React, { createContext } from "react";
-import { HpTqGraphViewModel, HpTqGraphViewModelContext, IHpTqGraphViewModel } from "./HpTqGraphViewModel";
-import { AppRoutes } from "../constants/types";
+import { HpTqGraphViewModel, IHpTqGraphViewModel } from "./HpTqGraphViewModel";
 
 export interface IViewModelStore {
   hpTqGraph: IHpTqGraphViewModel;
@@ -14,8 +13,7 @@ export interface ViewModelStore_HocProps {
 
 export function ViewModelStore_Hoc(props: ViewModelStore_HocProps) {
   return (
-    <HpTqGraphViewModel route={AppRoutes.HP_TQ_GRAPH}>
-      <HpTqGraphViewModelContext.Consumer>
+    <HpTqGraphViewModel>
         {hptqVm => (
           <ViewModelStore.Provider value={{
             hpTqGraph: hptqVm
@@ -23,7 +21,6 @@ export function ViewModelStore_Hoc(props: ViewModelStore_HocProps) {
             {props.children}
           </ViewModelStore.Provider>
         )}
-      </HpTqGraphViewModelContext.Consumer>
     </HpTqGraphViewModel>
   )
 }
