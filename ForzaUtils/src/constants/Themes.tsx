@@ -83,7 +83,7 @@ export const LighColors: IThemeElements = {
         onSecondary: 'rgba(243,254, 243,1)'
       },
       secondary: {
-        onPrimary: "rgba(242,242,242,1)",
+        onPrimary: "rgb(124, 131, 145)",
         onSecondary: 'rgba(242,242,242,1)'
       },
       warning: {
@@ -99,7 +99,7 @@ export const LighColors: IThemeElements = {
       primary: 'rgb(255, 255, 255)',
       onPrimary: 'rgb(242,242,242)',
       secondary: 'rgb(34,40,44)',
-      onSecondary: 'rgb(57,61,65)'
+      onSecondary: 'rgb(131, 140, 149)'
     },
     card: {
       borderColor: 'rgb(223,218,220)'
