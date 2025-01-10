@@ -5,7 +5,8 @@ export enum AppRoutes {
   SPLASH,
   IP_INFO,
   DATA,
-  HP_TQ_GRAPH
+  HP_TQ_GRAPH,
+  SUSPENSION_GRAPH
 }
 export function delay(delay: number): Promise<void> {
   return new Promise((resolve, reject) => {

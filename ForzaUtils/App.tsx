@@ -15,6 +15,7 @@ import { Splash } from './src/pages/Splash';
 import { DataChooser } from './src/pages/DataChooser';
 import { ViewModelStore, ViewModelStore_Hoc } from './src/context/viewModels/ViewModelStore';
 import { HptqGraph } from './src/pages/HpTqGraph/HpTqGraph';
+import { SuspensionTravel } from './src/pages/SuspensionTravel/SuspensionTravel';
 
 
 function App(): React.JSX.Element {
@@ -44,6 +45,8 @@ function App(): React.JSX.Element {
                     <DataChooser route={AppRoutes.DATA} />
                     <HptqGraph route={AppRoutes.HP_TQ_GRAPH}
                       viewModel={viewModelStore.hpTqGraph} />
+                    <SuspensionTravel route={AppRoutes.SUSPENSION_GRAPH}
+                      viewModel={viewModelStore.suspensionGraph} />
                   </NavigationProvider>
                 )}
               </ViewModelStore.Consumer>

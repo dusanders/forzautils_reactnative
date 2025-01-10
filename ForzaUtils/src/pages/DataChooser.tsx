@@ -31,7 +31,7 @@ const options: DataOption[] = [
   },
   {
     id: randomKey(),
-    route: AppRoutes.HP_TQ_GRAPH,
+    route: AppRoutes.SUSPENSION_GRAPH,
     name: 'Suspension Travel',
     description: 'Graph suspension travel'
   },
