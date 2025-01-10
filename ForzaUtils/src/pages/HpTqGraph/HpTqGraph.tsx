@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "../../hooks/useNavigation";
-import { ActivityIndicator, Dimensions, FlatList, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Dimensions, FlatList, Pressable, StyleSheet, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import { IThemeElements } from "../../constants/Themes";
 import { Assets } from "../../assets";
-import { DataEvent, GearData, IHpTqGraphViewModel } from "../../context/viewModels/HpTqGraphViewModel";
+import { DataEvent, IHpTqGraphViewModel } from "../../context/viewModels/HpTqGraphViewModel";
 import { Paper } from "../../components/Paper";
 import { AppBarContainer } from "../../components/AppBarContainer";
 import { ThemeText } from "../../components/ThemeText";
 import { AppRoutes, randomKey } from "../../constants/types";
 import { HpTqCurves } from "./HpTqCurves";
 import { INavigationTarget } from "../../context/Navigator";
+import { ThemeButton } from "../../components/ThemeButton";
+import { AppSettingsButton } from "../../components/AppBar";
 
 export interface HpTqGraphProps extends INavigationTarget {
   route: AppRoutes;
@@ -70,7 +72,23 @@ export function HptqGraph(props: HpTqGraphProps) {
     <AppBarContainer title="Hp / Tq Graph"
       onBack={() => {
         navigation.goBack()
-      }}>
+      }}
+      injectElements={[
+        {
+          id: randomKey(),
+          onPress: () => { 
+            console.log(`clearing...`)
+            setGears([]);
+          },
+          renderItem: () => (
+            <ThemeText
+              allcaps
+              fontFamily={'bold'}>
+              Clear Data
+            </ThemeText>
+          )
+        },
+      ]}>
       <View
         style={styles.contentWrapper}>
         {gears.length < 1 && (

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { ReactElement, useState } from "react";
+import { Pressable, PressableProps, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "./ThemeText";
@@ -7,10 +7,39 @@ import { ThemeIcon } from "./ThemeIcon";
 import { Container } from "./Container";
 import { ThemeSwitch } from "./ThemeSwitch";
 
+
+export interface AppSettingsButtonProps extends PressableProps {
+  children?: any;
+}
+export const AppSettingsButton: React.FC<AppSettingsButtonProps> =
+  (props: AppSettingsButtonProps) => {
+    const theme = useTheme();
+    return <Pressable
+      style={{
+        backgroundColor: theme.theme.colors.background.primary,
+        borderRadius: theme.theme.sizes.borderRadius,
+        margin: 4,
+        marginTop: 8,
+        padding: 6,
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}
+      {...props}>
+      {props.children}
+    </Pressable>
+  }
+
+export interface AppBarSettingsButtonParams {
+  id: string;
+  onPress(): void;
+  renderItem(): ReactElement;
+}
+
 export interface AppBarProps {
   title?: string;
   hideSettings?: boolean;
   hideBack?: boolean;
+  injectElements?: AppBarSettingsButtonParams[];
   onBack?: () => void;
 }
 
@@ -73,17 +102,32 @@ export function AppBar(props: AppBarProps) {
             variant={'secondary'}
             style={style.settingsFlyoutView}>
             <View style={style.settingsFlyoutContent}>
-              <ThemeText
-                variant={'primary'}
-                onBackground={'onSecondary'}>
-                Dark Mode
-              </ThemeText>
-              <ThemeSwitch
-                onPalette={'secondary'}
-                onValueChange={(val) => {
-                  theme.changeTheme(val ? 'dark' : 'light')
-                }}
-                value={theme.current === 'dark'} />
+              <View style={style.themeButtonView}>
+                <ThemeText
+                  variant={'primary'}
+                  onBackground={'onSecondary'}>
+                  Dark Mode
+                </ThemeText>
+                <ThemeSwitch
+                  onPalette={'secondary'}
+                  onValueChange={(val) => {
+                    theme.changeTheme(val ? 'dark' : 'light')
+                  }}
+                  value={theme.current === 'dark'} />
+              </View>
+              {props.injectElements && (
+                <View style={{
+                  width: '100%'
+                }}>
+                  {props.injectElements.map((injected) => (
+                    <AppSettingsButton
+                      key={injected.id}
+                      onPress={() => { injected.onPress() }}>
+                      {injected.renderItem()}
+                    </AppSettingsButton>
+                  ))}
+                </View>
+              )}
             </View>
           </Container>
         )}
@@ -103,12 +147,17 @@ function themeStyles(theme: IThemeElements) {
       display: 'flex',
       flexDirection: 'row',
       padding: theme.sizes.borderRadius,
+    },
+    themeButtonView: {
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'row',
       justifyContent: 'space-between',
-      overflow: 'visible'
+      alignItems: 'center'
     },
     settingsFlyoutView: {
-      width: '45%',
-      bottom: -(theme.sizes.icon + 8 + 12),
+      width: '50%',
+      top: (theme.sizes.navBar),
       right: theme.sizes.borderRadius,
       position: 'absolute',
       backgroundColor: theme.colors.background.secondary,
@@ -118,15 +167,13 @@ function themeStyles(theme: IThemeElements) {
     settingsFlyoutContent: {
       width: '100%',
       display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center'
+      flexDirection: 'column',
     },
     settingsFlyoutOutsideTouchable: {
       position: 'absolute',
       height: '100%',
       width: '100%',
-      zIndex: 2
+      zIndex: 2,
     },
     settingIconView: {
       padding: 5,
