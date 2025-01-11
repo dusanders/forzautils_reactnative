@@ -160,6 +160,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
     }
     return false
   }
+  
   useEffect(() => {
     if (ignorePacket()) {
       return;

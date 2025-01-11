@@ -21,14 +21,7 @@ export function HptqGraph(props: HpTqGraphProps) {
   const navigation = useNavigation();
   const theme = useTheme();
   const styles = themeStyles(theme.theme);
-  const [graphWidth, setGraphWidth] = useState(Dimensions.get('window').width - 40)
-
-  // useEffect(() => {
-  //   if (!props.viewModel.gears.length) {
-  //     console.log(`Start DEBUG`);
-  //     props.viewModel.DEBUG_StartStream();
-  //   }
-  // }, []);
+  const [graphWidth, setGraphWidth] = useState(Dimensions.get('window').width - 40);
 
   const separator = () => {
     return (
