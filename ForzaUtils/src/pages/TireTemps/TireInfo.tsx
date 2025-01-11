@@ -14,12 +14,22 @@ export function TireInfo(props: TireInfoProps) {
   const theme = useTheme().theme;
   const style = themeStyles(theme);
 
+  const colorForTemp = (temp: number) => {
+    if(temp < 170) {
+      return theme.colors.text.primary.onPrimary
+    }
+    if(temp < 190) {
+      return theme.colors.text.warning.onPrimary
+    }
+    return theme.colors.text.error.onPrimary
+  }
+
   const TempView = () => {
     return (
       <View style={{
         height: '50%',
         width: '40%',
-        backgroundColor: theme.colors.text.primary.onPrimary,
+        backgroundColor: colorForTemp(props.temp),
         marginBottom: 12,
         marginTop: 12,
         borderRadius: theme.sizes.borderRadius

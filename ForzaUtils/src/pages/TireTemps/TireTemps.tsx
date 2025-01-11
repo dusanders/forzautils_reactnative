@@ -7,7 +7,6 @@ import { StyleSheet, View } from "react-native";
 import { INavigationTarget } from "../../context/Navigator";
 import { ITireTempViewModel } from "../../context/viewModels/TireTempViewModel";
 import { Card } from "../../components/Card";
-import { ThemeText } from "../../components/ThemeText";
 import { Row } from "../../components/Row";
 import { TireInfo } from "./TireInfo";
 
@@ -20,25 +19,6 @@ export function TireTemps(props: TireTempsProps) {
   const style = themeStyles(theme);
   const navigation = useNavigation();
 
-  const TempView = () => {
-    return (
-      <View style={{
-        height: '50%',
-        width: '40%',
-        backgroundColor: 'white',
-        marginBottom: 12,
-        borderRadius: theme.sizes.borderRadius
-      }} />
-    )
-  }
-  const DataCard = (props: { children: any }) => (
-    <Card style={[
-      style.halfWidth,
-      style.centerContent
-    ]}>
-      {props.children}
-    </Card>
-  )
   return (
     <AppBarContainer
       title="Tire Temps"
