@@ -25,22 +25,22 @@ class ForzaByteBuffer {
     this.buffer = buffer;
   }
   getByte() {
-    const val = this.buffer.readUintLE(this.offset, 1);
+    const val = this.buffer.readUInt8(this.offset);
     this.offset += 1;
     return val;
   }
   getInt() {
-    const val = this.buffer.readInt32LE(this.offset);
+    const val = this.buffer.readUInt32LE(this.offset);
     this.offset += 4;
     return val;
   }
   getLong() {
     const val = this.buffer.readUint32LE(this.offset);
-    this.offset += 2;
+    this.offset += 4;
     return val;
   }
   getShort() {
-    const val = this.buffer.readInt16LE(this.offset);
+    const val = this.buffer.readUInt16LE(this.offset);
     this.offset += 2;
     return val;
   }
@@ -188,8 +188,8 @@ export class ForzaTelemetryApi {
     this.buffer = new ForzaByteBuffer(buffer);
     this.Log = new Log();
     if (!this.isForzaHorizonPacket()
-      || !this.isForza7Packet()
-      || !this.isForza8Packet()) {
+      && !this.isForza7Packet()
+      && !this.isForza8Packet()) {
       this.Log.w(this.TAG, `Invalid packet length ${this.packetLength}`);
     }
     this.isRaceOn = this.buffer.getInt() == 1;
@@ -246,18 +246,15 @@ export class ForzaTelemetryApi {
     this.suspensionTravelMeters.leftRear = this.buffer.getFloat() * 100;
     this.suspensionTravelMeters.rightRear = this.buffer.getFloat() * 100;
     this.carInfo.ordinalId = this.buffer.getInt();
-    if (this.isForzaHorizonPacket()) {
-      this.carInfo.carType = this.toCarType(this.buffer.getInt());
-    } else {
-      this.carInfo.carType = 'Not Available';
-    }
     this.carInfo.class = this.toCarClass(this.buffer.getInt());
     this.carInfo.performanceIndex = this.buffer.getInt();
     this.carInfo.drivetrainType = this.toDrivetrain(this.buffer.getInt());
     this.carInfo.numberOfCylinders = this.buffer.getInt();
     if (this.isForzaHorizonPacket()) {
+      this.carInfo.carType = this.toCarType(this.buffer.getInt());
       this.objectHit = this.buffer.getLong();
     } else {
+      this.carInfo.carType = 'Not Available';
       this.objectHit = 0;
     }
     this.position.x = this.buffer.getFloat() * 100;
@@ -274,6 +271,7 @@ export class ForzaTelemetryApi {
     this.fuel = Math.floor(this.buffer.getFloat() * 100);
     this.distanceTraveled = this.buffer.getFloat();
     this.bestLap = this.buffer.getFloat();
+    this.lastLap = this.buffer.getFloat();
     this.currentLap = this.buffer.getFloat();
     this.currentRaceTime = this.buffer.getFloat();
     this.lapNumber = this.buffer.getShort();
@@ -282,7 +280,7 @@ export class ForzaTelemetryApi {
     this.brake = (this.buffer.getByte() & 0xff) * 100 / 255;
     this.clutch = (this.buffer.getByte() & 0xff) * 100 / 255;
     this.handbrake = (this.buffer.getByte() & 0xff) * 100 / 255;
-    this.gear = this.buffer.getByte() & 0xff;
+    this.gear = (this.buffer.getByte() & 0xff);
     this.steer = (this.buffer.getByte() & 0xff) * 100 / 127;
     this.normalizedDrivingLine = (this.buffer.getByte() & 0xff) * 100 / 127;
     this.normalizedAIBrakeDifference = (this.buffer.getByte() & 0xff) * 100 / 127;
