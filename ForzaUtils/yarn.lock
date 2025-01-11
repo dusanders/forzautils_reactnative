@@ -2124,7 +2124,7 @@
   resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.10.tgz#a1337ca426aa61cef9fe15b5b28e340a72f6fa99"
   integrity sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==
 
-ForzaTelemetryApi@../ForzaTelemetryApi:
+ForzaTelemetryApi@../../ForzaTelemetryAPI_typescript:
   version "1.0.0"
 
 abort-controller@^3.0.0:
