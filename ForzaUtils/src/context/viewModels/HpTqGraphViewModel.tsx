@@ -102,40 +102,36 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
       return;
     }
     next.allData = prev.allData.sort((a, b) => a.gear - b.gear);
-    if (next.allData.length < next.lastData.gear) {
-      next.allData.push({
+    let existingGear = next.allData.find((ele) => ele.gear === next.lastData?.gear);
+    if(!existingGear) {
+      let index = next.allData.push({
         gear: next.lastData.gear,
-        events: [next.lastData].sort((a, b) => a.rpm - b.rpm)
+        events: [next.lastData]
       });
-    } else {
-      const existingGear = next.allData[next.lastData.gear - 1];
-      if (existingGear.gear != next.lastData.gear) {
-        existingGear.gear = next.lastData.gear;
-      }
-      const dataPoint = existingGear.events.find((val) => val.rpm === next.lastData?.rpm);
-      if (dataPoint) {
-        if (dataPoint.hp < next.lastData.hp) {
-          dataPoint.hp = next.lastData.hp;
-        }
-        if (dataPoint.tq < next.lastData.tq) {
-          dataPoint.tq = next.lastData.tq
-        }
-      } else {
-        existingGear.events.push(next.lastData)
-        existingGear.events.sort((a, b) => a.rpm - b.rpm)
-      }
+      existingGear = next.allData[index - 1];
     }
+    if (existingGear.gear != next.lastData.gear) {
+      existingGear.gear = next.lastData.gear;
+    }
+    const dataPoint = existingGear.events.find((val) => val.rpm === next.lastData?.rpm);
+    if (dataPoint) {
+      if (dataPoint.hp < next.lastData.hp) {
+        dataPoint.hp = next.lastData.hp;
+      }
+      if (dataPoint.tq < next.lastData.tq) {
+        dataPoint.tq = next.lastData.tq
+      }
+    } else {
+      existingGear.events.push(next.lastData)
+      existingGear.events.sort((a, b) => a.rpm - b.rpm)
+    }
+    return next;
   }
 
   const [state, setState] = useReducer<StateHandler<HpTqGraphViewModelState>>((prev, next) => {
     let result = {
       ...prev,
-      ...next
-    }
-    updateMap(prev, next);
-    result = {
-      ...prev,
-      ...next
+      ...updateMap(prev, next)
     }
     return result;
   }, initialState);
@@ -151,7 +147,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
     if (forza.packet.gear >= 11) {
       return true;
     }
-    if(forza.packet.getHorsepower() < 0){
+    if (forza.packet.getHorsepower() < 0) {
       return true;
     }
     const existing = state.allData.find((ele) => ele.gear === forza.packet?.gear);
