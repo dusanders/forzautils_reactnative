@@ -19,7 +19,7 @@ export function TireInfo(props: TireInfoProps) {
       <View style={{
         height: '50%',
         width: '40%',
-        backgroundColor: 'white',
+        backgroundColor: theme.colors.text.primary.onPrimary,
         marginBottom: 12,
         marginTop: 12,
         borderRadius: theme.sizes.borderRadius

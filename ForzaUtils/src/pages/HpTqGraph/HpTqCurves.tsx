@@ -44,6 +44,16 @@ export function HpTqCurves(props: HpTqCurvesProps) {
         width={props.width || 40}
         height={200}
         withInnerLines={false}
+        formatXLabel={(label) => {
+          const index = lineData.labels.indexOf(label);
+          return lineData.labels.length > 10
+            ? (index % 5 === 1)
+              ? label
+              : ''
+            : (index % 2 === 1)
+            ? label
+            : ''
+        }}
         chartConfig={{
           labelColor: () => theme.theme.colors.text.primary.onPrimary,
           color: (opacity) => {
@@ -53,7 +63,7 @@ export function HpTqCurves(props: HpTqCurvesProps) {
             return theme.theme.colors.text.secondary.onSecondary
           },
           backgroundGradientFromOpacity: 0,
-          backgroundGradientToOpacity: 0
+          backgroundGradientToOpacity: 0,
         }} />
     </Paper>
   )

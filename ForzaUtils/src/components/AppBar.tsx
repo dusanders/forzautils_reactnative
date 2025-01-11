@@ -1,20 +1,25 @@
-import React, { ReactElement, useState } from "react";
-import { Pressable, PressableProps, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { ReactElement, useCallback, useState } from "react";
+import { Pressable, PressableProps, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "./ThemeText";
 import { ThemeIcon } from "./ThemeIcon";
 import { Container } from "./Container";
 import { ThemeSwitch } from "./ThemeSwitch";
+import { randomKey } from "../constants/types";
 
 
-export interface AppSettingsButtonProps extends PressableProps {
+export interface AppSettingsButtonProps {
+  onPress(): void;
   children?: any;
 }
-export const AppSettingsButton: React.FC<AppSettingsButtonProps> =
-  (props: AppSettingsButtonProps) => {
-    const theme = useTheme();
-    return <Pressable
+export function AppSettingsButton(props: AppSettingsButtonProps) {
+  const handleClick = useCallback(() => {
+    props.onPress()
+  }, []);
+  const theme = useTheme();
+  return (
+    <Pressable
       style={{
         backgroundColor: theme.theme.colors.background.primary,
         borderRadius: theme.theme.sizes.borderRadius,
@@ -22,12 +27,16 @@ export const AppSettingsButton: React.FC<AppSettingsButtonProps> =
         marginTop: 8,
         padding: 6,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        elevation: 12,
+        zIndex: 12
       }}
-      {...props}>
+      onPress={handleClick}
+    >
       {props.children}
     </Pressable>
-  }
+  )
+}
 
 export interface AppBarSettingsButtonParams {
   id: string;
@@ -121,8 +130,9 @@ export function AppBar(props: AppBarProps) {
                 }}>
                   {props.injectElements.map((injected) => (
                     <AppSettingsButton
-                      key={injected.id}
-                      onPress={() => { injected.onPress() }}>
+                      onPress={() => {
+                        injected.onPress()
+                      }}>
                       {injected.renderItem()}
                     </AppSettingsButton>
                   ))}

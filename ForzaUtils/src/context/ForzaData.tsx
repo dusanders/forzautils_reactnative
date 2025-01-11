@@ -45,7 +45,7 @@ export function ForzaDataProvider(props: ForzaDataProviderProps) {
   }, []);
 
   const dataHandler = useCallback((data: Buffer, rinfo: Upd_rinfo) => {
-    logger.debug(tag, `msg: ${data.toString()}`);
+    // logger.debug(tag, `msg: ${data.toString()}`);
     const packet = new ForzaTelemetryApi(rinfo.size, data);
     setPacket(packet)
   }, []);

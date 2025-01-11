@@ -17,50 +17,18 @@ export interface HpTqGraphProps extends INavigationTarget {
   viewModel: IHpTqGraphViewModel;
 }
 
-interface GraphData {
-  gear: number;
-  data: DataEvent[];
-}
-
 export function HptqGraph(props: HpTqGraphProps) {
   const navigation = useNavigation();
   const theme = useTheme();
   const styles = themeStyles(theme.theme);
   const [graphWidth, setGraphWidth] = useState(Dimensions.get('window').width - 40)
-  const [gears, setGears] = useState<GraphData[]>([]);
 
-  useEffect(() => {
-    if(props.viewModel.gears.length == 0) {
-      setGears([]);
-      return;
-    }
-    const all = props.viewModel.gears.sort((a, b) => a.gear - b.gear);
-    const newValues: GraphData[] = [];
-    all.forEach((gear) => {
-      const sorted = gear.events.sort((a, b) => a.rpm - b.rpm);
-      const newGearData: GraphData = {
-        gear: gear.gear,
-        data: []
-      }
-      sorted.forEach((dataPoint) => {
-        newGearData.data.push({
-          hp: dataPoint.hp,
-          tq: dataPoint.tq,
-          rpm: dataPoint.rpm,
-          gear: gear.gear
-        });
-      });
-      newValues.push(newGearData);
-    });
-    setGears(newValues);
-  }, [props.viewModel.data]);
-
-  useEffect(() => {
-    if (!props.viewModel.gears.length) {
-      console.log(`Start DEBUG`);
-      props.viewModel.DEBUG_StartStream();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!props.viewModel.gears.length) {
+  //     console.log(`Start DEBUG`);
+  //     props.viewModel.DEBUG_StartStream();
+  //   }
+  // }, []);
 
   const separator = () => {
     return (
@@ -78,7 +46,7 @@ export function HptqGraph(props: HpTqGraphProps) {
       injectElements={[
         {
           id: randomKey(),
-          onPress: () => { 
+          onPress: () => {
             props.viewModel.clearCache();
           },
           renderItem: () => (
@@ -92,7 +60,7 @@ export function HptqGraph(props: HpTqGraphProps) {
       ]}>
       <View
         style={styles.contentWrapper}>
-        {gears.length < 1 && (
+        {props.viewModel.gears.length < 1 && (
           <Paper style={styles.waitPaper}>
             <ThemeText
               fontFamily="bold"
@@ -107,18 +75,18 @@ export function HptqGraph(props: HpTqGraphProps) {
             <ActivityIndicator />
           </Paper>
         )}
-        {gears.length > 0 && (
+        {props.viewModel.gears.length > 0 && (
           <FlatList
             ItemSeparatorComponent={separator}
             style={{
               flexGrow: 1
             }}
-            data={gears}
+            data={props.viewModel.gears}
             renderItem={(item) => (
               <HpTqCurves
                 width={graphWidth}
                 key={randomKey()}
-                data={item.item.data}
+                data={item.item.events}
                 gear={item.item.gear} />
             )} />
         )}

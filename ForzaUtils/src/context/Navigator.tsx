@@ -48,7 +48,6 @@ export function NavigationProvider(props: NavigatorProps) {
     if(next.backStack.length < 1) {
       next.backStack.push(next.route!);
     }
-    console.log(`NEXT: ${JSON.stringify({...prev, ...next})}`)
     return {
       ...prev,
       ...next

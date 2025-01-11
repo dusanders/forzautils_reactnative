@@ -67,6 +67,9 @@ const debugData: DataEvent[] = [
   }
 ]
 
+function roundToNearestRpmRange(rpm: number) {
+  return Math.round(rpm / 100.0) * 100
+}
 interface HpTqGraphViewModelState {
   allData: GearData[]
   lastData?: DataEvent;
@@ -94,15 +97,21 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   }
 
   const updateMap = (prev: HpTqGraphViewModelState, next: Partial<HpTqGraphViewModelState>) => {
-    if (!next.lastData) return;
+    if (!next.lastData) {
+      logger.log(tag, `skipping - no data packet`);
+      return;
+    }
     next.allData = prev.allData.sort((a, b) => a.gear - b.gear);
     if (next.allData.length < next.lastData.gear) {
       next.allData.push({
         gear: next.lastData.gear,
-        events: [next.lastData]
+        events: [next.lastData].sort((a, b) => a.rpm - b.rpm)
       });
     } else {
       const existingGear = next.allData[next.lastData.gear - 1];
+      if (existingGear.gear != next.lastData.gear) {
+        existingGear.gear = next.lastData.gear;
+      }
       const dataPoint = existingGear.events.find((val) => val.rpm === next.lastData?.rpm);
       if (dataPoint) {
         if (dataPoint.hp < next.lastData.hp) {
@@ -113,6 +122,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
         }
       } else {
         existingGear.events.push(next.lastData)
+        existingGear.events.sort((a, b) => a.rpm - b.rpm)
       }
     }
   }
@@ -122,14 +132,6 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
       ...prev,
       ...next
     }
-    if (!next.lastData) {
-      logger.warn(tag, `undefined data packet`);
-      return result;
-    }
-    if (next.lastData.gear < 1) {
-      logger.warn(tag, `Ignore REVERSE gear!`);
-      return result;
-    }
     updateMap(prev, next);
     result = {
       ...prev,
@@ -138,17 +140,40 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
     return result;
   }, initialState);
 
-  useEffect(() => {
+  const ignorePacket = () => {
     if (!forza.packet) {
       logger.warn(tag, `undefined data packet`);
+      return true;
+    }
+    if (forza.packet.gear <= 0) {
+      return true;
+    }
+    if (forza.packet.gear >= 11) {
+      return true;
+    }
+    if(forza.packet.getHorsepower() < 0){
+      return true;
+    }
+    const existing = state.allData.find((ele) => ele.gear === forza.packet?.gear);
+    if (existing && existing.events?.length) {
+      const last = existing.events[existing.events.length];
+      if (last && (forza.packet.rpmData.current < last.rpm)) {
+        console.log(`skip decel`)
+        return;
+      }
+    }
+    return false
+  }
+  useEffect(() => {
+    if (ignorePacket()) {
       return;
     }
     setState({
       lastData: {
-        gear: forza.packet.gear,
-        hp: forza.packet.getHorsepower(),
-        tq: forza.packet.torque,
-        rpm: forza.packet.rpmData.current
+        gear: forza.packet!.gear,
+        hp: forza.packet!.getHorsepower(),
+        tq: forza.packet!.torque,
+        rpm: roundToNearestRpmRange(forza.packet!.rpmData.current)
       }
     });
   }, [forza.packet]);
@@ -157,6 +182,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
     data: state.lastData,
     gears: state.allData,
     clearCache: () => {
+      logger.log(tag, `clearing cache`);
       setState({
         allData: [],
         lastData: undefined
