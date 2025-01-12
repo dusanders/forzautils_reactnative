@@ -130,6 +130,7 @@ export function AppBar(props: AppBarProps) {
                 }}>
                   {props.injectElements.map((injected) => (
                     <AppSettingsButton
+                      key={randomKey()}
                       onPress={() => {
                         injected.onPress()
                       }}>
