@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useMemo, useReducer } from "react";
 import { useForzaData } from "../../hooks/useForzaData";
 import { useLogger } from "../Logger";
 import { delay, StateHandler } from "../../constants/types";
@@ -75,13 +75,6 @@ interface HpTqGraphViewModelState {
   lastData?: DataEvent;
 }
 export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
-  const tag = 'HpTqGraphViewModel';
-  const initialState: HpTqGraphViewModelState = {
-    allData: [],
-  }
-  const logger = useLogger();
-  const forza = useForzaData();
-
   const DEBUG_Stream = async () => {
     for (const data of debugData) {
       setState({
@@ -95,15 +88,25 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
       await delay(100);
     }
   }
+  const tag = 'HpTqGraphViewModel';
+  const initialState: HpTqGraphViewModelState = {
+    allData: [],
+  }
+  const logger = useLogger();
+  const forza = useForzaData();
 
   const updateMap = (prev: HpTqGraphViewModelState, next: Partial<HpTqGraphViewModelState>) => {
     if (!next.lastData) {
-      logger.log(tag, `skipping - no data packet`);
-      return;
+      logger.log(tag, `skipping - no data packet :: ${next.allData?.length} elements`);
+      return next;
+    }
+    if (next.lastData.rpm == prev.lastData?.rpm) {
+      console.log(`skipping same rpm`);
+      return next;
     }
     next.allData = prev.allData.sort((a, b) => a.gear - b.gear);
     let existingGear = next.allData.find((ele) => ele.gear === next.lastData?.gear);
-    if(!existingGear) {
+    if (!existingGear) {
       let index = next.allData.push({
         gear: next.lastData.gear,
         events: [next.lastData]
@@ -115,9 +118,10 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
     }
     const dataPoint = existingGear.events.find((val) => val.rpm === next.lastData?.rpm);
     if (dataPoint) {
-      if (dataPoint.hp < next.lastData.hp) {
-        dataPoint.hp = next.lastData.hp;
-      }
+      if (next.lastData.hp - dataPoint.hp)
+        if (dataPoint.hp < next.lastData.hp) {
+          dataPoint.hp = next.lastData.hp;
+        }
       if (dataPoint.tq < next.lastData.tq) {
         dataPoint.tq = next.lastData.tq
       }
@@ -128,17 +132,15 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
     return next;
   }
 
-  const [state, setState] = useReducer<StateHandler<HpTqGraphViewModelState>>((prev, next) => {
-    let result = {
-      ...prev,
-      ...updateMap(prev, next)
-    }
-    return result;
-  }, initialState);
-
   const ignorePacket = () => {
     if (!forza.packet) {
       logger.warn(tag, `undefined data packet`);
+      return true;
+    }
+    if (!forza.packet.isRaceOn) {
+      return true;
+    }
+    if (forza.packet.throttle < 50) {
       return true;
     }
     if (forza.packet.gear <= 0) {
@@ -160,19 +162,27 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
     }
     return false
   }
+
+  const [state, setState] = useReducer<StateHandler<HpTqGraphViewModelState>>((prev, next) => {
+    // next.allData = allGears;
+    let result = {
+      ...prev,
+      ...updateMap(prev, next)
+    }
+    return result;
+  }, initialState);
   
   useEffect(() => {
-    if (ignorePacket()) {
-      return;
+    if (!ignorePacket()) {
+      setState({
+        lastData: {
+          gear: forza.packet!.gear,
+          hp: forza.packet!.getHorsepower(),
+          tq: forza.packet!.torque,
+          rpm: roundToNearestRpmRange(forza.packet!.rpmData.current)
+        }
+      });
     }
-    setState({
-      lastData: {
-        gear: forza.packet!.gear,
-        hp: forza.packet!.getHorsepower(),
-        tq: forza.packet!.torque,
-        rpm: roundToNearestRpmRange(forza.packet!.rpmData.current)
-      }
-    });
   }, [forza.packet]);
 
   return {

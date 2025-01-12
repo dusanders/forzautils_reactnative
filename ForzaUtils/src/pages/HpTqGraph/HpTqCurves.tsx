@@ -47,10 +47,10 @@ export function HpTqCurves(props: HpTqCurvesProps) {
         formatXLabel={(label) => {
           const index = lineData.labels.indexOf(label);
           return lineData.labels.length > 10
-            ? (index % 5 === 1)
+            ? (index % 5 === 0)
               ? label
               : ''
-            : (index % 2 === 1)
+            : (index % 2 === 0)
             ? label
             : ''
         }}
