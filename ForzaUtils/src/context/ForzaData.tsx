@@ -29,11 +29,15 @@ export interface ForzaDataProviderProps {
   children?: any;
 }
 
-export function ForzaDataProvider(props: ForzaDataProviderProps) {
+export function ForzaContextProvider(props: ForzaDataProviderProps) {
   const tag = 'ForzaDataProvider';
+  const inetInfo = props.netInfo as NetInfoWifiState;
+  const socketOptions = {
+    type: 'udp4',
+    reusePort: true
+  }
   const logger = useLogger();
   const [port, setPort] = useState(5200);
-  const inetInfo = props.netInfo as NetInfoWifiState;
   const [packet, setPacket] = useState<ForzaTelemetryApi | undefined>(undefined);
   const throttledPacket = useRef<ForzaTelemetryApi>(undefined);
 
@@ -57,7 +61,7 @@ export function ForzaDataProvider(props: ForzaDataProviderProps) {
 
   useEffect(() => {
     const flush = setInterval(() => {
-      if(throttledPacket.current){
+      if (throttledPacket.current) {
         setPacket(throttledPacket.current);
       }
     }, 100);
@@ -67,10 +71,7 @@ export function ForzaDataProvider(props: ForzaDataProviderProps) {
   }, []);
 
   useEffect(() => {
-    const socket = UdpSockets.createSocket({
-      type: 'udp4',
-      reusePort: true
-    })
+    const socket = UdpSockets.createSocket(socketOptions)
       .once('error', () => bindErrorCallback)
       .once('close', closeHandler)
       .once('listening', () => {
