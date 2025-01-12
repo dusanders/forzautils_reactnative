@@ -48,8 +48,8 @@ function App(): React.JSX.Element {
                       viewModel={viewModelStore.hpTqGraph} />
                     <SuspensionTravel route={AppRoutes.SUSPENSION_GRAPH}
                       viewModel={viewModelStore.suspensionGraph} />
-                    <TireTemps route={AppRoutes.TIRE_TEMPS}
-                      viewModel={viewModelStore.tireTemps} />
+                    <TireTemps route={AppRoutes.TIRE_TEMPS} 
+                      viewModel={viewModelStore.tireTemps}/>
                   </NavigationProvider>
                 )}
               </ViewModelStore.Consumer>

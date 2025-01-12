@@ -15,10 +15,10 @@ export function TireInfo(props: TireInfoProps) {
   const style = themeStyles(theme);
 
   const colorForTemp = (temp: number) => {
-    if(temp < 170) {
+    if(temp < 210) {
       return theme.colors.text.primary.onPrimary
     }
-    if(temp < 190) {
+    if(temp < 240) {
       return theme.colors.text.warning.onPrimary
     }
     return theme.colors.text.error.onPrimary

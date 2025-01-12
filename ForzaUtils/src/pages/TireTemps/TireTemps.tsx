@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { AppBarContainer } from "../../components/AppBarContainer";
 import { useTheme } from "../../hooks/useTheme";
 import { useNavigation } from "../../hooks/useNavigation";
@@ -18,6 +18,24 @@ export function TireTemps(props: TireTempsProps) {
   const theme = useTheme().theme;
   const style = themeStyles(theme);
   const navigation = useNavigation();
+  const [temps, setTemps] = useState<number[]>([0,0,0,0]);
+  const handleUpdate = useCallback(() => {
+    setTemps([
+      props.viewModel.leftFront,
+      props.viewModel.rightFront,
+      props.viewModel.leftRear,
+      props.viewModel.rightRear
+    ])
+  }, []);
+  useEffect(() => {
+    setTemps([
+      props.viewModel.leftFront,
+      props.viewModel.rightFront,
+      props.viewModel.leftRear,
+      props.viewModel.rightRear
+    ])
+  }, 
+    [props.viewModel.leftFront]);
 
   return (
     <AppBarContainer
@@ -26,15 +44,15 @@ export function TireTemps(props: TireTempsProps) {
         navigation.goBack()
       }}>
       <Row style={style.halfHeight}>
-        <TireInfo temp={0}
+        <TireInfo temp={temps[0]}
           title="Left Front" />
-        <TireInfo temp={0}
+        <TireInfo temp={temps[1]}
           title="Right Front" />
       </Row>
       <Row style={style.halfHeight}>
-        <TireInfo temp={0}
+        <TireInfo temp={temps[2]}
           title="Left Rear" />
-        <TireInfo temp={0}
+        <TireInfo temp={temps[3]}
           title="Right Rear" />
       </Row>
     </AppBarContainer>
