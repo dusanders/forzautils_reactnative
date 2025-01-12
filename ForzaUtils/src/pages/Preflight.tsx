@@ -84,7 +84,7 @@ export function Preflight(props: PreflightProps) {
   }, []);
 
   if (!loaded) {
-    return (<Splash route={AppRoutes.SPLASH} />)
+    return (<Splash/>)
   }
   if (!hasPermissions) {
     return (

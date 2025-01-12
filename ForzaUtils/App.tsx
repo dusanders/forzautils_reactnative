@@ -1,63 +1,90 @@
 import React from 'react';
 import {
-  SafeAreaView,
-  StatusBar,
   useColorScheme,
+  View,
 } from 'react-native';
 
 import { LocaleContextHoc } from './src/context/Locale';
-import { AppRoutes } from './src/constants/types';
+import { AppRoutes, RootStackParamList } from './src/constants/types';
 import { Preflight } from './src/pages/Preflight';
 import { ThemeProvider } from './src/context/Theme';
 import { WifiInfo } from './src/pages/WifiInfo';
-import { NavigationProvider } from './src/context/Navigator';
-import { Splash } from './src/pages/Splash';
 import { DataChooser } from './src/pages/DataChooser';
-import { ViewModelStore, ViewModelStore_Hoc } from './src/context/viewModels/ViewModelStore';
+import { ViewModelStore_Hoc } from './src/context/viewModels/ViewModelStore';
 import { HptqGraph } from './src/pages/HpTqGraph/HpTqGraph';
 import { SuspensionTravel } from './src/pages/SuspensionTravel/SuspensionTravel';
 import { TireTemps } from './src/pages/TireTemps/TireTemps';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
+function SafeStack(props: { children?: any }) {
+  const safeArea = useSafeAreaInsets();
+  return (
+    <View style={{
+      height: '100%',
+      width: '100%',
+      paddingTop: safeArea.top,
+      paddingBottom: safeArea.bottom,
+      paddingLeft: safeArea.left,
+      paddingRight: safeArea.right
+    }}>
+      {props.children}
+    </View>
+  )
+}
 function App(): React.JSX.Element {
   const colorScheme = useColorScheme();
-
   const isDarkTheme = () => {
     return colorScheme == 'dark';
   }
   return (
-    <SafeAreaView>
-      <StatusBar
-        barStyle={isDarkTheme() ? 'light-content' : 'dark-content'}
-      />
-      {/** Provide a Locale Context API */}
-      <LocaleContextHoc>
-        {/** Provide a Theme Context API */}
-        <ThemeProvider initialMode={colorScheme}>
-          {/** Preflight - check permissions, initial WiFi info, etc */}
-          <Preflight>
-            {/** View model store to preserve states across page changes */}
-            <ViewModelStore_Hoc>
-              <ViewModelStore.Consumer>
-                {viewModelStore => (
-                  <NavigationProvider
-                    initialRoute={AppRoutes.IP_INFO}>
-                    <WifiInfo route={AppRoutes.IP_INFO} />
-                    <DataChooser route={AppRoutes.DATA} />
-                    <HptqGraph route={AppRoutes.HP_TQ_GRAPH}
-                      viewModel={viewModelStore.hpTqGraph} />
-                    <SuspensionTravel route={AppRoutes.SUSPENSION_GRAPH}
-                      viewModel={viewModelStore.suspensionGraph} />
-                    <TireTemps route={AppRoutes.TIRE_TEMPS} 
-                      viewModel={viewModelStore.tireTemps}/>
-                  </NavigationProvider>
-                )}
-              </ViewModelStore.Consumer>
-            </ViewModelStore_Hoc>
-          </Preflight>
-        </ThemeProvider>
-      </LocaleContextHoc>
-    </SafeAreaView>
+    <SafeAreaProvider style={{ backgroundColor: "#000" }}>
+      <NavigationContainer>
+        <SafeStack>
+          {/** Provide a Locale Context API */}
+          <LocaleContextHoc>
+            {/** Provide a Theme Context API */}
+            <ThemeProvider initialMode={colorScheme}>
+              {/** Preflight - check permissions, initial WiFi info, etc */}
+              <Preflight>
+                {/** Setup the view models for the views - keeps values in cache 
+                 * while navigating between different screens
+                 */}
+                <ViewModelStore_Hoc>
+                  <Stack.Navigator
+                    initialRouteName={AppRoutes.IP_INFO}
+                    screenOptions={{ headerShown: false }}>
+                    <Stack.Screen
+                      name={AppRoutes.IP_INFO}
+                      component={WifiInfo} />
+                    <Stack.Screen
+                      name={AppRoutes.DATA}
+                      component={DataChooser} />
+                    <Stack.Screen
+                      name={AppRoutes.HP_TQ_GRAPH}
+                      component={HptqGraph} />
+                    <Stack.Screen
+                      name={AppRoutes.SUSPENSION_GRAPH}
+                      component={SuspensionTravel} />
+                    <Stack.Screen
+                      name={AppRoutes.TIRE_TEMPS}
+                      component={TireTemps} />
+                    <Stack.Screen
+                      name={AppRoutes.GRIP}
+                      component={HptqGraph} />
+                  </Stack.Navigator>
+                </ViewModelStore_Hoc>
+              </Preflight>
+            </ThemeProvider>
+          </LocaleContextHoc>
+
+        </SafeStack>
+      </NavigationContainer>
+
+    </SafeAreaProvider>
   );
 }
 

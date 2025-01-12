@@ -1,41 +1,42 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { AppBarContainer } from "../../components/AppBarContainer";
 import { useTheme } from "../../hooks/useTheme";
-import { useNavigation } from "../../hooks/useNavigation";
 import { IThemeElements } from "../../constants/Themes";
-import { StyleSheet, View } from "react-native";
-import { INavigationTarget } from "../../context/Navigator";
-import { ITireTempViewModel } from "../../context/viewModels/TireTempViewModel";
-import { Card } from "../../components/Card";
+import { StyleSheet } from "react-native";
 import { Row } from "../../components/Row";
 import { TireInfo } from "./TireInfo";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigation } from "../../constants/types";
 
-export interface TireTempsProps extends INavigationTarget {
-  viewModel: ITireTempViewModel;
+export interface TireTempsProps {
+  // Nothing
 }
 
 export function TireTemps(props: TireTempsProps) {
   const theme = useTheme().theme;
   const style = themeStyles(theme);
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigation>();
+  const store = useViewModelStore();
+  const viewModel = store.tireTemps;
   const [temps, setTemps] = useState<number[]>([0,0,0,0]);
   const handleUpdate = useCallback(() => {
     setTemps([
-      props.viewModel.leftFront,
-      props.viewModel.rightFront,
-      props.viewModel.leftRear,
-      props.viewModel.rightRear
+      viewModel.leftFront,
+      viewModel.rightFront,
+      viewModel.leftRear,
+      viewModel.rightRear
     ])
   }, []);
   useEffect(() => {
     setTemps([
-      props.viewModel.leftFront,
-      props.viewModel.rightFront,
-      props.viewModel.leftRear,
-      props.viewModel.rightRear
+      viewModel.leftFront,
+      viewModel.rightFront,
+      viewModel.leftRear,
+      viewModel.rightRear
     ])
   }, 
-    [props.viewModel.leftFront]);
+    [viewModel.leftFront]);
 
   return (
     <AppBarContainer

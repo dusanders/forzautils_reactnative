@@ -3,9 +3,8 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
 import { useLocale } from "../hooks/useLocale";
-import { INavigationTarget } from "../context/Navigator";
 
-export interface SplashProps extends INavigationTarget {
+export interface SplashProps {
 
 }
 

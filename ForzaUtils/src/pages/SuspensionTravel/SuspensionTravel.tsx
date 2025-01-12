@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Dimensions, ScaledSize, StyleSheet } from "react-native";
-import { ISuspensionGraphViewModel } from "../../context/viewModels/SuspensionGraphViewModel";
-import { INavigationTarget } from "../../context/Navigator";
 import { AppBarContainer } from "../../components/AppBarContainer";
-import { useNavigation } from "../../hooks/useNavigation";
 import { useTheme } from "../../hooks/useTheme";
 import { IThemeElements } from "../../constants/Themes";
 import { BarChart } from "react-native-chart-kit";
 import { ChartData } from "react-native-chart-kit/dist/HelperTypes";
 import { Paper } from "../../components/Paper";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigation } from "../../constants/types";
 
-export interface SuspensionTravelProps extends INavigationTarget {
-  viewModel: ISuspensionGraphViewModel;
+export interface SuspensionTravelProps {
+  // Nothing
 }
 
 const labels = [
@@ -27,7 +27,9 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   const getScaledWidth = (screenWidth: number) => {
     return screenWidth;
   }
-  const navigation = useNavigation();
+  const store = useViewModelStore();
+  const viewModel = store.suspensionGraph;
+  const navigation = useNavigation<StackNavigation>();
   const theme = useTheme().theme;
   const [height, setHeight] = useState(getScaledHeight(Dimensions.get('window').height));
   const [width, setWidth] = useState(getScaledWidth(Dimensions.get('window').width));
@@ -52,19 +54,19 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
       datasets: [
         {
           data: [
-            props.viewModel.leftFront,
-            props.viewModel.rightFront,
-            props.viewModel.leftRear,
-            props.viewModel.rightRear
+            viewModel.leftFront,
+            viewModel.rightFront,
+            viewModel.leftRear,
+            viewModel.rightRear
           ],
         },
       ]
     })
-  }, [props.viewModel.leftFront]);
+  }, [store.suspensionGraph.leftFront]);
 
   useEffect(
     handleViewModelUpdate,
-    [props.viewModel.leftFront]
+    [store.suspensionGraph.leftFront]
   );
 
   useEffect(() => {

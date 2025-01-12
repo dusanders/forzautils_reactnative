@@ -3,19 +3,17 @@ import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
-import { INavigationTarget } from "../context/Navigator";
-import { AppRoutes } from "../constants/types";
-import { useNavigation } from "../hooks/useNavigation";
+import { AppRoutes, StackNavigation } from "../constants/types";
 import { useForzaData } from "../hooks/useForzaData";
 import { Card } from "../components/Card";
 import { ThemeButton } from "../components/ThemeButton";
 import { ThemeIcon } from "../components/ThemeIcon";
-import { AppBar } from "../components/AppBar";
 import { AppBarContainer } from "../components/AppBarContainer";
 import { Row } from "../components/Row";
+import { useNavigation } from "@react-navigation/native";
 
-export interface WifiInfoProps extends INavigationTarget {
-
+export interface WifiInfoProps {
+  // None
 }
 
 interface CircleCheckIconProps {
@@ -48,7 +46,7 @@ function CircleCheckIcon(props: CircleCheckIconProps) {
 export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps> {
   const theme = useTheme();
   const styles = themeStyles(theme.theme);
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigation>();
   const forza = useForzaData();
 
   return (
@@ -114,7 +112,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
         <ThemeButton
           style={styles.doneBtn}
           onPress={() => {
-            navigation.navigateTo(AppRoutes.DATA);
+            navigation.push(AppRoutes.DATA);
           }}>
           <CircleCheckIcon />
           <ThemeText

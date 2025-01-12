@@ -1,26 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { useNavigation } from "../../hooks/useNavigation";
-import { ActivityIndicator, Dimensions, FlatList, StyleSheet, View } from "react-native";
+import React, { memo, useCallback, useState } from "react";
+import { ActivityIndicator, Dimensions, FlatList, ListRenderItemInfo, StyleSheet, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import { IThemeElements } from "../../constants/Themes";
 import { Assets } from "../../assets";
-import { DataEvent, IHpTqGraphViewModel } from "../../context/viewModels/HpTqGraphViewModel";
+import { GearData } from "../../context/viewModels/HpTqGraphViewModel";
 import { Paper } from "../../components/Paper";
 import { AppBarContainer } from "../../components/AppBarContainer";
 import { ThemeText } from "../../components/ThemeText";
-import { AppRoutes, randomKey } from "../../constants/types";
+import { randomKey } from "../../constants/types";
 import { HpTqCurves } from "./HpTqCurves";
-import { INavigationTarget } from "../../context/Navigator";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigation } from "../../constants/types";
 
-export interface HpTqGraphProps extends INavigationTarget {
-  route: AppRoutes;
-  viewModel: IHpTqGraphViewModel;
+export interface HpTqGraphProps {
+
 }
 
 export function HptqGraph(props: HpTqGraphProps) {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigation>();
   const theme = useTheme();
   const styles = themeStyles(theme.theme);
+  const store = useViewModelStore();
   const [graphWidth, setGraphWidth] = useState(Dimensions.get('window').width - 40);
 
   const separator = () => {
@@ -31,6 +32,28 @@ export function HptqGraph(props: HpTqGraphProps) {
     )
   }
 
+  const CurveMemo = memo((props: { item: GearData }) => {
+    console.log(`render curve`)
+    return (
+      <HpTqCurves
+        width={graphWidth}
+        key={randomKey()}
+        data={props.item.events}
+        gear={props.item.gear} />
+
+    )
+  }, (prev, next) => {
+    return prev.item.events.length === next.item.events.length
+  });
+
+  const renderItem = useCallback((item: ListRenderItemInfo<GearData>) => {
+    return (
+      <CurveMemo item={item.item} />
+    )
+  }, [store.hpTqGraph.gears]);
+
+
+  console.log(`render parent`)
   return (
     <AppBarContainer title="Hp / Tq Graph"
       onBack={() => {
@@ -40,7 +63,7 @@ export function HptqGraph(props: HpTqGraphProps) {
         {
           id: randomKey(),
           onPress: () => {
-            props.viewModel.clearCache();
+            store.hpTqGraph.clearCache();
           },
           renderItem: () => (
             <ThemeText
@@ -53,7 +76,7 @@ export function HptqGraph(props: HpTqGraphProps) {
       ]}>
       <View
         style={styles.contentWrapper}>
-        {props.viewModel.gears.length < 1 && (
+        {store.hpTqGraph.gears.length < 1 && (
           <Paper style={styles.waitPaper}>
             <ThemeText
               fontFamily="bold"
@@ -68,20 +91,14 @@ export function HptqGraph(props: HpTqGraphProps) {
             <ActivityIndicator />
           </Paper>
         )}
-        {props.viewModel.gears.length > 0 && (
+        {store.hpTqGraph.gears.length > 0 && (
           <FlatList
             ItemSeparatorComponent={separator}
             style={{
               flexGrow: 1
             }}
-            data={props.viewModel.gears}
-            renderItem={(item) => (
-              <HpTqCurves
-                width={graphWidth}
-                key={randomKey()}
-                data={item.item.events}
-                gear={item.item.gear} />
-            )} />
+            data={store.hpTqGraph.gears}
+            renderItem={renderItem} />
         )}
       </View>
     </AppBarContainer>
