@@ -4,7 +4,7 @@ import { AppBarContainer } from "../../components/AppBarContainer";
 import { useTheme } from "../../hooks/useTheme";
 import { IThemeElements } from "../../constants/Themes";
 import { BarChart } from "react-native-chart-kit";
-import { ChartData } from "react-native-chart-kit/dist/HelperTypes";
+import { ChartData, Dataset } from "react-native-chart-kit/dist/HelperTypes";
 import { Paper } from "../../components/Paper";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
@@ -27,6 +27,17 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   const getScaledWidth = (screenWidth: number) => {
     return screenWidth;
   }
+  const getDataSets = (toDisplay: number[]): Dataset[] => {
+    return [
+      {
+        data: toDisplay
+      },
+      {
+        data: [100],
+        withDots: false
+      }
+    ]
+  }
   const store = useViewModelStore();
   const viewModel = store.suspensionGraph;
   const navigation = useNavigation<StackNavigation>();
@@ -36,14 +47,10 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   const style = themeStyles(theme);
   const [chartData, setChartData] = useState<ChartData>({
     labels: labels,
-    datasets: [
-      {
-        data: [0, 0, 0, 0]
-      }
-    ]
+    datasets: getDataSets([0, 0, 0, 0])
   });
 
-  const handleOrientationChange = useCallback((ev: {window: ScaledSize, screen: ScaledSize}) => {
+  const handleOrientationChange = useCallback((ev: { window: ScaledSize, screen: ScaledSize }) => {
     setHeight(getScaledHeight(ev.window.height));
     setWidth(getScaledWidth(ev.window.width));
   }, [])
@@ -51,16 +58,10 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   const handleViewModelUpdate = useCallback(() => {
     setChartData({
       labels: labels,
-      datasets: [
-        {
-          data: [
-            viewModel.leftFront,
-            viewModel.rightFront,
-            viewModel.leftRear,
-            viewModel.rightRear
-          ],
-        },
-      ]
+      datasets: getDataSets(
+        [viewModel.leftFront, viewModel.rightFront,
+        viewModel.leftRear, viewModel.rightRear]
+      )
     })
   }, [store.suspensionGraph.leftFront]);
 

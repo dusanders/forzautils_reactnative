@@ -39,7 +39,7 @@ const options: DataOption[] = [
   },
   {
     id: randomKey(),
-    route: AppRoutes.HP_TQ_GRAPH,
+    route: AppRoutes.GRIP,
     name: 'Grip',
     description: 'Compare tire slip, steering angle, throttle, and brake'
   }

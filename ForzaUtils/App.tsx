@@ -17,6 +17,7 @@ import { TireTemps } from './src/pages/TireTemps/TireTemps';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Grip } from './src/pages/Grip/Grip';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -74,7 +75,7 @@ function App(): React.JSX.Element {
                       component={TireTemps} />
                     <Stack.Screen
                       name={AppRoutes.GRIP}
-                      component={HptqGraph} />
+                      component={Grip} />
                   </Stack.Navigator>
                 </ViewModelStore_Hoc>
               </Preflight>
