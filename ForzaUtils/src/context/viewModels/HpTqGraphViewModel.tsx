@@ -127,7 +127,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
 
   const ignorePacket = () => {
     if (!forza.packet) {
-      logger.warn(tag, `undefined data packet`);
+      logger.debug(tag, `undefined data packet`);
       return true;
     }
     if (!forza.packet.isRaceOn) {
@@ -171,16 +171,17 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   }
 
   const insertEvent = (newEvent: DataEvent) => {
-    const toInsertIndex = newEvent.gear - 1;
     setGears((prev) => {
-      if (prev.length < (newEvent.gear)) {
+      const exists = prev.find((i) => i.gear === newEvent.gear);
+      if (!exists) {
         return [...prev, {
           gear: newEvent.gear,
           events: [newEvent]
         }]
       }
+
       const newState = prev.map((gear, index) => {
-        if (index !== toInsertIndex) {
+        if (gear.gear !== newEvent.gear) {
           return gear
         }
         let existing = gear.events.find((ev) => ev.rpm === newEvent.rpm);
@@ -211,7 +212,6 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
 
   useEffect(() => {
     if (!ignorePacket()) {
-      logger.log(tag, `update vm`);
       insertEvent(eventFromPacket(forza.packet!));
     }
   }, [forza.packet]);
