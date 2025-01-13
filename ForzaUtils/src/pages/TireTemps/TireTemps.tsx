@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AppBarContainer } from "../../components/AppBarContainer";
 import { useTheme } from "../../hooks/useTheme";
 import { IThemeElements } from "../../constants/Themes";
@@ -19,24 +19,17 @@ export function TireTemps(props: TireTempsProps) {
   const navigation = useNavigation<StackNavigation>();
   const store = useViewModelStore();
   const viewModel = store.tireTemps;
-  const [temps, setTemps] = useState<number[]>([0,0,0,0]);
-  const handleUpdate = useCallback(() => {
-    setTemps([
+  
+  const temps = useMemo(() => {
+    return [
       viewModel.leftFront,
       viewModel.rightFront,
       viewModel.leftRear,
       viewModel.rightRear
-    ])
-  }, []);
-  useEffect(() => {
-    setTemps([
-      viewModel.leftFront,
-      viewModel.rightFront,
-      viewModel.leftRear,
-      viewModel.rightRear
-    ])
-  }, 
-    [viewModel.leftFront]);
+    ]
+  }, [viewModel.leftFront, viewModel.rightFront,
+    viewModel.leftRear, viewModel.rightRear
+  ]);
 
   return (
     <AppBarContainer

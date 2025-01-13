@@ -1,6 +1,7 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useMemo, useReducer } from "react";
 import { StateHandler } from "../../constants/types";
 import { useForzaData } from "../../hooks/useForzaData";
+import { useLogger } from "../Logger";
 
 export interface ITireTempViewModel {
   leftFront: number;
@@ -9,43 +10,31 @@ export interface ITireTempViewModel {
   rightRear: number;
 }
 
-interface TireTempViewModelState {
-  leftFront: number;
-  rightFront: number;
-  leftRear: number;
-  rightRear: number;
-}
-const initialState: TireTempViewModelState = {
-  leftFront: 0,
-  rightFront: 0,
-  leftRear: 0,
-  rightRear: 0
-}
 export function useTireTempsViewModel(): ITireTempViewModel {
+  const tag = `TireTempsViewModel`;
+  const logger = useLogger();
   const forza = useForzaData();
-  const [state, setState] = useReducer<StateHandler<TireTempViewModelState>>((prev, next) => {
-    return {
-      ...prev,
-      ...next
-    }
-  }, initialState);
-
-  useEffect(() => {
-    if(!forza.packet) {
-      return;
-    }
-    setState({
-      leftFront: forza.packet.tireTemp.leftFront,
-      rightFront: forza.packet.tireTemp.rightFront,
-      leftRear: forza.packet.tireTemp.leftRear,
-      rightRear: forza.packet.tireTemp.rightRear
-    });
-  }, [forza.packet])
+  const leftFront = useMemo(() =>
+    forza.packet?.formatDecimal(forza.packet.tireTemp.leftFront) || 0,
+    [forza.packet?.tireTemp.leftFront]
+  );
+  const rightFront = useMemo(() =>
+    forza.packet?.formatDecimal(forza.packet.tireTemp.rightFront) || 0,
+    [forza.packet?.tireTemp.rightFront]
+  );
+  const leftRear = useMemo(() =>
+    forza.packet?.formatDecimal(forza.packet.tireTemp.leftRear) || 0,
+    [forza.packet?.tireTemp.leftRear]
+  );
+  const rightRear = useMemo(() =>
+    forza.packet?.formatDecimal(forza.packet.tireTemp.rightRear) || 0,
+    [forza.packet?.tireTemp.rightRear]
+  );
 
   return {
-    leftFront: state.leftFront,
-    rightFront: state.rightFront,
-    leftRear: state.leftRear,
-    rightRear: state.rightRear
+    leftFront: leftFront,
+    rightFront: rightFront,
+    leftRear: leftRear,
+    rightRear: rightRear
   }
 }

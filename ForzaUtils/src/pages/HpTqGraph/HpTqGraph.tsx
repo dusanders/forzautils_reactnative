@@ -48,7 +48,6 @@ export function HptqGraph(props: HpTqGraphProps) {
     getScaledWidth(Dimensions.get('window'))
   );
 
-
   const separator = () => {
     return (
       <View style={{
@@ -58,7 +57,7 @@ export function HptqGraph(props: HpTqGraphProps) {
   }
 
   useEffect(() => {
-    store.hpTqGraph.DEBUG_StartStream();
+    // store.hpTqGraph.DEBUG_StartStream();
     const handleOrientation = Dimensions.addEventListener('change',
       (ev: { window: ScaledSize, screen: ScaledSize }) => {
         setGraphWidth(
