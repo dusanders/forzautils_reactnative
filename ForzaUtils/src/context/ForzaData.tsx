@@ -56,7 +56,7 @@ export function ForzaContextProvider(props: ForzaDataProviderProps) {
   }, []);
 
   const closeHandler = useCallback(() => {
-    logger.warn(tag, `socket did close`);
+    logger.debug(tag, `socket did close`);
   }, []);
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export function ForzaContextProvider(props: ForzaDataProviderProps) {
     return () => {
       if (socket) {
         socket.close(() => {
-          logger.warn(tag, 'socket did close from close() call');
+          logger.debug(tag, 'socket did close from close() call');
         })
       }
     }
