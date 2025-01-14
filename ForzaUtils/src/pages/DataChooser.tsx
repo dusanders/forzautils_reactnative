@@ -1,17 +1,13 @@
 import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import { INavigationTarget } from "../context/Navigator";
-import { AppRoutes, randomKey } from "../constants/types";
-import { useNavigation } from "../hooks/useNavigation";
-import { useForzaData } from "../hooks/useForzaData";
+import { AppRoutes, randomKey, StackNavigation } from "../constants/types";
 import { IThemeElements } from "../constants/Themes";
-import { Container } from "../components/Container";
 import { useTheme } from "../hooks/useTheme";
-import { AppBar } from "../components/AppBar";
 import { Card } from "../components/Card";
 import { AppBarContainer } from "../components/AppBarContainer";
+import { useNavigation } from "@react-navigation/native";
 
-export interface DataChooserProps extends INavigationTarget {
+export interface DataChooserProps {
 
 }
 
@@ -43,7 +39,7 @@ const options: DataOption[] = [
   },
   {
     id: randomKey(),
-    route: AppRoutes.HP_TQ_GRAPH,
+    route: AppRoutes.GRIP,
     name: 'Grip',
     description: 'Compare tire slip, steering angle, throttle, and brake'
   }
@@ -52,8 +48,7 @@ const options: DataOption[] = [
 export function DataChooser(props: DataChooserProps) {
   const theme = useTheme();
   const styles = themeStyles(theme.theme);
-  const navigation = useNavigation();
-  const forzaData = useForzaData();
+  const navigation = useNavigation<StackNavigation>();
 
   return (
     <AppBarContainer
@@ -95,7 +90,7 @@ export function DataChooser(props: DataChooserProps) {
                 onPress={(id) => {
                   for (const i of options) {
                     if (i.id === id) {
-                      navigation.navigateTo(i.route)
+                      navigation.navigate(i.route);
                     }
                   }
                 }} />

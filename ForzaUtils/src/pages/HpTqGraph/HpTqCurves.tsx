@@ -3,17 +3,13 @@ import LineChart, { LineChartData } from "react-native-chart-kit/dist/line-chart
 import { Paper } from "../../components/Paper";
 import { ThemeText } from "../../components/ThemeText";
 import { useTheme } from "../../hooks/useTheme";
+import { DataEvent } from "../../context/viewModels/HpTqGraphViewModel";
 
-export interface CurveDataPoint {
-  rpm: number,
-  hp: number,
-  tq: number
-}
 
 export interface HpTqCurvesProps {
   gear: number;
   width: number;
-  data: CurveDataPoint[];
+  data: DataEvent[];
 }
 
 export function HpTqCurves(props: HpTqCurvesProps) {
@@ -34,6 +30,7 @@ export function HpTqCurves(props: HpTqCurvesProps) {
     ],
     legend: ['Torque', 'Horsepower'],
   }
+
   return (
     <Paper centerContent>
       <ThemeText>
@@ -47,12 +44,12 @@ export function HpTqCurves(props: HpTqCurvesProps) {
         formatXLabel={(label) => {
           const index = lineData.labels.indexOf(label);
           return lineData.labels.length > 10
-            ? (index % 5 === 1)
+            ? (index % 5 === 0)
               ? label
               : ''
-            : (index % 2 === 1)
-            ? label
-            : ''
+            : (index % 2 === 0)
+              ? label
+              : ''
         }}
         chartConfig={{
           labelColor: () => theme.theme.colors.text.primary.onPrimary,

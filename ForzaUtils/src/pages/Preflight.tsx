@@ -5,7 +5,7 @@ import { WifiError } from "./WifiError";
 import { useTheme } from "../hooks/useTheme";
 import { AppState, Linking, Platform, useColorScheme } from "react-native";
 import { AppRoutes } from "../constants/types";
-import { ForzaDataProvider } from "../context/ForzaData";
+import { ForzaContextProvider } from "../context/ForzaData";
 import { useLogger } from "../context/Logger";
 import { Permission, PERMISSIONS, requestMultiple } from "react-native-permissions";
 import { PermissionError } from "./PermissionError";
@@ -84,7 +84,7 @@ export function Preflight(props: PreflightProps) {
   }, []);
 
   if (!loaded) {
-    return (<Splash route={AppRoutes.SPLASH} />)
+    return (<Splash/>)
   }
   if (!hasPermissions) {
     return (
@@ -103,8 +103,8 @@ export function Preflight(props: PreflightProps) {
     )
   }
   return (
-    <ForzaDataProvider netInfo={netInfo!}>
+    <ForzaContextProvider netInfo={netInfo!}>
       {props.children}
-    </ForzaDataProvider>
+    </ForzaContextProvider>
   );
 }

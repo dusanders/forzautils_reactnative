@@ -1,6 +1,6 @@
 import { NetInfoState, NetInfoWifiState } from "@react-native-community/netinfo";
 import { ForzaTelemetryApi } from "ForzaTelemetryApi";
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { useLogger } from "./Logger";
 import UdpSockets from "react-native-udp";
 
@@ -29,12 +29,17 @@ export interface ForzaDataProviderProps {
   children?: any;
 }
 
-export function ForzaDataProvider(props: ForzaDataProviderProps) {
+export function ForzaContextProvider(props: ForzaDataProviderProps) {
   const tag = 'ForzaDataProvider';
+  const inetInfo = props.netInfo as NetInfoWifiState;
+  const socketOptions = {
+    type: 'udp4',
+    reusePort: true
+  }
   const logger = useLogger();
   const [port, setPort] = useState(5200);
-  const inetInfo = props.netInfo as NetInfoWifiState;
   const [packet, setPacket] = useState<ForzaTelemetryApi | undefined>(undefined);
+  const throttledPacket = useRef<ForzaTelemetryApi>(undefined);
 
   const bindErrorCallback = useCallback(() => {
     logger.error(tag, `Failed to bind port!`);
@@ -45,20 +50,28 @@ export function ForzaDataProvider(props: ForzaDataProviderProps) {
   }, []);
 
   const dataHandler = useCallback((data: Buffer, rinfo: Upd_rinfo) => {
-    // logger.debug(tag, `msg: ${data.toString()}`);
     const packet = new ForzaTelemetryApi(rinfo.size, data);
-    setPacket(packet)
+    // logger.debug(tag, `packet: ${packet.isRaceOn}`);
+    throttledPacket.current = packet;
   }, []);
 
   const closeHandler = useCallback(() => {
-    logger.warn(tag, `socket did close`);
+    logger.debug(tag, `socket did close`);
   }, []);
 
   useEffect(() => {
-    const socket = UdpSockets.createSocket({
-      type: 'udp4',
-      reusePort: true
-    })
+    const flush = setInterval(() => {
+      if (throttledPacket.current) {
+        setPacket(throttledPacket.current);
+      }
+    }, 100);
+    return () => {
+      clearInterval(flush)
+    }
+  }, []);
+
+  useEffect(() => {
+    const socket = UdpSockets.createSocket(socketOptions)
       .once('error', () => bindErrorCallback)
       .once('close', closeHandler)
       .once('listening', () => {
@@ -73,7 +86,7 @@ export function ForzaDataProvider(props: ForzaDataProviderProps) {
     return () => {
       if (socket) {
         socket.close(() => {
-          logger.warn(tag, 'socket did close from close() call');
+          logger.debug(tag, 'socket did close from close() call');
         })
       }
     }

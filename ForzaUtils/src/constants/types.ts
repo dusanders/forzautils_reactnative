@@ -1,13 +1,18 @@
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export type StateHandler<T> = (prev: T, next: Partial<T>) => T;
 
+export type RootStackParamList = Record<AppRoutes, undefined>;
+export type StackNavigation = NativeStackNavigationProp<RootStackParamList>;
+
 export enum AppRoutes {
-  SPLASH,
-  IP_INFO,
-  DATA,
-  HP_TQ_GRAPH,
-  SUSPENSION_GRAPH,
-  TIRE_TEMPS
+  SPLASH = 'splash',
+  IP_INFO = 'ip_info',
+  DATA = 'data',
+  HP_TQ_GRAPH = 'hp_tq_graph',
+  SUSPENSION_GRAPH = 'suspension_graph',
+  TIRE_TEMPS = 'tire_temps',
+  GRIP = 'grip'
 }
 export function delay(delay: number): Promise<void> {
   return new Promise((resolve, reject) => {

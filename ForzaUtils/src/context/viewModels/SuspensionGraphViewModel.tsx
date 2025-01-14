@@ -1,6 +1,7 @@
-import React, { ReactElement, useEffect, useReducer } from "react";
+import React, { ReactElement, useEffect, useMemo, useReducer } from "react";
 import { StateHandler } from "../../constants/types";
 import { useForzaData } from "../../hooks/useForzaData";
+import { useLogger } from "../Logger";
 
 export interface ISuspensionGraphViewModel {
   leftFront: number;
@@ -24,35 +25,30 @@ const initialState: SuspensionGraphViewModelState = {
 }
 
 export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
+  const tag = 'SuspensionGraphViewModel';
+  const logger = useLogger();
   const forza = useForzaData();
-  const [state, setState] = useReducer<StateHandler<SuspensionGraphViewModelState>>((prev, next) => {
-    const result = {
-      ...prev,
-      ...next
-    }
-    return result;
-  }, initialState);
-
-  useEffect(() => {
-    if (!forza.packet) {
-      return;
-    }
-    const leftFront = forza.packet.normalizedSuspensionTravel.leftFront;
-    const rightFront = forza.packet.normalizedSuspensionTravel.rightFront;
-    const leftRear = forza.packet.normalizedSuspensionTravel.leftRear;
-    const rightRear = forza.packet.normalizedSuspensionTravel.rightRear;
-    setState({
-      leftFront: leftFront,
-      rightFront: rightFront,
-      leftRear: leftRear,
-      rightRear: rightRear
-    });
-  }, [forza.packet]);
+  const leftFront = useMemo(() =>
+    forza.packet?.normalizedSuspensionTravel.leftFront || 0,
+    [forza.packet?.normalizedSuspensionTravel.leftFront]
+  );
+  const rightFront = useMemo(() =>
+    forza.packet?.normalizedSuspensionTravel.rightFront || 0,
+    [forza.packet?.normalizedSuspensionTravel.rightFront]
+  );
+  const leftRear = useMemo(() =>
+    forza.packet?.normalizedSuspensionTravel.leftRear || 0,
+    [forza.packet?.normalizedSuspensionTravel.leftRear]
+  );
+  const rightRear = useMemo(() =>
+    forza.packet?.normalizedSuspensionTravel.rightRear || 0,
+    [forza.packet?.normalizedSuspensionTravel.rightRear]
+  );
 
   return {
-    leftFront: state.leftFront,
-    leftRear: state.leftRear,
-    rightFront: state.rightFront,
-    rightRear: state.rightRear
+    leftFront: leftFront,
+    leftRear: leftRear,
+    rightFront: rightFront,
+    rightRear: rightRear
   };
 }

@@ -1,27 +1,52 @@
-import React, { useEffect, useState } from "react";
-import { useNavigation } from "../../hooks/useNavigation";
-import { ActivityIndicator, Dimensions, FlatList, StyleSheet, View } from "react-native";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Dimensions, FlatList, ListRenderItemInfo, ScaledSize, ScrollView, StyleSheet, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import { IThemeElements } from "../../constants/Themes";
 import { Assets } from "../../assets";
-import { DataEvent, IHpTqGraphViewModel } from "../../context/viewModels/HpTqGraphViewModel";
+import { DataEvent, GearData } from "../../context/viewModels/HpTqGraphViewModel";
 import { Paper } from "../../components/Paper";
 import { AppBarContainer } from "../../components/AppBarContainer";
 import { ThemeText } from "../../components/ThemeText";
-import { AppRoutes, randomKey } from "../../constants/types";
+import { randomKey } from "../../constants/types";
 import { HpTqCurves } from "./HpTqCurves";
-import { INavigationTarget } from "../../context/Navigator";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigation } from "../../constants/types";
 
-export interface HpTqGraphProps extends INavigationTarget {
-  route: AppRoutes;
-  viewModel: IHpTqGraphViewModel;
+export interface HpTqGraphProps {
+
+}
+
+interface CurvesMemoProps {
+  gear: number;
+  events: DataEvent[];
+  width: number;
+}
+const CurveMemo = memo((props: CurvesMemoProps) => {
+  console.log(`render curve ${props.gear} ${JSON.stringify(props.events.length)}`)
+  return (
+    <HpTqCurves
+      width={props.width}
+      data={props.events}
+      gear={props.gear} />
+  )
+});
+
+function getScaledWidth(window: ScaledSize) {
+  const measure = window.width > window.height
+    ? window.width - 100
+    : window.width;
+  return measure * 0.9;
 }
 
 export function HptqGraph(props: HpTqGraphProps) {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigation>();
   const theme = useTheme();
   const styles = themeStyles(theme.theme);
-  const [graphWidth, setGraphWidth] = useState(Dimensions.get('window').width - 40);
+  const store = useViewModelStore();
+  const [graphWidth, setGraphWidth] = useState(
+    getScaledWidth(Dimensions.get('window'))
+  );
 
   const separator = () => {
     return (
@@ -31,6 +56,21 @@ export function HptqGraph(props: HpTqGraphProps) {
     )
   }
 
+  useEffect(() => {
+    // store.hpTqGraph.DEBUG_StartStream();
+    const handleOrientation = Dimensions.addEventListener('change',
+      (ev: { window: ScaledSize, screen: ScaledSize }) => {
+        setGraphWidth(
+          getScaledWidth(ev.window)
+        )
+      }
+    );
+    return () => {
+      handleOrientation.remove();
+    }
+  }, []);
+
+  console.log(`render parent`)
   return (
     <AppBarContainer title="Hp / Tq Graph"
       onBack={() => {
@@ -40,7 +80,7 @@ export function HptqGraph(props: HpTqGraphProps) {
         {
           id: randomKey(),
           onPress: () => {
-            props.viewModel.clearCache();
+            store.hpTqGraph.clearCache();
           },
           renderItem: () => (
             <ThemeText
@@ -53,7 +93,7 @@ export function HptqGraph(props: HpTqGraphProps) {
       ]}>
       <View
         style={styles.contentWrapper}>
-        {props.viewModel.gears.length < 1 && (
+        {store.hpTqGraph.gears.length < 1 && (
           <Paper style={styles.waitPaper}>
             <ThemeText
               fontFamily="bold"
@@ -68,20 +108,26 @@ export function HptqGraph(props: HpTqGraphProps) {
             <ActivityIndicator />
           </Paper>
         )}
-        {props.viewModel.gears.length > 0 && (
+        {store.hpTqGraph.gears.length > 0 && (
+
           <FlatList
             ItemSeparatorComponent={separator}
             style={{
               flexGrow: 1
             }}
-            data={props.viewModel.gears}
-            renderItem={(item) => (
-              <HpTqCurves
-                width={graphWidth}
-                key={randomKey()}
-                data={item.item.events}
-                gear={item.item.gear} />
-            )} />
+            data={store.hpTqGraph.gears}
+            keyExtractor={(item) => `${item.gear}`}
+            // renderItem={renderItem}
+            renderItem={(item) => {
+              return (
+                <CurveMemo
+                  gear={item.item.gear}
+                  events={item.item.events}
+                  width={graphWidth} />
+              )
+            }}
+          />
+
         )}
       </View>
     </AppBarContainer>
