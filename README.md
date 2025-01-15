@@ -19,10 +19,10 @@ Build and deploy the app per React Native workflow:
 
 Shows the IP and Port, optionally the WiFi name the device is connected to, if you allowed Location permission.
 
-<img src="./readme_assets/landing.png" />
+<img src="./readme_assets/landing.png" height="450" />
 
 ### Second Screen
 
 Shows various data viewer options
 
-<img src="./readme_assets/options.png" />
+<img src="./readme_assets/options.png" height="450" />
