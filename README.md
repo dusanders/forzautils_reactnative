@@ -5,6 +5,8 @@ Forza Utility written in React Native.
 
 ## React Native Mobile App
 
+Clone: [ForzaTelemetryAPI](https://github.com/dusanders/ForzaTelemetryAPI_typescript) at the project root - it is required by this app at: `../../ForzaTelemetryAPI_typescript`
+
 This is a mobile app for iOS and Android for viewing Forza telemetry data.
 
 Build and deploy the app per React Native workflow:
