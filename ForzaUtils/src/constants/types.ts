@@ -14,6 +14,7 @@ export enum AppRoutes {
   TIRE_TEMPS = 'tire_temps',
   GRIP = 'grip'
 }
+
 export function delay(delay: number): Promise<void> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -21,6 +22,7 @@ export function delay(delay: number): Promise<void> {
     }, delay);
   })
 }
+
 export function randomKey(): string {
   let
     d = new Date().getTime(),

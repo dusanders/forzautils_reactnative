@@ -6,42 +6,15 @@ import { BarChart, LineChart, ProgressChart } from "react-native-chart-kit";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { ChartData } from "react-native-chart-kit/dist/HelperTypes";
 import { useTheme } from "../../hooks/useTheme";
+import { BrakeThrottleChart, BrakeThrottleChartProps } from "./BrakeThrottleChart";
+import { SteeringChart } from "./SteeringChart";
+import { TireSlip } from "./TireSlip";
+import { ScrollView } from "react-native";
+import { TireData } from "ForzaTelemetryApi";
 
 export interface GripProps {
   // Nothing
 }
-
-interface BrakeThrottleChartProps {
-  throttle: number;
-  brake: number;
-}
-const BrakeThrottleChart = memo((props: BrakeThrottleChartProps) => {
-  return (
-    <ProgressChart
-      style={{
-        backgroundColor: '#00000000'
-      }}
-      data={{
-        labels: ['Brake', 'Throttle'],
-        data: [props.brake, props.throttle]
-      }}
-      width={370}
-      height={300}
-      strokeWidth={21}
-      radius={55}
-      hideLegend
-      chartConfig={{
-        backgroundGradientFromOpacity: 0,
-        backgroundGradientToOpacity: 0,
-        color: (op, index) => {
-          switch (index) {
-            case 0: return `rgba(244,0,0,${op})`
-          }
-          return `rgba(0,255,0,${op})`;
-        }
-      }} />
-  )
-})
 
 export function Grip(props: GripProps) {
   const theme = useTheme().theme;
@@ -54,46 +27,30 @@ export function Grip(props: GripProps) {
     }
   }, [viewModel.brake, viewModel.throttle]);
 
-  const steeringChart: ChartData = {
-    labels: ['Steering Angle'],
-    datasets: [
-      {
-        data: [0]
-      }
-    ]
-  }
+  const steering = useMemo<number>(() => {
+    return viewModel.steering;
+  }, [viewModel.steering]);
+
+  const tireSlipData = useMemo<TireData>(() => {
+    return viewModel.slipRatio
+  }, [viewModel.slipRatio])
 
   return (
     <AppBarContainer
       onBack={() => { navigation.pop() }}
       title="Grip">
-      <BrakeThrottleChart
-        brake={brakeThrottle.brake}
-        throttle={brakeThrottle.throttle} />
-      <BarChart
-        style={{
-          transform: [
-            {rotate: '90deg'},
-            {translateX: '40%'}
-          ]
-        }}
-        withHorizontalLabels={false}
-        flatColor
-        fromZero
-        withInnerLines={false}
-        data={steeringChart}
-        height={100}
-        width={200}
-        yAxisLabel=""
-        xAxisLabel=""
-        yAxisSuffix=""
-        chartConfig={{
-          color: (opacity, index) => {
-            return theme.colors.text.primary.onPrimary
-          },
-          backgroundGradientFromOpacity: 0,
-          backgroundGradientToOpacity: 0,
-        }} />
+      <ScrollView
+        style={{ paddingBottom: 24 }}>
+        <BrakeThrottleChart
+          {...brakeThrottle} />
+        <SteeringChart
+          steeringAngle={steering} />
+        <TireSlip
+          leftFront={tireSlipData.leftFront}
+          rightFront={tireSlipData.rightFront}
+          leftRear={tireSlipData.leftRear}
+          rightRear={tireSlipData.rightRear} />
+      </ScrollView>
     </AppBarContainer>
   )
 }

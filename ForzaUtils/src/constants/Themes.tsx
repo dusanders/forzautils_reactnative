@@ -1,4 +1,5 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 
 export interface IThemeElements {
   colors: {
@@ -153,3 +154,10 @@ export const DarkColors: IThemeElements = {
     button: defaultButton
   }
 }
+
+export const GlobalStyles = StyleSheet.create({
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+})
