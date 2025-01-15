@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Dimensions, ScaledSize, StyleSheet } from "react-native";
 import { AppBarContainer } from "../../components/AppBarContainer";
 import { useTheme } from "../../hooks/useTheme";
@@ -9,20 +9,23 @@ import { Paper } from "../../components/Paper";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
+import { TireData } from "ForzaTelemetryApi";
 
 export interface SuspensionTravelProps {
   // Nothing
 }
 
-const labels = [
+const frontLabels = [
   'Left Front',
   'Right Front',
+]
+const rearLabels = [
   'Left Rear',
   'Right Rear'
 ]
 export function SuspensionTravel(props: SuspensionTravelProps) {
   const getScaledHeight = (screenHeight: number) => {
-    return screenHeight * 0.5;
+    return screenHeight * 0.3;
   }
   const getScaledWidth = (screenWidth: number) => {
     return screenWidth;
@@ -45,30 +48,23 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   const [height, setHeight] = useState(getScaledHeight(Dimensions.get('window').height));
   const [width, setWidth] = useState(getScaledWidth(Dimensions.get('window').width));
   const style = themeStyles(theme);
-  const [chartData, setChartData] = useState<ChartData>({
-    labels: labels,
-    datasets: getDataSets([0, 0, 0, 0])
-  });
+  const frontChartData = useMemo<ChartData>(() => {
+    return {
+      labels: frontLabels,
+      datasets: getDataSets([0, 0])
+    }
+  }, [viewModel.leftFront, viewModel.rightFront]);
+  const rearChartData = useMemo<ChartData>(() => {
+    return {
+      labels: rearLabels,
+      datasets: getDataSets([0, 0])
+    }
+  }, [viewModel.leftRear, viewModel.rightRear]);
 
   const handleOrientationChange = useCallback((ev: { window: ScaledSize, screen: ScaledSize }) => {
     setHeight(getScaledHeight(ev.window.height));
     setWidth(getScaledWidth(ev.window.width));
-  }, [])
-
-  const handleViewModelUpdate = useCallback(() => {
-    setChartData({
-      labels: labels,
-      datasets: getDataSets(
-        [viewModel.leftFront, viewModel.rightFront,
-        viewModel.leftRear, viewModel.rightRear]
-      )
-    })
-  }, [store.suspensionGraph.leftFront]);
-
-  useEffect(
-    handleViewModelUpdate,
-    [store.suspensionGraph.leftFront]
-  );
+  }, []);
 
   useEffect(() => {
     Dimensions.addEventListener('change', handleOrientationChange)
@@ -87,7 +83,31 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
           flatColor
           fromZero
           withInnerLines={false}
-          data={chartData}
+          data={frontChartData}
+          height={height}
+          width={width}
+          yAxisLabel=""
+          xAxisLabel=""
+          yAxisSuffix=""
+          chartConfig={{
+            color: (opacity, index) => {
+              return theme.colors.text.primary.onPrimary
+            },
+            backgroundGradientFromOpacity: 0,
+            backgroundGradientToOpacity: 0,
+            width: 400
+          }} />
+      </Paper>
+      <Paper style={style.content}>
+        <BarChart
+          style={{
+            marginBottom: 0,
+            paddingBottom: 0
+          }}
+          flatColor
+          fromZero
+          withInnerLines={false}
+          data={rearChartData}
           height={height}
           width={width}
           yAxisLabel=""
@@ -112,7 +132,8 @@ function themeStyles(theme: IThemeElements) {
       justifyContent: 'center',
       alignItems: 'center',
       alignSelf: 'center',
-      paddingBottom: 0
+      paddingBottom: 0,
+      marginBottom: theme.sizes.borderRadius
     }
   })
 }
