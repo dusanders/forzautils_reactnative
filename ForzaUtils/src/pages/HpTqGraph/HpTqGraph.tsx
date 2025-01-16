@@ -70,7 +70,6 @@ export function HptqGraph(props: HpTqGraphProps) {
     }
   }, []);
 
-  console.log(`render parent`)
   return (
     <AppBarContainer title="Hp / Tq Graph"
       onBack={() => {

@@ -42,7 +42,8 @@ export function Grip(props: GripProps) {
       <ScrollView
         style={{ paddingBottom: 24 }}>
         <BrakeThrottleChart
-          {...brakeThrottle} />
+          brake={brakeThrottle.brake}
+          throttle={brakeThrottle.throttle} />
         <SteeringChart
           steeringAngle={steering} />
         <TireSlip

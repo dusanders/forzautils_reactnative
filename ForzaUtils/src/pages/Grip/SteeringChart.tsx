@@ -13,6 +13,13 @@ export interface SteeringChartProps {
 export const SteeringChart = memo((props: SteeringChartProps) => {
   const theme = useTheme().theme;
   const style = themeStyles(theme);
+  const calcSteerPosition = () => {
+    if(props.steeringAngle < 101) {
+      return 50 + (props.steeringAngle / 2)
+    } else {
+      return 50 - ((200 - props.steeringAngle)/2)
+    }
+  }
   return (
     <View style={style.root}>
       <ThemeText
@@ -33,7 +40,7 @@ export const SteeringChart = memo((props: SteeringChartProps) => {
             width: 4,
             backgroundColor: theme.colors.text.primary.onPrimary,
             position: 'absolute',
-            left: '50%'
+            left: `${calcSteerPosition()}%`
           }
         ]}/>
       </View>

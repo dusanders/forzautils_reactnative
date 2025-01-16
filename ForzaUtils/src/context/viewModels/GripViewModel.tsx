@@ -22,7 +22,14 @@ export function useGripViewModel(): IGripViewModel {
     return forza.packet?.brake || 0
   }, [forza.packet?.brake]);
   const tireSlip = useMemo(() => {
-    return forza.packet?.tireSlipRatio || {
+    return forza.packet?.tireSlipRatio 
+    ? {
+      leftFront: forza.packet.formatDecimal(forza.packet.tireSlipRatio.leftFront),
+      rightFront: forza.packet.formatDecimal(forza.packet.tireSlipRatio.rightFront),
+      leftRear: forza.packet.formatDecimal(forza.packet.tireSlipRatio.leftRear),
+      rightRear: forza.packet.formatDecimal(forza.packet.tireSlipRatio.rightRear)
+    }
+    : {
       leftFront: 0,
       rightFront: 0,
       leftRear: 0,

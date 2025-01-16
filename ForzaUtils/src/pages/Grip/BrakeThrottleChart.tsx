@@ -45,8 +45,8 @@ export const BrakeThrottleChart = memo((props: BrakeThrottleChartProps) => {
   return (
     <View style={[GlobalStyles.centerContent]}>
       <Row style={styles.brakeThrottleRow}>
-        <LabeledDot color={'green'} label="Throttle" />
-        <LabeledDot color={'red'} label="Brake" />
+        <LabeledDot color={'green'} label={'Throttle'} />
+        <LabeledDot color={'red'} label={'Brake'} />
       </Row>
       <ProgressChart
         style={{
@@ -54,12 +54,12 @@ export const BrakeThrottleChart = memo((props: BrakeThrottleChartProps) => {
         }}
         data={{
           labels: ['Brake', 'Throttle'],
-          data: [props.brake, props.throttle]
+          data: [props.brake / 100, props.throttle / 100]
         }}
-        width={370}
+        width={300}
         height={300}
-        strokeWidth={21}
-        radius={55}
+        strokeWidth={18}
+        radius={50}
         hideLegend
         chartConfig={{
           backgroundGradientFromOpacity: 0,

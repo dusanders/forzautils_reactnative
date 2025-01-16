@@ -36,7 +36,7 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
         data: toDisplay
       },
       {
-        data: [100],
+        data: [100, 0],
         withDots: false
       }
     ]
@@ -51,13 +51,13 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   const frontChartData = useMemo<ChartData>(() => {
     return {
       labels: frontLabels,
-      datasets: getDataSets([0, 0])
+      datasets: getDataSets([viewModel.leftFront, viewModel.rightFront])
     }
   }, [viewModel.leftFront, viewModel.rightFront]);
   const rearChartData = useMemo<ChartData>(() => {
     return {
       labels: rearLabels,
-      datasets: getDataSets([0, 0])
+      datasets: getDataSets([viewModel.leftRear, viewModel.rightRear])
     }
   }, [viewModel.leftRear, viewModel.rightRear]);
 
@@ -82,6 +82,7 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
           }}
           flatColor
           fromZero
+          fromNumber={65}
           withInnerLines={false}
           data={frontChartData}
           height={height}
@@ -91,11 +92,11 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
           yAxisSuffix=""
           chartConfig={{
             color: (opacity, index) => {
-              return theme.colors.text.primary.onPrimary
+              return index === 2 ? '' : theme.colors.text.primary.onPrimary
             },
             backgroundGradientFromOpacity: 0,
             backgroundGradientToOpacity: 0,
-            width: 400
+            width: 400,
           }} />
       </Paper>
       <Paper style={style.content}>
@@ -113,6 +114,7 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
           yAxisLabel=""
           xAxisLabel=""
           yAxisSuffix=""
+          fromNumber={65}
           chartConfig={{
             color: (opacity, index) => {
               return theme.colors.text.primary.onPrimary
