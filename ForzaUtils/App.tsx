@@ -84,7 +84,6 @@ function App(): React.JSX.Element {
 
         </SafeStack>
       </NavigationContainer>
-
     </SafeAreaProvider>
   );
 }

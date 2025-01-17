@@ -1,9 +1,8 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Dimensions, FlatList, ListRenderItemInfo, ScaledSize, ScrollView, StyleSheet, View } from "react-native";
+import React, {  } from "react";
+import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import { IThemeElements } from "../../constants/Themes";
 import { Assets } from "../../assets";
-import { DataEvent, GearData } from "../../context/viewModels/HpTqGraphViewModel";
 import { Paper } from "../../components/Paper";
 import { AppBarContainer } from "../../components/AppBarContainer";
 import { ThemeText } from "../../components/ThemeText";
@@ -12,31 +11,10 @@ import { HpTqCurves } from "./HpTqCurves";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
+import { withScaledWindow } from "../../hooks/withScaledWindow";
 
 export interface HpTqGraphProps {
-
-}
-
-interface CurvesMemoProps {
-  gear: number;
-  events: DataEvent[];
-  width: number;
-}
-const CurveMemo = memo((props: CurvesMemoProps) => {
-  console.log(`render curve ${props.gear} ${JSON.stringify(props.events.length)}`)
-  return (
-    <HpTqCurves
-      width={props.width}
-      data={props.events}
-      gear={props.gear} />
-  )
-});
-
-function getScaledWidth(window: ScaledSize) {
-  const measure = window.width > window.height
-    ? window.width - 100
-    : window.width;
-  return measure * 0.9;
+  // Nothing
 }
 
 export function HptqGraph(props: HpTqGraphProps) {
@@ -44,9 +22,7 @@ export function HptqGraph(props: HpTqGraphProps) {
   const theme = useTheme();
   const styles = themeStyles(theme.theme);
   const store = useViewModelStore();
-  const [graphWidth, setGraphWidth] = useState(
-    getScaledWidth(Dimensions.get('window'))
-  );
+  const windowMeasure = withScaledWindow(0.9, 1);
 
   const separator = () => {
     return (
@@ -55,20 +31,6 @@ export function HptqGraph(props: HpTqGraphProps) {
       }}></View>
     )
   }
-
-  useEffect(() => {
-    // store.hpTqGraph.DEBUG_StartStream();
-    const handleOrientation = Dimensions.addEventListener('change',
-      (ev: { window: ScaledSize, screen: ScaledSize }) => {
-        setGraphWidth(
-          getScaledWidth(ev.window)
-        )
-      }
-    );
-    return () => {
-      handleOrientation.remove();
-    }
-  }, []);
 
   return (
     <AppBarContainer title="Hp / Tq Graph"
@@ -119,10 +81,10 @@ export function HptqGraph(props: HpTqGraphProps) {
             // renderItem={renderItem}
             renderItem={(item) => {
               return (
-                <CurveMemo
+                <HpTqCurves
                   gear={item.item.gear}
-                  events={item.item.events}
-                  width={graphWidth} />
+                  data={item.item.events}
+                  width={windowMeasure.width} />
               )
             }}
           />

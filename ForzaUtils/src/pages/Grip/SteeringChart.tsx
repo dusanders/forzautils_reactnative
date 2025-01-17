@@ -1,6 +1,4 @@
 import React, { memo } from "react";
-import { BarChart } from "react-native-chart-kit";
-import { ChartData } from "react-native-chart-kit/dist/HelperTypes";
 import { useTheme } from "../../hooks/useTheme";
 import { StyleSheet, View } from "react-native";
 import { ThemeText } from "../../components/ThemeText";

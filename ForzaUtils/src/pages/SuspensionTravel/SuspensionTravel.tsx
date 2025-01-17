@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Dimensions, ScaledSize, StyleSheet } from "react-native";
+import React, { useMemo } from "react";
+import { StyleSheet } from "react-native";
 import { AppBarContainer } from "../../components/AppBarContainer";
 import { useTheme } from "../../hooks/useTheme";
 import { IThemeElements } from "../../constants/Themes";
@@ -9,27 +9,13 @@ import { Paper } from "../../components/Paper";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
-import { TireData } from "ForzaTelemetryApi";
+import { withScaledWindow } from "../../hooks/withScaledWindow";
 
 export interface SuspensionTravelProps {
   // Nothing
 }
 
-const frontLabels = [
-  'Left Front',
-  'Right Front',
-]
-const rearLabels = [
-  'Left Rear',
-  'Right Rear'
-]
 export function SuspensionTravel(props: SuspensionTravelProps) {
-  const getScaledHeight = (screenHeight: number) => {
-    return screenHeight * 0.3;
-  }
-  const getScaledWidth = (screenWidth: number) => {
-    return screenWidth;
-  }
   const getDataSets = (toDisplay: number[]): Dataset[] => {
     return [
       {
@@ -41,34 +27,34 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
       }
     ]
   }
+  const frontLabels = [
+    'Left Front',
+    'Right Front',
+  ]
+  const rearLabels = [
+    'Left Rear',
+    'Right Rear'
+  ]
   const store = useViewModelStore();
   const viewModel = store.suspensionGraph;
   const navigation = useNavigation<StackNavigation>();
   const theme = useTheme().theme;
-  const [height, setHeight] = useState(getScaledHeight(Dimensions.get('window').height));
-  const [width, setWidth] = useState(getScaledWidth(Dimensions.get('window').width));
+  const dimensions = withScaledWindow(0.9, 0.3);
   const style = themeStyles(theme);
+
   const frontChartData = useMemo<ChartData>(() => {
     return {
       labels: frontLabels,
       datasets: getDataSets([viewModel.leftFront, viewModel.rightFront])
     }
   }, [viewModel.leftFront, viewModel.rightFront]);
+
   const rearChartData = useMemo<ChartData>(() => {
     return {
       labels: rearLabels,
       datasets: getDataSets([viewModel.leftRear, viewModel.rightRear])
     }
   }, [viewModel.leftRear, viewModel.rightRear]);
-
-  const handleOrientationChange = useCallback((ev: { window: ScaledSize, screen: ScaledSize }) => {
-    setHeight(getScaledHeight(ev.window.height));
-    setWidth(getScaledWidth(ev.window.width));
-  }, []);
-
-  useEffect(() => {
-    Dimensions.addEventListener('change', handleOrientationChange)
-  })
 
   return (
     <AppBarContainer
@@ -85,8 +71,8 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
           fromNumber={65}
           withInnerLines={false}
           data={frontChartData}
-          height={height}
-          width={width}
+          height={dimensions.height}
+          width={dimensions.width}
           yAxisLabel=""
           xAxisLabel=""
           yAxisSuffix=""
@@ -109,8 +95,8 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
           fromZero
           withInnerLines={false}
           data={rearChartData}
-          height={height}
-          width={width}
+          height={dimensions.height}
+          width={dimensions.width}
           yAxisLabel=""
           xAxisLabel=""
           yAxisSuffix=""

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import LineChart, { LineChartData } from "react-native-chart-kit/dist/line-chart/LineChart";
 import { Paper } from "../../components/Paper";
 import { ThemeText } from "../../components/ThemeText";
@@ -12,7 +12,7 @@ export interface HpTqCurvesProps {
   data: DataEvent[];
 }
 
-export function HpTqCurves(props: HpTqCurvesProps) {
+export const HpTqCurves = memo((props: HpTqCurvesProps) => {
   const theme = useTheme();
   const sorted = props.data.sort((a, b) => a.rpm - b.rpm);
 
@@ -64,4 +64,4 @@ export function HpTqCurves(props: HpTqCurvesProps) {
         }} />
     </Paper>
   )
-}
+});

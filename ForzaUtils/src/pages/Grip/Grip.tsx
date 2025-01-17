@@ -1,10 +1,8 @@
-import React, { memo, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { AppBarContainer } from "../../components/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
-import { BarChart, LineChart, ProgressChart } from "react-native-chart-kit";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
-import { ChartData } from "react-native-chart-kit/dist/HelperTypes";
 import { useTheme } from "../../hooks/useTheme";
 import { BrakeThrottleChart, BrakeThrottleChartProps } from "./BrakeThrottleChart";
 import { SteeringChart } from "./SteeringChart";
