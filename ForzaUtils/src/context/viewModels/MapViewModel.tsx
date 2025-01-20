@@ -3,13 +3,14 @@ import { memo, useEffect, useMemo, useState } from "react";
 import { useForzaData } from "../../hooks/useForzaData";
 
 export interface IMapViewModel {
-  position: DirectionalData[];
+  position: DirectionalData | undefined;
   isOnTrack: boolean;
+  trackId: number;
 }
 
 export function useMapViewModel(): IMapViewModel {
   const forza = useForzaData();
-  const [mapCoords, setMapCoords] = useState<DirectionalData[]>([]);
+  const [mapCoords, setMapCoords] = useState<DirectionalData | undefined>(undefined);
 
   const formatPosition = (position: DirectionalData) => {
     const scaleFactorX = 0.005;
@@ -21,14 +22,15 @@ export function useMapViewModel(): IMapViewModel {
   }
 
   useEffect(() => {
-    if (!forza.packet?.position) {
+    if (!forza.packet?.position || !forza.packet.isRaceOn) {
       return;
     }
-    setMapCoords([...mapCoords, formatPosition(forza.packet.position)])
+    setMapCoords(formatPosition(forza.packet.position))
   }, [forza.packet?.position]);
 
   return {
     position: mapCoords,
-    isOnTrack: forza.packet?.isOnTrack || false
+    isOnTrack: forza.packet?.isOnTrack || false,
+    trackId: forza.packet?.trackId || 0
   }
 }

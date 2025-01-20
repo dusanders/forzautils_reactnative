@@ -18,6 +18,7 @@ interface TrackMapState {
   maxX: number;
   position: DirectionalData | undefined;
   pathString: string;
+  trackId: number;
 }
 export function TrackMap(props: TrackMapProps) {
   const returnMax = (a: number, b: number) => {
@@ -30,10 +31,7 @@ export function TrackMap(props: TrackMapProps) {
     let b1 = b || 0;
     return a1 < b1 ? a1 : b1;
   }
-  const getLatest = (coord: keyof DirectionalData) => {
-    const lastIndex = coords.length - 1;
-    return coords[lastIndex][coord];
-  }
+  
   const theme = useTheme().theme;
   const initialState: TrackMapState = {
     position: {
@@ -46,6 +44,7 @@ export function TrackMap(props: TrackMapProps) {
     maxY: 1,
     minX: -1,
     maxX: 1,
+    trackId: 0
   }
   const viewModel = useViewModelStore().map;
   const [state, setState] = useReducer<StateHandler<TrackMapState>>((prev: TrackMapState, next: Partial<TrackMapState>) => {
@@ -54,6 +53,15 @@ export function TrackMap(props: TrackMapProps) {
       next.position.x !== prev.position?.x
       || next.position.z !== prev.position?.z)
     );
+    if (Boolean(viewModel.trackId) && prev.trackId != viewModel.trackId) {
+      return {
+        ...initialState,
+        ...{
+          trackId: viewModel.trackId
+        }
+      }
+    }
+    next.trackId = viewModel.trackId || prev.trackId;
     if (!isNewPosition) {
       return prev;
     }
@@ -77,31 +85,22 @@ export function TrackMap(props: TrackMapProps) {
   }, initialState);
 
   useEffect(() => {
-    if (!coords.length) {
+    if (!viewModel.position) {
       return;
     }
     setState({
-      position: coords[coords.length - 1],
+      position: viewModel.position,
     });
   }, [viewModel.position]);
 
 
-  const coords = useMemo<DirectionalData[]>(() => {
-    return viewModel.position.length
-      ? viewModel.position
-      : [{
-        x: 0,
-        y: 0,
-        z: 0
-      }]
-  }, [viewModel.position]);
-
   return (
     <View>
       <View>
-        <ThemeText>x: {getLatest('x')}</ThemeText>
-        <ThemeText>y: {getLatest('y')}</ThemeText>
-        <ThemeText>z: {getLatest('z')}</ThemeText>
+        <ThemeText>x: {`Track: ${viewModel.trackId}`}</ThemeText>
+        <ThemeText>x: {viewModel.position?.x}</ThemeText>
+        <ThemeText>y: {viewModel.position?.y}</ThemeText>
+        <ThemeText>z: {viewModel.position?.z}</ThemeText>
         <ThemeText>minY: {state.minY}</ThemeText>
         <ThemeText>maxY: {state.maxY}</ThemeText>
         <ThemeText>minX: {state.minX}</ThemeText>
@@ -113,15 +112,15 @@ export function TrackMap(props: TrackMapProps) {
           ${state.minY - (Math.abs(state.minY * 0.1))} 
           ${state.maxX + Math.abs(state.minX * 1.2)} 
           ${(state.maxY + Math.abs(state.minY * 1.2))}`}>
-        <Path 
-        d={state.pathString} 
-        stroke={theme.colors.text.secondary.onPrimary} 
-        strokeWidth={returnMax(state.maxX, state.maxY) * 0.015} 
-        fill={'transparent'} />
-          <Circle 
-          cx={state.position?.x} 
-          cy={state.position?.z} 
-          r={returnMax(state.maxX, state.maxY) * 0.035} 
+        <Path
+          d={state.pathString}
+          stroke={theme.colors.text.secondary.onPrimary}
+          strokeWidth={returnMax(state.maxX, state.maxY) * 0.015}
+          fill={'transparent'} />
+        <Circle
+          cx={state.position?.x}
+          cy={state.position?.z}
+          r={returnMax(state.maxX, state.maxY) * 0.035}
           fill={theme.colors.text.primary.onPrimary} />
       </Svg>
     </View>
