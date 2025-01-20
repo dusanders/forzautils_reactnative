@@ -6,6 +6,7 @@ import { useTheme } from "../hooks/useTheme";
 import { Card } from "../components/Card";
 import { AppBarContainer } from "../components/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
+import { TrackMap } from "../components/TrackMap";
 
 export interface DataChooserProps {
 
@@ -61,6 +62,7 @@ export function DataChooser(props: DataChooserProps) {
         justifyContent: 'center',
         alignItems: 'center'
       }}>
+        <TrackMap />
         <FlatList
           style={styles.listRoot}
           data={options}
