@@ -42,10 +42,10 @@ export function TrackMap(props: TrackMapProps) {
       z: 0
     },
     pathString: '',
-    minY: 0,
-    maxY: 0,
-    minX: 0,
-    maxX: 0,
+    minY: -1,
+    maxY: 1,
+    minX: -1,
+    maxX: 1,
   }
   const viewModel = useViewModelStore().map;
   const [state, setState] = useReducer<StateHandler<TrackMapState>>((prev: TrackMapState, next: Partial<TrackMapState>) => {
