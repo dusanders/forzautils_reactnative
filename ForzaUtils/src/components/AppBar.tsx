@@ -16,7 +16,7 @@ export interface AppSettingsButtonProps {
 export function AppSettingsButton(props: AppSettingsButtonProps) {
   const handleClick = useCallback(() => {
     props.onPress()
-  }, []);
+  }, [props.onPress]);
   const theme = useTheme();
   return (
     <Pressable
@@ -83,10 +83,7 @@ export function AppBar(props: AppBarProps) {
           <Pressable style={style.backIconView}
             onPress={() => {
               if (props.onBack) {
-                console.log(`back press`)
                 props.onBack()
-              } else {
-                console.log(`no back prop`)
               }
             }}>
             <ThemeIcon name={'chevron-left'}
@@ -197,6 +194,8 @@ function themeStyles(theme: IThemeElements) {
       backgroundColor: theme.colors.background.onPrimary,
       borderRadius: 100,
       alignSelf: 'center',
+      zIndex: 10,
+      elevation: 10
     },
     titleText: {
       textAlign: 'center',
