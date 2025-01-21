@@ -37,6 +37,7 @@ export function ForzaContextProvider(props: ForzaDataProviderProps) {
     reusePort: true
   }
   const logger = useLogger();
+  const [cache, setCache] = useState<ForzaTelemetryApi[]>([]);
   const [port, setPort] = useState(5200);
   const [packet, setPacket] = useState<ForzaTelemetryApi | undefined>(undefined);
   const throttledPacket = useRef<ForzaTelemetryApi>(undefined);
@@ -60,11 +61,16 @@ export function ForzaContextProvider(props: ForzaDataProviderProps) {
   }, []);
 
   useEffect(() => {
+    if (packet)
+      setCache([...cache, packet]);
+  }, [packet]);
+
+  useEffect(() => {
     const flush = setInterval(() => {
       if (throttledPacket.current) {
         setPacket(throttledPacket.current);
       }
-    }, 100);
+    }, 10);
     return () => {
       clearInterval(flush)
     }
