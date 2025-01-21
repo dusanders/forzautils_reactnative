@@ -17,12 +17,6 @@ export function TrackMap(props: TrackMapProps) {
     <View>
       <View>
         <ThemeText>{`Track: ${viewModel.trackId}`}</ThemeText>
-        <ThemeText>x: {viewModel.playerPosition?.x}</ThemeText>
-        <ThemeText>y: {viewModel.playerPosition?.y}</ThemeText>
-        <ThemeText>minY: {viewModel.viewBox.minY}</ThemeText>
-        <ThemeText>maxY: {viewModel.viewBox.maxY}</ThemeText>
-        <ThemeText>minX: {viewModel.viewBox.minX}</ThemeText>
-        <ThemeText>maxX: {viewModel.viewBox.maxX}</ThemeText>
       </View>
       <Svg height={viewModel.svgHeight} width={viewModel.svgWidth}
         viewBox={`
