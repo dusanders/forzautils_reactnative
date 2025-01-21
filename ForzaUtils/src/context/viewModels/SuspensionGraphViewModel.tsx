@@ -1,7 +1,5 @@
-import React, { ReactElement, useEffect, useMemo, useReducer } from "react";
-import { StateHandler } from "../../constants/types";
+import { useMemo } from "react";
 import { useForzaData } from "../../hooks/useForzaData";
-import { useLogger } from "../Logger";
 
 export interface ISuspensionGraphViewModel {
   leftFront: number;
@@ -9,24 +7,8 @@ export interface ISuspensionGraphViewModel {
   rightFront: number;
   rightRear: number;
 }
-
-interface SuspensionGraphViewModelState {
-  leftFront: number;
-  leftRear: number;
-  rightFront: number;
-  rightRear: number;
-}
-
-const initialState: SuspensionGraphViewModelState = {
-  leftFront: 0,
-  leftRear: 0,
-  rightFront: 0,
-  rightRear: 0
-}
-
 export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
-  const logger = useLogger();
   const forza = useForzaData();
   const leftFront = useMemo(() =>
     forza.packet?.normalizedSuspensionTravel.leftFront || 0,
