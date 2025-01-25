@@ -12,27 +12,33 @@ export interface TrackMapProps {
 export function TrackMap(props: TrackMapProps) {
   const theme = useTheme().theme;
   const viewModel = useViewModelStore().map;
-
+  const minSvgX = viewModel.viewBox.minX;
+  const minSvgY = viewModel.viewBox.minY;
+  const totalSvgHeight = Math.abs(viewModel.viewBox.minY) + Math.abs(viewModel.viewBox.maxY);
+  const totalSvgWidth = Math.abs(viewModel.viewBox.minX) + Math.abs(viewModel.viewBox.maxX) * 1.3;
   return (
     <View>
       <View>
-        <ThemeText>{`Track: ${viewModel.trackId}`}</ThemeText>
+        <ThemeText>{`Track: ${viewModel.trackId}`}
+
+          {JSON.stringify(viewModel.viewBox)}
+        </ThemeText>
       </View>
       <Svg height={viewModel.svgHeight} width={viewModel.svgWidth}
         viewBox={`
-          ${viewModel.viewBox.minX}
-          ${viewModel.viewBox.minY + (viewModel.viewBox.minY * 0.1)} 
-          ${Math.abs(viewModel.viewBox.minX) + Math.abs(viewModel.viewBox.maxX * 1.3)} 
-          ${Math.abs(viewModel.viewBox.minY) + Math.abs(viewModel.viewBox.maxY)}`}>
+          ${minSvgX - ((totalSvgWidth - minSvgX) * 0.1)}
+          ${minSvgY} 
+          ${totalSvgWidth} 
+          ${totalSvgHeight + (totalSvgHeight * 0.3)}`}>
         <Path
           d={viewModel.svgPath}
           stroke={theme.colors.text.secondary.onPrimary}
-          strokeWidth={Math.max(viewModel.viewBox.maxX, Math.abs(viewModel.viewBox.minY)) * 0.015}
+          strokeWidth={Math.max(totalSvgWidth, totalSvgHeight) * 0.015}
           fill={'transparent'} />
         <Circle
           cx={viewModel.playerPosition?.x}
           cy={viewModel.playerPosition?.y}
-          r={Math.max(viewModel.viewBox.maxX, Math.abs(viewModel.viewBox.minX)) * 0.035}
+          r={Math.max(totalSvgWidth, totalSvgHeight) * 0.035}
           fill={theme.colors.text.primary.onPrimary} />
       </Svg>
     </View>
