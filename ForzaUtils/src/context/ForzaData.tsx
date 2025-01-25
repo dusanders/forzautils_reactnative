@@ -3,6 +3,7 @@ import { ForzaTelemetryApi } from "ForzaTelemetryApi";
 import React, { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { useLogger } from "./Logger";
 import UdpSockets from "react-native-udp";
+import { LISTEN_PORT } from "../constants/types";
 
 /**
  * Add Type for react-native-udp 'rinfo' object
@@ -38,7 +39,7 @@ export function ForzaContextProvider(props: ForzaDataProviderProps) {
   }
   const logger = useLogger();
   const [cache, setCache] = useState<ForzaTelemetryApi[]>([]);
-  const [port, setPort] = useState(5200);
+  const [port, setPort] = useState(LISTEN_PORT);
   const [packet, setPacket] = useState<ForzaTelemetryApi | undefined>(undefined);
   const throttledPacket = useRef<ForzaTelemetryApi>(undefined);
 
@@ -51,7 +52,7 @@ export function ForzaContextProvider(props: ForzaDataProviderProps) {
   }, []);
 
   const dataHandler = useCallback((data: Buffer, rinfo: Upd_rinfo) => {
-    const packet = new ForzaTelemetryApi(rinfo.size, data);
+    const packet = new ForzaTelemetryApi(rinfo.size, data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
     // logger.debug(tag, `packet: ${packet.isRaceOn}`);
     throttledPacket.current = packet;
   }, []);
