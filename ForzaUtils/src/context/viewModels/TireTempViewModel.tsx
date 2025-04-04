@@ -1,7 +1,5 @@
-import React, { useEffect, useMemo, useReducer } from "react";
-import { StateHandler } from "../../constants/types";
+import { useMemo } from "react";
 import { useForzaData } from "../../hooks/useForzaData";
-import { useLogger } from "../Logger";
 
 export interface ITireTempViewModel {
   leftFront: number;
@@ -12,7 +10,6 @@ export interface ITireTempViewModel {
 
 export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
-  const logger = useLogger();
   const forza = useForzaData();
   const leftFront = useMemo(() =>
     Number(forza.packet?.tireTemp.leftFront.toFixed(2)) || 0,

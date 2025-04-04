@@ -5,6 +5,7 @@ export type StateHandler<T> = (prev: T, next: Partial<T>) => T;
 export type RootStackParamList = Record<AppRoutes, undefined>;
 export type StackNavigation = NativeStackNavigationProp<RootStackParamList>;
 
+export const LISTEN_PORT = 5300;
 export enum AppRoutes {
   SPLASH = 'splash',
   IP_INFO = 'ip_info',

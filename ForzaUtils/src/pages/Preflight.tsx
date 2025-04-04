@@ -97,11 +97,12 @@ export function Preflight(props: PreflightProps) {
         }} />
     )
   }
-  if (!isWifiConnected(netInfo)) {
-    return (
-      <WifiError />
-    )
-  }
+  // Disable WiFi check for offline usage
+  // if (!isWifiConnected(netInfo)) {
+  //   return (
+  //     <WifiError />
+  //   )
+  // }
   return (
     <ForzaContextProvider netInfo={netInfo!}>
       {props.children}
