@@ -1,5 +1,5 @@
-import React from "react";
-import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import { Button, Dimensions, FlatList, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
@@ -48,9 +48,27 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
   const styles = themeStyles(theme.theme);
   const navigation = useNavigation<StackNavigation>();
   const forza = useForzaData();
+  const i = useState('')
 
   return (
     <AppBarContainer hideBack>
+      <View style={{margin: 23}}></View>
+      <FlatList
+      data={[]}
+      renderItem={(i) => {
+        return (
+          <View style={{
+            height: 50,
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <ThemeIcon name={'wifi'+ i.item} />
+          </View>
+        )
+      }}>
+
+      </FlatList>
       <ScrollView bounces={false}>
         <View style={styles.content}>
           <View style={styles.messageView}>

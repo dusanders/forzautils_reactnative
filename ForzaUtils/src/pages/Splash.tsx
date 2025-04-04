@@ -24,6 +24,7 @@ export function Splash(props: SplashProps) {
     </View>
   )
 }
+
 function withStyles(theme: IThemeElements) {
   return StyleSheet.create({
     root: {
