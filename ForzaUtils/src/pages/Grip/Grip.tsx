@@ -3,7 +3,7 @@ import { AppBarContainer } from "../../components/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/Theme";
 import { BrakeThrottleChart, BrakeThrottleChartProps } from "./BrakeThrottleChart";
 import { SteeringChart } from "./SteeringChart";
 import { TireSlip } from "./TireSlip";

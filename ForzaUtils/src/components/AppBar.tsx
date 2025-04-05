@@ -1,12 +1,12 @@
 import React, { ReactElement, useCallback, useState } from "react";
 import { Pressable, PressableProps, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useTheme } from "../hooks/useTheme";
 import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "./ThemeText";
 import { ThemeIcon } from "./ThemeIcon";
 import { Container } from "./Container";
 import { ThemeSwitch } from "./ThemeSwitch";
 import { randomKey } from "../constants/types";
+import { useTheme } from "../context/Theme";
 
 
 export interface AppSettingsButtonProps {

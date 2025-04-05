@@ -2,7 +2,7 @@ import React from "react";
 import { Container } from "../components/Container";
 import { View } from "react-native";
 import { ThemeText } from "../components/ThemeText";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 import { Paper } from "../components/Paper";
 import { ThemeButton } from "../components/ThemeButton";
 

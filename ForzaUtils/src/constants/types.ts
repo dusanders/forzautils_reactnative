@@ -13,7 +13,9 @@ export enum AppRoutes {
   HP_TQ_GRAPH = 'hp_tq_graph',
   SUSPENSION_GRAPH = 'suspension_graph',
   TIRE_TEMPS = 'tire_temps',
-  GRIP = 'grip'
+  GRIP = 'grip',
+  SOURCE_CHOOSER = 'source_chooser',
+  TUNING_CALCULATOR = 'tuning_calculator',
 }
 
 export function delay(delay: number): Promise<void> {

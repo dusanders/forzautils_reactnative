@@ -2,7 +2,7 @@ import React from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { ContainerProps } from "./Container";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 
 
 export interface PaperProps extends ContainerProps {

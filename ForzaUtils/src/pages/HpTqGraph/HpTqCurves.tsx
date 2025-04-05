@@ -2,7 +2,7 @@ import React, { memo } from "react";
 import LineChart, { LineChartData } from "react-native-chart-kit/dist/line-chart/LineChart";
 import { Paper } from "../../components/Paper";
 import { ThemeText } from "../../components/ThemeText";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/Theme";
 import { DataEvent } from "../../context/viewModels/HpTqGraphViewModel";
 
 

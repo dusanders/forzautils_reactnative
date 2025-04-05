@@ -1,7 +1,7 @@
 import React from "react";
 import { TextOnBackgroundVariant, TextVariantType } from "../constants/Themes";
 import { StyleProp, Text, TextStyle } from "react-native";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 import { Assets } from "../assets";
 
 export type FontFamily = 'regular' | 'light' | 'bold';
@@ -90,7 +90,8 @@ export function LabelText(props: ThemeTextProps) {
       style={[{
         marginTop: 4,
         letterSpacing: 0.4,
-        opacity: 0.7
+        opacity: 0.7,
+        flexWrap: 'wrap'
       }, props.style]}>
       {props.children}
     </ThemeText>

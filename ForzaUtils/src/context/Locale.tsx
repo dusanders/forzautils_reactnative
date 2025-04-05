@@ -1,4 +1,4 @@
-import { createContext, useReducer } from "react";
+import { createContext, useContext, useReducer } from "react";
 import { IStringDefinitions, ISupportLocale } from "../locale/strings";
 import { Strings_enUS } from "../locale/enUS";
 import { StateHandler } from "../constants/types";
@@ -56,4 +56,8 @@ export function LocaleContextHoc(props: LocaleContextHocProps) {
       {props.children}
     </LocaleContext.Provider>
   )
+}
+
+export function useLocale() {
+  return useContext(LocaleContext);
 }

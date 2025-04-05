@@ -1,7 +1,7 @@
 import { IconProps } from "@react-native-vector-icons/common";
 import Icon from "@react-native-vector-icons/material-icons";
 import React from "react";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 
 export interface ThemeIconProps<T> extends IconProps<T> {
   

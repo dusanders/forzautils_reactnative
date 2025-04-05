@@ -1,10 +1,10 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/Theme";
 import { ThemeText } from "../../components/ThemeText";
 import { Row } from "../../components/Row";
-import { Card } from "../../components/Card";
+import { TextCard } from "../../components/TextCard";
 
 export interface TireSlipProps {
   leftFront: number;
@@ -26,7 +26,7 @@ export function TireSlip(props: TireSlipProps) {
         Slip Angles
       </ThemeText>
       <Row>
-        <Card style={style.cardBase}>
+        <TextCard style={style.cardBase}>
           <ThemeText>
             Left Front
           </ThemeText>
@@ -36,8 +36,8 @@ export function TireSlip(props: TireSlipProps) {
             style={style.angleText}>
             {props.leftFront}
           </ThemeText>
-        </Card>
-        <Card style={style.cardBase}>
+        </TextCard>
+        <TextCard style={style.cardBase}>
           <ThemeText>
             Right Front
           </ThemeText>
@@ -47,10 +47,10 @@ export function TireSlip(props: TireSlipProps) {
             style={style.angleText}>
             {props.rightFront}
           </ThemeText>
-        </Card>
+        </TextCard>
       </Row>
       <Row>
-        <Card style={style.cardBase}>
+        <TextCard style={style.cardBase}>
           <ThemeText>
             Left Rear
           </ThemeText>
@@ -60,8 +60,8 @@ export function TireSlip(props: TireSlipProps) {
             style={style.angleText}>
             {props.leftRear}
           </ThemeText>
-        </Card>
-        <Card style={style.cardBase}>
+        </TextCard>
+        <TextCard style={style.cardBase}>
           <ThemeText>
             Right Rear
           </ThemeText>
@@ -71,7 +71,7 @@ export function TireSlip(props: TireSlipProps) {
             style={style.angleText}>
             {props.rightRear}
           </ThemeText>
-        </Card>
+        </TextCard>
       </Row>
     </View>
   )

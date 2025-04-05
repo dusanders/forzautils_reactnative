@@ -1,10 +1,10 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { useLocale } from "../hooks/useLocale";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "../components/ThemeText";
 import { Container } from "../components/Container";
+import { useLocale } from "../context/Locale";
 
 export interface WifiErrorProps {
 

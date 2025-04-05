@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { AppBarContainer } from "../../components/AppBarContainer";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/Theme";
 import { IThemeElements } from "../../constants/Themes";
 import { BarChart } from "react-native-chart-kit";
 import { ChartData, Dataset } from "react-native-chart-kit/dist/HelperTypes";

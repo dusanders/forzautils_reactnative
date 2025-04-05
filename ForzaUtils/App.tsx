@@ -18,6 +18,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Grip } from './src/pages/Grip/Grip';
+import { SourceChooser } from './src/pages/SourceChooser';
+import { TuningPage } from './src/pages/Tuning';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -76,6 +78,12 @@ function App(): React.JSX.Element {
                     <Stack.Screen
                       name={AppRoutes.GRIP}
                       component={Grip} />
+                    <Stack.Screen
+                      name={AppRoutes.SOURCE_CHOOSER}
+                      component={SourceChooser} />
+                    <Stack.Screen
+                      name={AppRoutes.TUNING_CALCULATOR}
+                      component={TuningPage} />
                   </Stack.Navigator>
                 </ViewModelStore_Hoc>
               </Preflight>

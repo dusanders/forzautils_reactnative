@@ -4,7 +4,7 @@ import { ProgressChart } from "react-native-chart-kit";
 import { ThemeText } from "../../components/ThemeText";
 import { Row } from "../../components/Row";
 import { GlobalStyles, IThemeElements } from "../../constants/Themes";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/Theme";
 
 export interface BrakeThrottleChartProps {
   throttle: number;

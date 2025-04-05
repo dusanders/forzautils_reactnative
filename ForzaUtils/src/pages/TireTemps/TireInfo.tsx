@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Card } from "../../components/Card";
-import { useTheme } from "../../hooks/useTheme";
+import { TextCard } from "../../components/TextCard";
+import { useTheme } from "../../context/Theme";
 import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
 
@@ -37,12 +37,12 @@ export function TireInfo(props: TireInfoProps) {
     )
   }
   const DataCard = (props: { children: any }) => (
-    <Card style={[
+    <TextCard style={[
       style.halfWidth,
       style.centerContent
     ]}>
       {props.children}
-    </Card>
+    </TextCard>
   )
   return (
     <DataCard>

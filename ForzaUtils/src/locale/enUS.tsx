@@ -5,5 +5,4 @@ export class Strings_enUS implements IStringDefinitions {
   generics: IStrings_Generic = {
     loading: "Loading"
   };
-
 }

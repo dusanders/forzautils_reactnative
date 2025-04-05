@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Splash } from "./Splash";
 import { addEventListener, NetInfoState, NetInfoStateType, NetInfoSubscription } from "@react-native-community/netinfo";
 import { WifiError } from "./WifiError";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 import { AppState, Linking, Platform, useColorScheme } from "react-native";
 import { AppRoutes } from "../constants/types";
-import { ForzaContextProvider } from "../context/ForzaData";
+import { ForzaContextProvider } from "../context/Forza";
 import { useLogger } from "../context/Logger";
 import { Permission, PERMISSIONS, requestMultiple } from "react-native-permissions";
 import { PermissionError } from "./PermissionError";
@@ -83,7 +83,7 @@ export function Preflight(props: PreflightProps) {
     }
   }, []);
 
-  if (!loaded) {
+  if (!loaded || !netInfo) {
     return (<Splash/>)
   }
   if (!hasPermissions) {

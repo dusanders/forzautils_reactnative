@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AppBarContainer } from "../../components/AppBarContainer";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/Theme";
 import { IThemeElements } from "../../constants/Themes";
 import { StyleSheet } from "react-native";
 import { Row } from "../../components/Row";

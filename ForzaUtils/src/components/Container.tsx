@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
 import { BackgroundVariantType, IThemeElements } from "../constants/Themes";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 
 export type ContainerFlex = 'row' | 'column';
 export type ContainerFill = 'parent' | 'width' | 'height';

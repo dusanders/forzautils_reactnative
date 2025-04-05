@@ -1,13 +1,13 @@
 import React, { } from "react";
-import { View } from "react-native";
+import { StyleProp, View, ViewStyle } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 import { useViewModelStore } from "../context/viewModels/ViewModelStore";
 import { ThemeText } from "./ThemeText";
 import { Paper } from "./Paper";
 
 export interface TrackMapProps {
-
+  style?: StyleProp<ViewStyle>;
 }
 
 export function TrackMap(props: TrackMapProps) {
@@ -18,7 +18,7 @@ export function TrackMap(props: TrackMapProps) {
   const totalSvgHeight = Math.abs(viewModel.viewBox.minY) + Math.abs(viewModel.viewBox.maxY);
   const totalSvgWidth = Math.abs(viewModel.viewBox.minX) + Math.abs(viewModel.viewBox.maxX) * 1.3;
   return (
-    <Paper>
+    <Paper style={props.style}>
       <View>
         <ThemeText>
           {`Track: ${viewModel.trackId}`}

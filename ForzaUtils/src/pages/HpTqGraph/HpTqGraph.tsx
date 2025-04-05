@@ -1,6 +1,6 @@
 import React, {  } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../context/Theme";
 import { IThemeElements } from "../../constants/Themes";
 import { Assets } from "../../assets";
 import { Paper } from "../../components/Paper";

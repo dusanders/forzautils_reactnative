@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Button, Dimensions, FlatList, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
 import { AppRoutes, StackNavigation } from "../constants/types";
 import { useForzaData } from "../hooks/useForzaData";
-import { Card } from "../components/Card";
+import { TextCard } from "../components/TextCard";
 import { ThemeButton } from "../components/ThemeButton";
 import { ThemeIcon } from "../components/ThemeIcon";
 import { AppBarContainer } from "../components/AppBarContainer";
@@ -88,7 +88,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
             </LabelText>
           </View>
           <Row>
-            <Card
+            <TextCard
               style={{
                 width: '50%'
               }}
@@ -97,7 +97,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
               centerContent
               title={forza.ip}
               body="IP Address" />
-            <Card
+            <TextCard
               style={{
                 width: '50%'
               }}
@@ -108,7 +108,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
               body="Port" />
           </Row>
           <Row>
-            <Card
+            <TextCard
               style={{
                 width: '50%'
               }}
@@ -116,7 +116,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
               centerContent
               title={forza.ssid}
               body="WiFi Name" />
-            <Card
+            <TextCard
               style={{
                 width: '50%'
               }}
@@ -130,7 +130,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
         <ThemeButton
           style={styles.doneBtn}
           onPress={() => {
-            navigation.push(AppRoutes.DATA);
+            navigation.push(AppRoutes.SOURCE_CHOOSER);
           }}>
           <CircleCheckIcon />
           <ThemeText

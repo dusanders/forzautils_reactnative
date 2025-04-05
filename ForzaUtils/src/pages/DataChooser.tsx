@@ -2,8 +2,8 @@ import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { AppRoutes, randomKey, StackNavigation } from "../constants/types";
 import { IThemeElements } from "../constants/Themes";
-import { useTheme } from "../hooks/useTheme";
-import { Card } from "../components/Card";
+import { useTheme } from "../context/Theme";
+import { TextCard } from "../components/TextCard";
 import { AppBarContainer } from "../components/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
 import { TrackMap } from "../components/TrackMap";
@@ -59,17 +59,20 @@ export function DataChooser(props: DataChooserProps) {
       }}>
       <View style={{
         height: '100%',
-        justifyContent: 'center',
         alignItems: 'center'
       }}>
-        <TrackMap />
+        <TrackMap 
+        style={{
+          marginBottom: 20,
+          width: '95%'
+        }}/>
         <FlatList
           style={styles.listRoot}
           data={options}
           numColumns={2}
           renderItem={(info) => {
             return (
-              <Card
+              <TextCard
                 id={info.item.id}
                 key={info.item.id}
                 style={{
@@ -81,11 +84,9 @@ export function DataChooser(props: DataChooserProps) {
                 body={info.item.description}
                 titleStyle={{
                   fontSize: theme.theme.sizes.font.medium,
-                  width: '100%',
                   textAlign: 'center'
                 }}
                 bodyStyle={{
-                  width: '100%',
                   textAlign: 'center',
                   fontSize: theme.theme.sizes.font.small
                 }}

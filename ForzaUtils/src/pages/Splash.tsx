@@ -1,8 +1,8 @@
 import React, {  } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 import { IThemeElements } from "../constants/Themes";
-import { useLocale } from "../hooks/useLocale";
+import { useLocale } from "../context/Locale";
 
 export interface SplashProps {
 

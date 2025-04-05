@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, ButtonProps, Pressable, PressableProps, StyleSheet } from "react-native";
 import { IThemeElements } from "../constants/Themes";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 
 export interface ThemeButtonProps extends PressableProps {
   children?: any;

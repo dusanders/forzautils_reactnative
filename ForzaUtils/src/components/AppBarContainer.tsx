@@ -2,7 +2,7 @@ import React from "react";
 import { Container, ContainerProps } from "./Container";
 import { AppBar, AppBarProps } from "./AppBar";
 import { StyleProp, View, ViewStyle } from "react-native";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../context/Theme";
 
 export interface AppBarContainerProps extends ContainerProps, AppBarProps {
   
