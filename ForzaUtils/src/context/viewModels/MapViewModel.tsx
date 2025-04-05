@@ -1,6 +1,6 @@
 import { DirectionalData } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
-import { useForzaData } from "../../hooks/useForzaData";
+import { useForzaData } from "../../context/Forza";
 
 export interface PlayerPosition {
   x: number;

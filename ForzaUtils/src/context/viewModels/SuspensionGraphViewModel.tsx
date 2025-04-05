@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useForzaData } from "../../hooks/useForzaData";
+import { useForzaData } from "../../context/Forza";
 
 export interface ISuspensionGraphViewModel {
   leftFront: number;

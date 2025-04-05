@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForzaData } from "../../hooks/useForzaData";
+import { useForzaData } from "../../context/Forza";
 import { useLogger } from "../Logger";
 import { delay } from "../../constants/types";
 import { ForzaTelemetryApi } from "ForzaTelemetryApi";

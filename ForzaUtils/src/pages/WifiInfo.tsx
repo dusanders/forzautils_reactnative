@@ -4,13 +4,13 @@ import { useTheme } from "../context/Theme";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
 import { AppRoutes, StackNavigation } from "../constants/types";
-import { useForzaData } from "../hooks/useForzaData";
 import { TextCard } from "../components/TextCard";
 import { ThemeButton } from "../components/ThemeButton";
 import { ThemeIcon } from "../components/ThemeIcon";
 import { AppBarContainer } from "../components/AppBarContainer";
 import { Row } from "../components/Row";
 import { useNavigation } from "@react-navigation/native";
+import { useForzaData } from "../context/Forza";
 
 export interface WifiInfoProps {
   // None

@@ -1,6 +1,6 @@
 import { NetInfoState, NetInfoWifiState } from "@react-native-community/netinfo";
 import { ForzaTelemetryApi } from "ForzaTelemetryApi";
-import React, { createContext, useCallback, useEffect, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useLogger } from "./Logger";
 import UdpSockets from "react-native-udp";
 import { LISTEN_PORT } from "../constants/types";
@@ -109,4 +109,8 @@ export function ForzaContextProvider(props: ForzaDataProviderProps) {
       {props.children}
     </ForzaContext.Provider>
   )
+}
+
+export function useForzaData(): ForzaData {
+  return useContext(ForzaContext);
 }
