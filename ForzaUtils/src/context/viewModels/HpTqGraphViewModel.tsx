@@ -126,23 +126,14 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
 
 
   const ignorePacket = () => {
-    if (!forza.packet) {
-      logger.debug(tag, `undefined data packet`);
-      return true;
-    }
-    if (!forza.packet.isRaceOn) {
-      return true;
-    }
-    if (forza.packet.throttle < 50) {
-      return true;
-    }
-    if (forza.packet.gear <= 0) {
-      return true;
-    }
-    if (forza.packet.gear >= 11) {
-      return true;
-    }
-    if (forza.packet.getHorsepower() < 0) {
+    if (!forza.packet ||
+      !forza.packet.isRaceOn ||
+      forza.packet.throttle < 50 ||
+      forza.packet.gear <= 0 ||
+      forza.packet.gear >= 11 ||
+      forza.packet.getHorsepower() < 0
+    ) {
+      // Ignore packet - there is no useful information here
       return true;
     }
     const existing = gears.find((ele) => ele.gear === forza.packet?.gear);

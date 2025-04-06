@@ -23,7 +23,7 @@ export interface ForzaData {
   packet: ForzaTelemetryApi | undefined;
 }
 
-export const ForzaContext = createContext({} as ForzaData);
+const ForzaContext = createContext({} as ForzaData);
 
 export interface ForzaDataProviderProps {
   netInfo: NetInfoState;
@@ -48,12 +48,11 @@ export function ForzaContextProvider(props: ForzaDataProviderProps) {
   }, []);
 
   const udpSocketError = useCallback((error: Error) => {
-    logger.error(tag, `Socket error`)
+    logger.error(tag, `Socket error`);
   }, []);
 
   const dataHandler = useCallback((data: Buffer, rinfo: Upd_rinfo) => {
     const packet = new ForzaTelemetryApi(rinfo.size, data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
-    // logger.debug(tag, `packet: ${packet.isRaceOn}`);
     throttledPacket.current = packet;
   }, []);
 
@@ -87,7 +86,7 @@ export function ForzaContextProvider(props: ForzaDataProviderProps) {
           .addListener('error', udpSocketError)
           .addListener('message', dataHandler);
         setPort(socket.address().port);
-      });
+      })
     socket.bind(port);
 
     return () => {
