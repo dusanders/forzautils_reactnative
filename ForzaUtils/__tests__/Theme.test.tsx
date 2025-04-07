@@ -1,6 +1,6 @@
 import 'react-native';
 import React, { useEffect } from 'react';
-import { act, fireEvent, render } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { describe, expect, it } from '@jest/globals';
 import { ThemeProvider, useTheme } from '../src/context/Theme';
 import { Button, Text } from 'react-native';
@@ -28,28 +28,28 @@ describe('Theme Tests', () => {
       );
     };
 
-    const { rerender, getByText, getByTestId } = render(
+    render(
       <ThemeProvider initialMode="dark">
         <TestComponent />
       </ThemeProvider>
     );
 
     // Assert initial theme
-    expect(getByText('dark')).toBeTruthy();
+    expect(screen.getByText('dark')).toBeTruthy();
 
-    expect(getByTestId('test-text').props.style.backgroundColor)
+    expect(screen.getByTestId('test-text').props.style.backgroundColor)
       .toBe(DarkColors.colors.background.primary);
 
     // Change theme to light
-    rerender(
+    screen.rerender(
       <ThemeProvider initialMode="light">
         <TestComponent />
       </ThemeProvider>
     );
 
     // Assert updated theme
-    expect(getByText('light')).toBeTruthy();
-    expect(getByTestId('test-text').props.style.backgroundColor)
+    expect(screen.getByText('light')).toBeTruthy();
+    expect(screen.getByTestId('test-text').props.style.backgroundColor)
       .not.toBe(DarkColors.colors.background.primary); // Ensure it's not dark theme
   });
 
@@ -71,22 +71,22 @@ describe('Theme Tests', () => {
       )
     }
 
-    let { getByTestId } = render(
+    render(
       <ThemeProvider initialMode={'dark'}>
         <TestComponent />
       </ThemeProvider>
     );
 
     // Assert initial theme
-    expect(getByTestId('current-theme').props.children).toBe('dark');
+    expect(screen.getByTestId('current-theme').props.children).toBe('dark');
 
     // Simulate button press to change theme
     await act(async () => {
-      fireEvent.press(getByTestId('change-theme-button'));
+      fireEvent.press(screen.getByTestId('change-theme-button'));
     });
 
     // Assert updated theme
-    expect(getByTestId('current-theme').props.children).toBe('light');
+    expect(screen.getByTestId('current-theme').props.children).toBe('light');
   });
 
   it('should handle invalid theme change gracefully', async () => {
@@ -108,18 +108,18 @@ describe('Theme Tests', () => {
       );
     };
 
-    const { getByTestId } = render(
+    render(
       <ThemeProvider initialMode={'dark'}>
         <TestComponent />
       </ThemeProvider>
     );
 
     // Assert that the theme has not changed to an invalid value
-    expect(getByTestId('current-theme').props.children).toBe('dark');
+    expect(screen.getByTestId('current-theme').props.children).toBe('dark');
     await act(async () => {
-      fireEvent.press(getByTestId('change-theme-button'));
+      fireEvent.press(screen.getByTestId('change-theme-button'));
     });
-    expect(getByTestId('current-theme').props.children).toBe('dark');
+    expect(screen.getByTestId('current-theme').props.children).toBe('dark');
   });
 
   it('should render the theme correctly in the ThemeProvider', () => {
@@ -132,23 +132,23 @@ describe('Theme Tests', () => {
       );
     };
 
-    const { getByTestId, rerender } = render(
+    render(
       <ThemeProvider initialMode="dark">
         <TestComponent />
       </ThemeProvider>
     );
 
     // Verify that the text color matches the dark theme color
-    expect(getByTestId('theme-color').props.style.color).toBe(DarkColors.colors.text.primary.onPrimary);
+    expect(screen.getByTestId('theme-color').props.style.color).toBe(DarkColors.colors.text.primary.onPrimary);
 
-    rerender(
+    screen.rerender(
       <ThemeProvider initialMode="light">
         <TestComponent />
       </ThemeProvider>
     )
 
     // Verify that the text color has changed to light theme color
-    expect(getByTestId('theme-color').props.style.color)
+    expect(screen.getByTestId('theme-color').props.style.color)
       .toBe(LightColors.colors.text.primary.onPrimary); // Ensure it's not dark theme color
   });
 
@@ -170,16 +170,16 @@ describe('Theme Tests', () => {
         </>
       );
     };
-    const {getByTestId} = render(
+    render(
       <ThemeProvider initialMode={'dark'}>
         <TestComponent />
       </ThemeProvider>
     );
-    expect(getByTestId('current-theme').props.style.color).toBe(DarkColors.colors.text.primary.onPrimary);
+    expect(screen.getByTestId('current-theme').props.style.color).toBe(DarkColors.colors.text.primary.onPrimary);
     await act(async () => {
-      fireEvent.press(getByTestId('change-theme-button'));
+      fireEvent.press(screen.getByTestId('change-theme-button'));
     });
-    expect(getByTestId('current-theme').props.style.color)
+    expect(screen.getByTestId('current-theme').props.style.color)
       .toBe(LightColors.colors.text.primary.onPrimary); // Ensure it's not dark theme color
   });
 });

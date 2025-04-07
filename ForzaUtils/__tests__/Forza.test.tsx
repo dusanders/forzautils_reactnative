@@ -1,6 +1,6 @@
 import 'react-native';
 import React, { useEffect } from 'react';
-import { act, render } from '@testing-library/react-native';
+import { act, render, screen } from '@testing-library/react-native';
 // Note: import explicitly to use the types shipped with jest.
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { ForzaContextProvider, useForzaData } from '../src/context/Forza';
@@ -60,14 +60,14 @@ describe('Forza Context Tests', () => {
       )
     }
 
-    const { getByTestId, getByText } = render(
+    render(
       <ForzaContextProvider netInfo={mockNetInfo}>
         <TestComponent />
       </ForzaContextProvider>
     );
 
     // Since the packet is initially undefined, we expect it to be falsy
-    expect(getByTestId('raceOn')).toBeEmptyElement(); // Check that the initial value is undefined
+    expect(screen.getByTestId('raceOn')).toBeEmptyElement(); // Check that the initial value is undefined
 
     await act( async () => {
       const listeningHandler = mockSocket.once.mock.calls.find(
@@ -101,6 +101,6 @@ describe('Forza Context Tests', () => {
     });
 
     // Now we expect the updated value to be reflected in the Text component
-    expect(getByText('true')).toBeTruthy(); // Check that the updated value is true
+    expect(screen.getByText('true')).toBeTruthy(); // Check that the updated value is true
   });
 });
