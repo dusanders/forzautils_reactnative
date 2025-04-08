@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Permission, PERMISSIONS, requestMultiple } from "react-native-permissions";
 import { useSelector } from "react-redux";
 import { PermissionError } from "../pages/PermissionError";
-import { AppState, Platform } from "react-native";
+import { AppState, AppStateStatus, Platform } from "react-native";
 import { setPermissionState } from "../redux/PermissionStore";
 import { Splash } from "../pages/Splash";
 import { AppStoreState } from "../redux/AppStore";
@@ -25,32 +25,44 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
   const [loaded, setLoaded] = useState(false);
 
   const ensurePermissions = async () => {
+    console.log(`ensuring permissions...`);
+    if(permissionState.isGranted == 'blocked') {
+      setLoaded(true);
+      return;
+    }
     let permList = androidPermissionList;
     switch (Platform.OS) {
       case 'ios':
         permList = iosPermissionList
     };
     const systemPermissions = await requestMultiple(permList);
-    let allAllowed = false
+    console.log(`done checking ${JSON.stringify(systemPermissions)}`);
+    let allAllowed = false;
+    let allBlocked = false;
+    let allDenied = false;
     permList.forEach((perm) => {
       allAllowed = systemPermissions[perm] === 'granted';
+      allBlocked = systemPermissions[perm] === 'blocked';
+      allDenied = systemPermissions[perm] === 'denied';
     });
-    if (!allAllowed) {
+    if (allAllowed) {
       setLoaded(true);
-      setPermissionState({ isGranted: false });
+      setPermissionState({ isGranted: 'granted' });
     } else {
       setLoaded(true);
-      setPermissionState({ isGranted: true });
+      setPermissionState({ isGranted: 'blocked' });
     }
   }
 
   // didMount initial logic
   useEffect(() => {
-    let appStateSub = AppState.addEventListener('change', (state) => {
+    const stateHandler = async (state: AppStateStatus) => {
+      console.log(`APP CHANGE: ${state}`);
       if (state === 'active') {
-        ensurePermissions();
+        await ensurePermissions();
       }
-    })
+    }
+    let appStateSub = AppState.addEventListener('change', stateHandler);
     ensurePermissions();
     return () => {
       if (appStateSub) {
@@ -59,34 +71,16 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
     }
   }, []);
 
-  if(!loaded) return (<Splash />);
-  if(!permissionState.isGranted) return props.children;
+  if (!loaded) return (<Splash />);
+  if (permissionState.isGranted != undefined) return props.children;
   return (
     <PermissionError
       onIgnore={() => {
         setLoaded(true);
-        setPermissionState({ isGranted: true });
+        setPermissionState({ isGranted: 'granted' });
       }}
       onOpenSettings={async () => {
-        let permList = androidPermissionList;
-        switch (Platform.OS) {
-          case 'ios':
-            permList = iosPermissionList
-        };
-        const systemPermissions = await requestMultiple(permList);
-        let allAllowed = false
-        permList.forEach((perm) => {
-          console.log(`Perm ${perm} -> ${systemPermissions[perm]}`)
-          allAllowed = systemPermissions[perm] === 'granted';
-        });
-        console.log(`all allowed ${allAllowed}`);
-        if (!allAllowed) {
-          setLoaded(true);
-          setPermissionState({ isGranted: false })
-        } else {
-          setLoaded(true);
-          setPermissionState({ isGranted: true });
-        }
+        await ensurePermissions();
       }} />
   );
 }

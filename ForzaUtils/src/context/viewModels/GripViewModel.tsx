@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
-import { useForzaData } from "../../context/Forza";
 import { TireData } from "ForzaTelemetryApi";
+import { useSelector } from "react-redux";
+import { getForzaPacket } from "../../redux/WifiStore";
 
 
 export interface IGripViewModel {
@@ -11,23 +12,23 @@ export interface IGripViewModel {
 }
 
 export function useGripViewModel(): IGripViewModel {
-  const forza = useForzaData();
+  const forza = useSelector(getForzaPacket);
   const steering = useMemo(() => {
-    return forza.packet?.steer || 0
-  }, [forza.packet?.steer]);
+    return forza?.steer || 0
+  }, [forza?.steer]);
   const throttle = useMemo(() => {
-    return forza.packet?.throttle || 0
-  }, [forza.packet?.throttle]);
+    return forza?.throttle || 0
+  }, [forza?.throttle]);
   const brake = useMemo(() => {
-    return forza.packet?.brake || 0
-  }, [forza.packet?.brake]);
+    return forza?.brake || 0
+  }, [forza?.brake]);
   const tireSlip = useMemo(() => {
-    return forza.packet?.tireSlipRatio
+    return forza?.tireSlipRatio
       ? {
-        leftFront: Number(forza.packet.tireSlipRatio.leftFront.toFixed(2)),
-        rightFront: Number(forza.packet.tireSlipRatio.rightFront.toFixed(2)),
-        leftRear: Number(forza.packet.tireSlipRatio.leftRear.toFixed(2)),
-        rightRear: Number(forza.packet.tireSlipRatio.rightRear.toFixed(2))
+        leftFront: Number(forza.tireSlipRatio.leftFront.toFixed(2)),
+        rightFront: Number(forza.tireSlipRatio.rightFront.toFixed(2)),
+        leftRear: Number(forza.tireSlipRatio.leftRear.toFixed(2)),
+        rightRear: Number(forza.tireSlipRatio.rightRear.toFixed(2))
       }
       : {
         leftFront: 0,
@@ -35,7 +36,7 @@ export function useGripViewModel(): IGripViewModel {
         leftRear: 0,
         rightRear: 0
       }
-  }, [forza.packet?.tireSlipRatio]);
+  }, [forza?.tireSlipRatio]);
 
   return {
     steering: steering,

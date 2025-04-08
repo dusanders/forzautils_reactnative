@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { useForzaData } from "../../context/Forza";
+import { useSelector } from "react-redux";
+import { getForzaPacket } from "../../redux/WifiStore";
 
 export interface ISuspensionGraphViewModel {
   leftFront: number;
@@ -9,22 +10,22 @@ export interface ISuspensionGraphViewModel {
 }
 export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
-  const forza = useForzaData();
+  const forza = useSelector(getForzaPacket);
   const leftFront = useMemo(() =>
-    forza.packet?.normalizedSuspensionTravel.leftFront || 0,
-    [forza.packet?.normalizedSuspensionTravel.leftFront]
+    forza?.normalizedSuspensionTravel.leftFront || 0,
+    [forza?.normalizedSuspensionTravel.leftFront]
   );
   const rightFront = useMemo(() =>
-    forza.packet?.normalizedSuspensionTravel.rightFront || 0,
-    [forza.packet?.normalizedSuspensionTravel.rightFront]
+    forza?.normalizedSuspensionTravel.rightFront || 0,
+    [forza?.normalizedSuspensionTravel.rightFront]
   );
   const leftRear = useMemo(() =>
-    forza.packet?.normalizedSuspensionTravel.leftRear || 0,
-    [forza.packet?.normalizedSuspensionTravel.leftRear]
+    forza?.normalizedSuspensionTravel.leftRear || 0,
+    [forza?.normalizedSuspensionTravel.leftRear]
   );
   const rightRear = useMemo(() =>
-    forza.packet?.normalizedSuspensionTravel.rightRear || 0,
-    [forza.packet?.normalizedSuspensionTravel.rightRear]
+    forza?.normalizedSuspensionTravel.rightRear || 0,
+    [forza?.normalizedSuspensionTravel.rightRear]
   );
 
   return {

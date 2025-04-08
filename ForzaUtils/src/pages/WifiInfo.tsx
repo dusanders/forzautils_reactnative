@@ -9,7 +9,6 @@ import { ThemeIcon } from "../components/ThemeIcon";
 import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { Row } from "../components/Row";
 import { useNavigation } from "@react-navigation/native";
-import { useForzaData } from "../context/Forza";
 import { useSelector } from "react-redux";
 import { getTheme } from "../redux/ThemeStore";
 import { CircleCheckIcon } from "../components/CircleCheckIcon";

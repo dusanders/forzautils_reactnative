@@ -63,4 +63,4 @@ export const getIsConnected = (state: AppStoreState) => state.wifi.isConnected;
 export const getIsUdpListening = (state: AppStoreState) => state.wifi.isUdpListening;
 export const getWifiPort = (state: AppStoreState) => state.wifi.port;
 export const getWifiIp = (state: AppStoreState) => state.wifi.ip;
-export const getWifiPacket = (state: AppStoreState) => state.wifi.packet;
+export const getForzaPacket = (state: AppStoreState) => state.wifi.packet;

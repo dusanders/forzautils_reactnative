@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useForzaData } from "../../context/Forza";
 import { useLogger } from "../Logger";
 import { delay } from "../../constants/types";
 import { ForzaTelemetryApi } from "ForzaTelemetryApi";
+import { useSelector } from "react-redux";
+import { getForzaPacket } from "../../redux/WifiStore";
 
 export interface IHpTqGraphViewModel {
   gears: GearData[];
@@ -121,25 +122,25 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   }
   const tag = 'HpTqGraphViewModel';
   const logger = useLogger();
-  const forza = useForzaData();
+  const forza = useSelector(getForzaPacket);
   const [gears, setGears] = useState<GearData[]>([]);
 
 
   const ignorePacket = () => {
-    if (!forza.packet ||
-      !forza.packet.isRaceOn ||
-      forza.packet.throttle < 50 ||
-      forza.packet.gear <= 0 ||
-      forza.packet.gear >= 11 ||
-      forza.packet.getHorsepower() < 0
+    if (!forza ||
+      !forza.isRaceOn ||
+      forza.throttle < 50 ||
+      forza.gear <= 0 ||
+      forza.gear >= 11 ||
+      forza.getHorsepower() < 0
     ) {
       // Ignore packet - there is no useful information here
       return true;
     }
-    const existing = gears.find((ele) => ele.gear === forza.packet?.gear);
+    const existing = gears.find((ele) => ele.gear === forza?.gear);
     if (existing && existing.events?.length) {
       const last = existing.events[existing.events.length];
-      if (last && (forza.packet.rpmData.current < last.rpm)) {
+      if (last && (forza.rpmData.current < last.rpm)) {
         console.log(`skip decel`)
         return;
       }
@@ -203,9 +204,9 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
 
   useEffect(() => {
     if (!ignorePacket()) {
-      insertEvent(eventFromPacket(forza.packet!));
+      insertEvent(eventFromPacket(forza!));
     }
-  }, [forza.packet]);
+  }, [forza]);
 
   return {
     gears: gears,

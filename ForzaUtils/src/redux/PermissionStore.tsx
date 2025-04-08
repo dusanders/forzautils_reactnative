@@ -3,11 +3,11 @@ import { useDispatch } from "react-redux";
 
 
 export interface IPermissionState {
-  isGranted: boolean;
+  isGranted: 'blocked' | 'granted';
 }
 
 const initialState: IPermissionState = {
-  isGranted: false,
+  isGranted: 'blocked',
 };
 
 const permissionSlice = createSlice({

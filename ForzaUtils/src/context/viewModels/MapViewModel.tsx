@@ -1,6 +1,7 @@
 import { DirectionalData } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
-import { useForzaData } from "../../context/Forza";
+import { useSelector } from "react-redux";
+import { getForzaPacket } from "../../redux/WifiStore";
 
 export interface PlayerPosition {
   x: number;
@@ -45,7 +46,7 @@ const initialViewBox: SvgViewBoxMeasures = {
 }
 
 export function useMapViewModel(): IMapViewModel {
-  const forza = useForzaData();
+  const forza = useSelector(getForzaPacket);
   const [trackId, setTrackId] = useState(0);
   const [svg, setSvg] = useState('');
   const [viewBox, setViewBox] = useState<SvgViewBoxMeasures>(initialViewBox);
@@ -66,20 +67,20 @@ export function useMapViewModel(): IMapViewModel {
   }, [position]);
 
   useEffect(() => {
-    if (!forza.packet || !forza.packet.isRaceOn || !forza.packet.trackId) {
+    if (!forza || !forza.isRaceOn || !forza.trackId) {
       return;
     }
-    if (trackId && forza.packet?.trackId) {
-      if (forza.packet.trackId !== trackId) {
+    if (trackId && forza?.trackId) {
+      if (forza.trackId !== trackId) {
         console.log(`clean map`);
         setSvg('');
         setViewBox(initialViewBox);
         setPosition(undefined);
-        setTrackId(forza.packet.trackId);
+        setTrackId(forza.trackId);
         return;
       }
     }
-    const formatted = formatPosition(forza.packet.position);
+    const formatted = formatPosition(forza.position);
     const playerPosition: PlayerPosition = {
       x: formatted.x,
       y: formatted.z
@@ -92,8 +93,8 @@ export function useMapViewModel(): IMapViewModel {
     }
     setSvg(path);
     setPosition(playerPosition);
-    setTrackId(forza.packet?.trackId || 0);
-  }, [forza.packet?.position]);
+    setTrackId(forza?.trackId || 0);
+  }, [forza?.position]);
 
   return {
     svgPath: svg,

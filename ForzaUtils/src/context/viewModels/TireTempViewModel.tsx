@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { useForzaData } from "../../context/Forza";
+import { useSelector } from "react-redux";
+import { getForzaPacket } from "../../redux/WifiStore";
 
 export interface ITireTempViewModel {
   leftFront: number;
@@ -10,22 +11,22 @@ export interface ITireTempViewModel {
 
 export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
-  const forza = useForzaData();
+  const forza = useSelector(getForzaPacket);
   const leftFront = useMemo(() =>
-    Number(forza.packet?.tireTemp.leftFront.toFixed(2)) || 0,
-    [forza.packet?.tireTemp.leftFront]
+    Number(forza?.tireTemp.leftFront.toFixed(2)) || 0,
+    [forza?.tireTemp.leftFront]
   );
   const rightFront = useMemo(() =>
-    Number(forza.packet?.tireTemp.rightFront.toFixed(2)) || 0,
-    [forza.packet?.tireTemp.rightFront]
+    Number(forza?.tireTemp.rightFront.toFixed(2)) || 0,
+    [forza?.tireTemp.rightFront]
   );
   const leftRear = useMemo(() =>
-    Number(forza.packet?.tireTemp.leftRear.toFixed(2)) || 0,
-    [forza.packet?.tireTemp.leftRear]
+    Number(forza?.tireTemp.leftRear.toFixed(2)) || 0,
+    [forza?.tireTemp.leftRear]
   );
   const rightRear = useMemo(() =>
-    Number(forza.packet?.tireTemp.rightRear.toFixed(2)) || 0,
-    [forza.packet?.tireTemp.rightRear]
+    Number(forza?.tireTemp.rightRear.toFixed(2)) || 0,
+    [forza?.tireTemp.rightRear]
   );
 
   return {
