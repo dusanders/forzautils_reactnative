@@ -1,13 +1,14 @@
 import React from "react";
-import { AppBarContainer } from "../components/AppBarContainer";
+import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { StyleSheet, View } from "react-native";
 import { TextCard } from "../components/TextCard";
 import { useNavigation } from "@react-navigation/native";
 import { AppRoutes, StackNavigation } from "../constants/types";
 import { Row } from "../components/Row";
 import { IThemeElements } from "../constants/Themes";
-import { useTheme } from "../context/Theme";
 import { ThemeText } from "../components/ThemeText";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export interface SourceChooserProps {
   // None
@@ -15,8 +16,8 @@ export interface SourceChooserProps {
 
 export function SourceChooser(props: SourceChooserProps) {
   const navigation = useNavigation<StackNavigation>();
-  const theme = useTheme();
-  const styles = themeStyles(theme.theme);
+  const theme = useSelector(getTheme);
+  const styles = themeStyles(theme);
 
   return (
     <AppBarContainer

@@ -1,15 +1,16 @@
 import React, { memo } from "react";
-import { useTheme } from "../../context/Theme";
 import { StyleSheet, View } from "react-native";
 import { ThemeText } from "../../components/ThemeText";
 import { IThemeElements } from "../../constants/Themes";
+import { useSelector } from "react-redux";
+import { getTheme } from "../../redux/ThemeStore";
 
 export interface SteeringChartProps {
   steeringAngle: number;
 }
 
 export const SteeringChart = memo((props: SteeringChartProps) => {
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   const style = themeStyles(theme);
   const calcSteerPosition = () => {
     if(props.steeringAngle < 101) {

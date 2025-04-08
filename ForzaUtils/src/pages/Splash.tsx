@@ -1,22 +1,21 @@
 import React, {  } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { useTheme } from "../context/Theme";
 import { IThemeElements } from "../constants/Themes";
-import { useLocale } from "../context/Locale";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export interface SplashProps {
 
 }
 
 export function Splash(props: SplashProps) {
-  const locale = useLocale();
-
-  const style = withStyles(useTheme().theme);
+  const theme = useSelector(getTheme);
+  const style = withStyles(theme);
   return (
     <View style={style.root}>
       <Text
         style={style.appNameTxt}>
-        {locale.strings.appName}
+        {/* {locale.strings.appName} */}
       </Text>
       <ActivityIndicator
         size={'large'}

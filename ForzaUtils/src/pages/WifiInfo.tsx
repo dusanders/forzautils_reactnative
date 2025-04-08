@@ -1,54 +1,29 @@
 import React, { useState } from "react";
-import { Button, Dimensions, FlatList, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { useTheme } from "../context/Theme";
+import { Dimensions, FlatList, ScrollView, StyleSheet, View } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
 import { AppRoutes, StackNavigation } from "../constants/types";
 import { TextCard } from "../components/TextCard";
 import { ThemeButton } from "../components/ThemeButton";
 import { ThemeIcon } from "../components/ThemeIcon";
-import { AppBarContainer } from "../components/AppBarContainer";
+import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { Row } from "../components/Row";
 import { useNavigation } from "@react-navigation/native";
 import { useForzaData } from "../context/Forza";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
+import { CircleCheckIcon } from "../components/CircleCheckIcon";
+import { getWifiState } from "../redux/WifiStore";
 
 export interface WifiInfoProps {
   // None
 }
 
-interface CircleCheckIconProps {
-
-}
-function CircleCheckIcon(props: CircleCheckIconProps) {
-  const theme = useTheme();
-  return (
-    <View style={{
-      height: 50,
-      width: 50,
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
-      <View style={{
-        borderColor: theme.theme.colors.text.primary.onPrimary,
-        borderRadius: 100,
-        borderWidth: 0.8,
-        position: 'absolute',
-        height: '100%',
-        width: '100%',
-        opacity: 0.25
-      }}></View>
-      <ThemeIcon name={'check'} />
-    </View>
-  )
-}
-
 export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps> {
-  const theme = useTheme();
-  const styles = themeStyles(theme.theme);
+  const theme = useSelector(getTheme);
+  const wifiInfo = useSelector(getWifiState);
+  const styles = themeStyles(theme);
   const navigation = useNavigation<StackNavigation>();
-  const forza = useForzaData();
-  const i = useState('')
 
   return (
     <AppBarContainer hideBack>
@@ -95,7 +70,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
               allcapsLabel
               allcapsTitle
               centerContent
-              title={forza.ip}
+              title={wifiInfo.ip || '-'}
               body="IP Address" />
             <TextCard
               style={{
@@ -104,7 +79,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
               allcapsLabel
               allcapsTitle
               centerContent
-              title={`${forza.port}`}
+              title={`${wifiInfo.port || '-'}`}
               body="Port" />
           </Row>
           <Row>
@@ -113,9 +88,10 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
                 width: '50%'
               }}
               allcapsLabel
+              allcapsTitle
               centerContent
-              title={forza.ssid}
-              body="WiFi Name" />
+              title={wifiInfo.isUdpListening ? 'Listening' : 'Error'}
+              body="Forza Data" />
             <TextCard
               style={{
                 width: '50%'

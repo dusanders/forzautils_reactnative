@@ -1,8 +1,8 @@
 import { IStringDefinitions, IStrings_Generic } from "./strings";
 
-export class Strings_enUS implements IStringDefinitions {
-  appName: string = "Forza Utils";
-  generics: IStrings_Generic = {
+export const Strings_enUS: IStringDefinitions = {
+  appName: "Forza Utils",
+  generics: {
     loading: "Loading"
-  };
+  }
 }

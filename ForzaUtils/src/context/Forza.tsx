@@ -77,25 +77,25 @@ export function ForzaContextProvider(props: ForzaDataProviderProps) {
   }, []);
 
   useEffect(() => {
-    const socket = UdpSockets.createSocket(socketOptions)
-      .once('error', () => bindErrorCallback)
-      .once('close', closeHandler)
-      .once('listening', () => {
-        logger.debug(tag, `socket opened @ ${JSON.stringify(socket.address())}`);
-        socket.removeListener('error', bindErrorCallback)
-          .addListener('error', udpSocketError)
-          .addListener('message', dataHandler);
-        setPort(socket.address().port);
-      })
-    socket.bind(port);
+    // const socket = UdpSockets.createSocket(socketOptions)
+    //   .once('error', () => bindErrorCallback)
+    //   .once('close', closeHandler)
+    //   .once('listening', () => {
+    //     logger.debug(tag, `socket opened @ ${JSON.stringify(socket.address())}`);
+    //     socket.removeListener('error', bindErrorCallback)
+    //       .addListener('error', udpSocketError)
+    //       .addListener('message', dataHandler);
+    //     setPort(socket.address().port);
+    //   })
+    // socket.bind(port);
 
-    return () => {
-      if (socket) {
-        socket.close(() => {
-          logger.debug(tag, 'socket did close from close() call');
-        })
-      }
-    }
+    // return () => {
+    //   if (socket) {
+    //     socket.close(() => {
+    //       logger.debug(tag, 'socket did close from close() call');
+    //     })
+    //   }
+    // }
   }, []);
 
   return (

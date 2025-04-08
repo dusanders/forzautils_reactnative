@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { AppBarContainer } from "../components/AppBarContainer";
-import { StyleSheet, TextInput, View } from "react-native";
+import { AppBarContainer } from "../components/AppBar/AppBarContainer";
+import { StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { IThemeElements } from "../constants/Themes";
-import { useTheme } from "../context/Theme";
 import { CardInput } from "../components/CardInput";
 import { Row } from "../components/Row";
 import { CardContainer } from "../components/CardContainer";
 import { ThemeSwitch } from "../components/ThemeSwitch";
 import { LabelText } from "../components/ThemeText";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export interface TuningPageProps {
   // No props needed for this page
@@ -16,8 +17,8 @@ export interface TuningPageProps {
 
 export function TuningPage(props: TuningPageProps) {
   const navigation = useNavigation();
-  const theme = useTheme();
-  const styles = themeStyles(theme.theme);
+  const theme = useSelector(getTheme);
+  const styles = themeStyles(theme);
   const [totalWeight, setTotalWeight] = useState<string>("");
   const [rollCage, setRollCage] = useState(false);
 

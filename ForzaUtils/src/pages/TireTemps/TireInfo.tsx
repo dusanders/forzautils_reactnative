@@ -1,9 +1,10 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { TextCard } from "../../components/TextCard";
-import { useTheme } from "../../context/Theme";
 import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
+import { useSelector } from "react-redux";
+import { getTheme } from "../../redux/ThemeStore";
 
 export interface TireInfoProps {
   temp: number;
@@ -11,7 +12,7 @@ export interface TireInfoProps {
 }
 
 export function TireInfo(props: TireInfoProps) {
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   const style = themeStyles(theme);
 
   const colorForTemp = (temp: number) => {

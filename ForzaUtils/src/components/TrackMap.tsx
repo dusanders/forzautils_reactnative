@@ -1,17 +1,18 @@
 import React, { } from "react";
 import { StyleProp, View, ViewStyle } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
-import { useTheme } from "../context/Theme";
 import { useViewModelStore } from "../context/viewModels/ViewModelStore";
 import { ThemeText } from "./ThemeText";
 import { Paper } from "./Paper";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export interface TrackMapProps {
   style?: StyleProp<ViewStyle>;
 }
 
 export function TrackMap(props: TrackMapProps) {
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   const viewModel = useViewModelStore().map;
   const minSvgX = viewModel.viewBox.minX;
   const minSvgY = viewModel.viewBox.minY;

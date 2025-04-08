@@ -1,8 +1,6 @@
 import React from "react";
-import { StyleProp, StyleSheet, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
-import { IThemeElements } from "../constants/Themes";
-import { useTheme } from "../context/Theme";
-import { LabelText, ThemeText, TitleText } from "./ThemeText";
+import { StyleProp, TextStyle, TouchableOpacity, ViewStyle } from "react-native";
+import { LabelText, TitleText } from "./ThemeText";
 import { CardContainer } from "./CardContainer";
 
 export interface CardProps {
@@ -41,14 +39,12 @@ export function TextCard(props: CardProps) {
             props.onPress(props.id)
           }
         }}>
-        {props.title && (
-          <TitleText
-            style={props.titleStyle}
-            allcaps={props.allcapsTitle}
-            fontSize={'small'}>
-            {props.title}
-          </TitleText>
-        )}
+        <TitleText
+          style={props.titleStyle}
+          allcaps={props.allcapsTitle}
+          fontSize={'small'}>
+          {props.title}
+        </TitleText>
         {props.body && (
           <LabelText
             style={props.bodyStyle}

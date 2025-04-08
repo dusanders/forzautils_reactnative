@@ -1,8 +1,9 @@
 import React from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { IThemeElements } from "../constants/Themes";
-import { useTheme } from "../context/Theme";
 import { LabelText } from "./ThemeText";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export interface CardInputProps {
   value: string;
@@ -12,8 +13,8 @@ export interface CardInputProps {
   style?: any;
 }
 export function CardInput(props: CardInputProps) {
-  const theme = useTheme();
-  const styles = themeStyles(theme.theme);
+  const theme = useSelector(getTheme);
+  const styles = themeStyles(theme);
 
   return (
     <View style={[styles.root, props.style]}>
@@ -21,7 +22,7 @@ export function CardInput(props: CardInputProps) {
         value={props.value}
         onChangeText={(text) => props.onChange(text)}
         placeholder={props.placeholder || ""}
-        placeholderTextColor={theme.theme.colors.text.secondary.onSecondary}
+        placeholderTextColor={theme.colors.text.secondary.onSecondary}
         style={styles.input}
         keyboardType={'numeric'}
         autoCapitalize="none"

@@ -2,11 +2,12 @@ import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { AppRoutes, randomKey, StackNavigation } from "../constants/types";
 import { IThemeElements } from "../constants/Themes";
-import { useTheme } from "../context/Theme";
 import { TextCard } from "../components/TextCard";
-import { AppBarContainer } from "../components/AppBarContainer";
+import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
 import { TrackMap } from "../components/TrackMap";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export interface DataChooserProps {
 
@@ -47,8 +48,8 @@ const options: DataOption[] = [
 ]
 
 export function DataChooser(props: DataChooserProps) {
-  const theme = useTheme();
-  const styles = themeStyles(theme.theme);
+  const theme = useSelector(getTheme);
+  const styles = themeStyles(theme);
   const navigation = useNavigation<StackNavigation>();
 
   return (
@@ -83,12 +84,12 @@ export function DataChooser(props: DataChooserProps) {
                 title={info.item.name}
                 body={info.item.description}
                 titleStyle={{
-                  fontSize: theme.theme.sizes.font.medium,
+                  fontSize: theme.sizes.font.medium,
                   textAlign: 'center'
                 }}
                 bodyStyle={{
                   textAlign: 'center',
-                  fontSize: theme.theme.sizes.font.small
+                  fontSize: theme.sizes.font.small
                 }}
                 onPress={(id) => {
                   for (const i of options) {

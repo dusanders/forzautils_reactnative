@@ -2,7 +2,8 @@ import React from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { ContainerProps } from "./Container";
-import { useTheme } from "../context/Theme";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 
 export interface PaperProps extends ContainerProps {
@@ -10,13 +11,13 @@ export interface PaperProps extends ContainerProps {
 }
 
 export function Paper(props: PaperProps) {
-  const theme = useTheme();
-  const styles = themeStyles(theme.theme);
+  const theme = useSelector(getTheme);
+  const styles = themeStyles(theme);
   let variantStyle: StyleProp<ViewStyle> = {
-    backgroundColor: theme.theme.colors.background.onPrimary
+    backgroundColor: theme.colors.background.onPrimary
   }
   if (props.variant) {
-    variantStyle.backgroundColor = theme.theme.colors.background[props.variant]
+    variantStyle.backgroundColor = theme.colors.background[props.variant]
   }
 
   let centerContentStyle: StyleProp<ViewStyle> = {};

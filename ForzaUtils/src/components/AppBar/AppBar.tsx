@@ -1,48 +1,23 @@
 import React, { ReactElement, useCallback, useState } from "react";
 import { Pressable, PressableProps, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { IThemeElements } from "../constants/Themes";
-import { ThemeText } from "./ThemeText";
-import { ThemeIcon } from "./ThemeIcon";
-import { Container } from "./Container";
-import { ThemeSwitch } from "./ThemeSwitch";
-import { randomKey } from "../constants/types";
-import { useTheme } from "../context/Theme";
+import { IThemeElements } from "../../constants/Themes";
+import { ThemeText } from "../ThemeText";
+import { ThemeIcon } from "../ThemeIcon";
+import { Container } from "../Container";
+import { ThemeSwitch } from "../ThemeSwitch";
+import { AppBarSettingsButtonParams, AppSettingsButton } from "./AppSettingsButton";
+import { useSelector } from "react-redux";
+import { getTheme, getThemeType, useSetTheme } from "../../redux/ThemeStore";
 
-
-export interface AppSettingsButtonProps {
-  onPress(): void;
-  children?: any;
-}
-export function AppSettingsButton(props: AppSettingsButtonProps) {
-  const handleClick = useCallback(() => {
-    props.onPress()
-  }, [props.onPress]);
-  const theme = useTheme();
-  return (
-    <Pressable
-      style={{
-        backgroundColor: theme.theme.colors.background.primary,
-        borderRadius: theme.theme.sizes.borderRadius,
-        margin: 4,
-        marginTop: 8,
-        padding: 6,
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 12,
-        zIndex: 12
-      }}
-      onPress={handleClick}
-    >
-      {props.children}
-    </Pressable>
-  )
-}
-
-export interface AppBarSettingsButtonParams {
-  id: string;
-  onPress(): void;
-  renderItem(): ReactElement;
-}
+export const AppBarTestID = {
+  root: 'app-bar-root',
+  titleText: 'app-bar-title-text',
+  backIconView: 'app-bar-back-icon-view',
+  settingIconView: 'app-bar-setting-icon-view',
+  settingsFlyoutView: 'app-bar-settings-flyout-view',
+  settingsFlyoutContent: 'app-bar-settings-flyout-content',
+  settingsFlyoutOutsideTouchable: 'app-bar-settings-flyout-outside-touchable',
+};
 
 export interface AppBarProps {
   title?: string;
@@ -54,8 +29,10 @@ export interface AppBarProps {
 
 export function AppBar(props: AppBarProps) {
   const [showSettings, setShowSettings] = useState(false);
-  const theme = useTheme();
-  const style = themeStyles(theme.theme);
+  const theme = useSelector(getTheme);
+  const themeType = useSelector(getThemeType);
+  const setTheme = useSetTheme();
+  const style = themeStyles(theme);
   let doShowSettingsButton = true;
   if (props.hideSettings != undefined) {
     doShowSettingsButton = !props.hideSettings
@@ -64,50 +41,60 @@ export function AppBar(props: AppBarProps) {
   if (props.hideBack != undefined) {
     doShowBackButton = !props.hideBack
   }
+  
   return (
     <>
       {showSettings && (
         <TouchableOpacity
+          testID={AppBarTestID.settingsFlyoutOutsideTouchable}
           style={style.settingsFlyoutOutsideTouchable}
           onPress={() => {
             setShowSettings(false)
           }} />
       )}
-      <View style={style.root}>
-        <ThemeText style={style.titleText}
-          fontFamily={'bold'}>
-          {props.title}
-        </ThemeText>
+      <View testID={AppBarTestID.root} style={style.root}>
+        {props.title && (
+          <ThemeText testID={AppBarTestID.titleText}
+            style={style.titleText}
+            fontFamily={'bold'}>
+            {props.title}
+          </ThemeText>
+        )}
 
         {doShowBackButton && (
-          <Pressable style={style.backIconView}
+          <Pressable testID={AppBarTestID.backIconView}
+            style={style.backIconView}
             onPress={() => {
               if (props.onBack) {
                 props.onBack()
               }
             }}>
             <ThemeIcon name={'chevron-left'}
-              size={theme.theme.sizes.icon} />
+              size={theme.sizes.icon} />
           </Pressable>
         )}
 
         <View style={{ flexGrow: 1 }} />
 
         {doShowSettingsButton && (
-          <Pressable style={style.settingIconView}
+          <Pressable testID={AppBarTestID.settingIconView}
+            style={style.settingIconView}
             onPress={() => {
               setShowSettings(!showSettings)
             }}>
             <ThemeIcon name={'settings'}
-              size={theme.theme.sizes.icon} />
+              size={theme.sizes.icon} />
           </Pressable>
         )}
 
         {showSettings && (
           <Container
+            testID={AppBarTestID.settingsFlyoutView}
             variant={'secondary'}
             style={style.settingsFlyoutView}>
-            <View style={style.settingsFlyoutContent}>
+            <View
+              testID={AppBarTestID.settingsFlyoutContent}
+              style={style.settingsFlyoutContent}>
               <View style={style.themeButtonView}>
                 <ThemeText
                   variant={'primary'}
@@ -117,9 +104,9 @@ export function AppBar(props: AppBarProps) {
                 <ThemeSwitch
                   onPalette={'secondary'}
                   onValueChange={(val) => {
-                    theme.changeTheme(val ? 'dark' : 'light')
+                    setTheme(val ? 'dark' : 'light');
                   }}
-                  value={theme.current === 'dark'} />
+                  value={themeType === 'dark'} />
               </View>
               {props.injectElements && (
                 <View style={{
@@ -127,7 +114,7 @@ export function AppBar(props: AppBarProps) {
                 }}>
                   {props.injectElements.map((injected) => (
                     <AppSettingsButton
-                      key={''}
+                      key={injected.id}
                       onPress={() => {
                         injected.onPress()
                       }}>

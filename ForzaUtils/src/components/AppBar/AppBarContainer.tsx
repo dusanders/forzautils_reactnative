@@ -1,15 +1,16 @@
 import React from "react";
-import { Container, ContainerProps } from "./Container";
+import { Container, ContainerProps } from "../Container";
 import { AppBar, AppBarProps } from "./AppBar";
-import { StyleProp, View, ViewStyle } from "react-native";
-import { useTheme } from "../context/Theme";
+import { View } from "react-native";
+import { useSelector } from "react-redux";
+import { getTheme } from "../../redux/ThemeStore";
 
 export interface AppBarContainerProps extends ContainerProps, AppBarProps {
   
 }
 
 export function AppBarContainer(props: AppBarContainerProps) {
-  const theme = useTheme();
+  const theme = useSelector(getTheme);
   return (
     <Container
       fill={'parent'}
@@ -21,7 +22,7 @@ export function AppBarContainer(props: AppBarContainerProps) {
       }}>
       <AppBar {...props} />
       <View style={{
-        paddingTop: theme.theme.sizes.navBar + theme.theme.sizes.borderRadius
+        paddingTop: theme.sizes.navBar + theme.sizes.borderRadius
       }}>
         {props.children}
       </View>

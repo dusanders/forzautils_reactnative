@@ -1,19 +1,18 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { useTheme } from "../context/Theme";
+import { StyleSheet } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "../components/ThemeText";
 import { Container } from "../components/Container";
-import { useLocale } from "../context/Locale";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export interface WifiErrorProps {
 
 }
 
 export function WifiError(props: WifiErrorProps) {
-  const locale = useLocale();
-  const theme = useTheme();
-  const styles = themeStyles(theme.theme);
+  const theme = useSelector(getTheme);
+  const styles = themeStyles(theme);
 
   return (
     <Container style={styles.root}>

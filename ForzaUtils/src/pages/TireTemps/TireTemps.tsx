@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { AppBarContainer } from "../../components/AppBarContainer";
-import { useTheme } from "../../context/Theme";
+import React, { useMemo } from "react";
+import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { IThemeElements } from "../../constants/Themes";
 import { StyleSheet } from "react-native";
 import { Row } from "../../components/Row";
@@ -8,13 +7,15 @@ import { TireInfo } from "./TireInfo";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
+import { useSelector } from "react-redux";
+import { getTheme } from "../../redux/ThemeStore";
 
 export interface TireTempsProps {
   // Nothing
 }
 
 export function TireTemps(props: TireTempsProps) {
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   const style = themeStyles(theme);
   const navigation = useNavigation<StackNavigation>();
   const store = useViewModelStore();

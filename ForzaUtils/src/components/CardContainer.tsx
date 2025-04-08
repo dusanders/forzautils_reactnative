@@ -1,7 +1,8 @@
 import React from "react";
 import { IThemeElements } from "../constants/Themes";
-import { StyleProp, StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
-import { useTheme } from "../context/Theme";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export interface CardContainerProps {
   children: React.ReactNode;
@@ -10,7 +11,7 @@ export interface CardContainerProps {
 }
 
 export function CardContainer(props: CardContainerProps) {
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
   const centerContentStyle: StyleProp<ViewStyle> = {
     justifyContent: 'center',
