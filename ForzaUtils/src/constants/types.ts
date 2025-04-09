@@ -11,8 +11,6 @@ export interface Upd_rinfo {
   ts: number,
 }
 
-export type LocaleType = 'enUS'
-
 /**
  * Add type for reducer function
  * @param prev Previous state

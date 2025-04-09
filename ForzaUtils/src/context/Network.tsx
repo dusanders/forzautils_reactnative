@@ -1,12 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLogger } from './Logger';
-import { addEventListener, NetInfoState, NetInfoStateType, NetInfoSubscription, NetInfoWifiState } from '@react-native-community/netinfo';
+import { addEventListener, NetInfoState, NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
 import { useSetPacket, useSetPort, useSetUdpListening, useSetWifiState } from '../redux/WifiStore';
 import { Splash } from '../pages/Splash';
-import { LISTEN_PORT, Upd_rinfo } from '../constants/types';
+import { LISTEN_PORT } from '../constants/types';
 import { ForzaTelemetryApi } from 'ForzaTelemetryApi';
-import UdpSocket from 'react-native-udp/lib/types/UdpSocket';
-import UdpSockets from 'react-native-udp';
 import { ISocketCallback, Socket } from '../services/Socket';
 
 

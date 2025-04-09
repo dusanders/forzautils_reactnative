@@ -1,5 +1,6 @@
 export enum ISupportLocale {
-  enUS
+  enUS = 'enUS',
+  fr = 'fr'
 }
 export interface IStrings_Generic {
   loading: string;

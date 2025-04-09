@@ -4,14 +4,27 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { AppBar, AppBarTestID } from '../../src/components/AppBar/AppBar';
 import { mockDarkColors } from '../../__mocks__/Theme.mock';
 import { Text } from 'react-native';
+import { useSelector } from 'react-redux';
 
-jest.mock('../../src/context/Theme', () => ({
-  useTheme: jest.fn(() => ({
-    theme: mockDarkColors,
-  })),
+jest.mock('react-redux', () => ({
+  useSelector: jest.fn(),
+  useDispatch: jest.fn(),
 }));
 
 describe('test AppBar', () => {
+  beforeEach(() => {
+    ((useSelector as unknown) as jest.Mock).mockImplementation((selector) => 
+      selector({
+        theme: {
+          current: 'dark',
+          theme: mockDarkColors
+        }
+      })
+    )
+  });
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   it('should render without crashing', () => {
     render(<AppBar title="Test Title" />);
     expect(screen.getByText("Test Title")).toBeTruthy();

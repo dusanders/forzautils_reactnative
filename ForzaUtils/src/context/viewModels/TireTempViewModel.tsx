@@ -13,19 +13,19 @@ export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const forza = useSelector(getForzaPacket);
   const leftFront = useMemo(() =>
-    Number(forza?.tireTemp.leftFront.toFixed(2)) || 0,
+    Number(forza?.tireTemp?.leftFront?.toFixed(2)) || 0,
     [forza?.tireTemp.leftFront]
   );
   const rightFront = useMemo(() =>
-    Number(forza?.tireTemp.rightFront.toFixed(2)) || 0,
+    Number(forza?.tireTemp?.rightFront?.toFixed(2)) || 0,
     [forza?.tireTemp.rightFront]
   );
   const leftRear = useMemo(() =>
-    Number(forza?.tireTemp.leftRear.toFixed(2)) || 0,
+    Number(forza?.tireTemp?.leftRear?.toFixed(2)) || 0,
     [forza?.tireTemp.leftRear]
   );
   const rightRear = useMemo(() =>
-    Number(forza?.tireTemp.rightRear.toFixed(2)) || 0,
+    Number(forza?.tireTemp?.rightRear?.toFixed(2)) || 0,
     [forza?.tireTemp.rightRear]
   );
 

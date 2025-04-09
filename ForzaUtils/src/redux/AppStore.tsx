@@ -19,3 +19,5 @@ export const AppStore = configureStore({
     locale: localeReducer
   },
 });
+
+export const useLocaleStore = () => AppStore.getState().locale;

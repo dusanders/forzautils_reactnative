@@ -6,6 +6,11 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { useViewModelStore, ViewModelStore_Hoc } from '../src/context/viewModels/ViewModelStore';
 import { Text } from 'react-native';
 
+jest.mock('react-redux', () => ({
+  useSelector: jest.fn(),
+  useDispatch: jest.fn(),
+}));
+
 describe('Forza Context Tests', () => {
   it('should render the Context Provider without crashing', () => {
     render(

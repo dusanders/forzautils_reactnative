@@ -159,7 +159,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
       copy.tq = newEvent.tq
       didUpdate = true;
     }
-    return didUpdate ? copy : newEvent;
+    return didUpdate ? copy : ev;
   }
 
   const insertEvent = (newEvent: DataEvent) => {
@@ -169,7 +169,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
         return [...prev, {
           gear: newEvent.gear,
           events: [newEvent]
-        }]
+        }];
       }
 
       const newState = prev.map((gear, index) => {
