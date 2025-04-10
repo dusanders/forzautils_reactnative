@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-native-community/netinfo": "^11.4.1",
+    "@react-native-picker/picker": "^2.11.0",
     "@react-native-vector-icons/common": "^11.0.0",
     "@react-native-vector-icons/feather": "^4.29.2",
     "@react-native-vector-icons/material-design-icons": "^7.4.47",
