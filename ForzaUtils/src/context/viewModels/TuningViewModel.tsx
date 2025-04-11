@@ -40,6 +40,7 @@ export interface ITuningViewModel {
   frontSettings: SuspensionSettings;
   rearSettings: SuspensionSettings;
 }
+let instance: ITuningViewModel | undefined;
 
 export function useTuningViewModel(): ITuningViewModel {
   const tag = 'TuningViewModel';
@@ -65,8 +66,8 @@ export function useTuningViewModel(): ITuningViewModel {
   const [frontDist, setFrontDist] = useState(55);
   const [rearDist, setRearDist] = useState(46);
   const [rollCage, setRollCage] = useState(false);
-  const [drivetrain, setDrivetrainType] = useState(Drivetrain.FWD);
-  const [layout, setLayout] = useState(EngineLayout.FRONT);
+  const [drivetrainType, setDrivetrainType] = useState(Drivetrain.FWD);
+  const [layoutType, setLayout] = useState(EngineLayout.FRONT);
   const [frontWeight, setFrontWeight] = useState(0);
   const [rearWeight, setRearWeight] = useState(0);
   const [frontCornerWeight, setFrontCornerWeight] = useState(0);
@@ -124,9 +125,9 @@ export function useTuningViewModel(): ITuningViewModel {
   };
   const adjustForLayout = (front: SuspensionSettings, rear: SuspensionSettings)
     : { front: SuspensionSettings, rear: SuspensionSettings } => {
-    switch (layout) {
+    switch (layoutType) {
       case EngineLayout.FRONT:
-        switch (drivetrain) {
+        switch (drivetrainType) {
           case Drivetrain.FWD:
             front.bound *= 1.15;
             rear.bound *= 0.9;
@@ -149,7 +150,7 @@ export function useTuningViewModel(): ITuningViewModel {
         }
         break;
       case EngineLayout.MID:
-        switch (drivetrain) {
+        switch (drivetrainType) {
           case Drivetrain.FWD:
             front.bound *= 1.1;
             rear.rebound *= 0.9;
@@ -168,7 +169,7 @@ export function useTuningViewModel(): ITuningViewModel {
         }
         break;
       case EngineLayout.REAR:
-        switch (drivetrain) {
+        switch (drivetrainType) {
           case Drivetrain.FWD:
             front.bound *= 1.1;
             rear.rebound *= 0.9;
@@ -209,12 +210,12 @@ export function useTuningViewModel(): ITuningViewModel {
     )
     const adjusted = adjustForLayout({
       springRate: frontSprings,
-      bound: bound,
-      rebound: rebound,
-      ARB: arb
+      bound: rollCage ? bound * rollCageFrontBump : bound,
+      rebound: rollCage ? rebound * rollCageFrontRebound : rebound,
+      ARB: rollCage ? arb * rollCageFrontARB : arb
     }, rearSettings);
     setFrontSettings(adjusted.front);
-  }, [totalSprings, drivetrain, layout]);
+  }, [totalSprings, drivetrainType, layoutType, rollCage]);
 
   /**
    * Spring rates changed - update front settings
@@ -228,12 +229,12 @@ export function useTuningViewModel(): ITuningViewModel {
     )
     const adjusted = adjustForLayout(frontSettings, {
       springRate: rearSprings,
-      bound: bound,
-      rebound: rebound,
-      ARB: arb
+      bound: rollCage ? bound * rollCageRearBump : bound,
+      rebound: rollCage ? rebound * rollCageRearRebound : rebound,
+      ARB: rollCage ? arb * rollCageRearARB : arb
     })
     setRearSettings(adjusted.rear);
-  }, [totalSprings, drivetrain, layout]);
+  }, [totalSprings, drivetrainType, layoutType, rollCage]);
 
   /**
    * Rear calcs have changed - update the spring rates
@@ -306,11 +307,11 @@ export function useTuningViewModel(): ITuningViewModel {
     setHasRollCage: (cage) => {
       setRollCage(cage)
     },
-    drivetrain: drivetrain,
+    drivetrain: drivetrainType,
     setDrivetrain: (drivetrain) => {
       setDrivetrainType(drivetrain)
     },
-    engineLayout: layout,
+    engineLayout: layoutType,
     setEngineLayout: (layout) => {
       setLayout(layout);
     },

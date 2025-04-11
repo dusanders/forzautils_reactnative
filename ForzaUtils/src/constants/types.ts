@@ -1,4 +1,6 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { TuningPageProps } from "../pages/Tuning";
+import { ITuningViewModel } from "../context/viewModels/TuningViewModel";
 
 /**
  * Add Type for react-native-udp 'rinfo' object
@@ -22,7 +24,17 @@ export type StateHandler<T> = (prev: T, next: Partial<T>) => T;
 /**
  * Define the Navigation stack for the app
  */
-export type RootStackParamList = Record<AppRoutes, undefined>;
+export type RootStackParamList = {
+  [AppRoutes.SPLASH]: undefined;
+  [AppRoutes.IP_INFO]: undefined;
+  [AppRoutes.DATA]: undefined;
+  [AppRoutes.HP_TQ_GRAPH]: undefined;
+  [AppRoutes.SUSPENSION_GRAPH]: undefined;
+  [AppRoutes.TIRE_TEMPS]: undefined;
+  [AppRoutes.GRIP]: undefined;
+  [AppRoutes.SOURCE_CHOOSER]: undefined;
+  [AppRoutes.TUNING_CALCULATOR]: undefined;
+}
 
 /**
  * Define the navigation type for the app

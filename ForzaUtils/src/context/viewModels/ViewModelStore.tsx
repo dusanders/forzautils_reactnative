@@ -22,12 +22,14 @@ export interface ViewModelStore_HocProps {
 }
 
 export function ViewModelStore_Hoc(props: ViewModelStore_HocProps) {
+  const tag = 'ViewModelStore_Hoc';
+  console.log(tag, `rendering...`)
   const hpTqVM = useHpTqGraphViewModel();
   const suspensionGraphVm = useSuspensionGraphViewModel();
   const tireTempVm = useTireTempsViewModel();
   const gripVm = useGripViewModel();
   const mapVm = useMapViewModel();
-  const tuningVm = useTuningViewModel();
+  const tuning = useTuningViewModel();
   /** Provide a centralized HoC / Context that will track view models */
   return (
     <ViewModelStore.Provider value={{
@@ -36,7 +38,7 @@ export function ViewModelStore_Hoc(props: ViewModelStore_HocProps) {
       tireTemps: tireTempVm,
       grip: gripVm,
       map: mapVm,
-      tuning: tuningVm
+      tuning: tuning
     }}>
       {props.children}
     </ViewModelStore.Provider>

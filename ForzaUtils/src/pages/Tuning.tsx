@@ -2,21 +2,22 @@ import React, { useEffect, useState } from "react";
 import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { GlobalStyles, IThemeElements } from "../constants/Themes";
+import { IThemeElements } from "../constants/Themes";
 import { CardInput } from "../components/CardInput";
 import { Row } from "../components/Row";
 import { CardContainer } from "../components/CardContainer";
 import { ThemeSwitch } from "../components/ThemeSwitch";
-import { LabelText, ThemeText } from "../components/ThemeText";
+import { LabelText } from "../components/ThemeText";
 import { useSelector } from "react-redux";
 import { getTheme } from "../redux/ThemeStore";
-import { EngineLayout, useTuningViewModel } from "../context/viewModels/TuningViewModel";
 import { Picker } from "@react-native-picker/picker";
 import { Drivetrain } from "ForzaTelemetryApi";
 import { TextCard } from "../components/TextCard";
+import { useViewModelStore } from "../context/viewModels/ViewModelStore";
+import { EngineLayout } from "../context/viewModels/TuningViewModel";
 
 export interface TuningPageProps {
-  // No props needed for this page
+    // Nothing
 }
 
 export function TuningPage(props: TuningPageProps) {
@@ -31,17 +32,18 @@ export function TuningPage(props: TuningPageProps) {
     EngineLayout.MID,
     EngineLayout.REAR
   ]
+  // const viewModel = useTuningViewModel();
+  const viewModel = useViewModelStore().tuning;
   const navigation = useNavigation();
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
-  const viewModel = useTuningViewModel();
   const [weightInput, setWeightInput] = useState(viewModel.totalVehicleWeight.toString());
   const [frontDistInput, setFrontDistInput] = useState(viewModel.frontDistribution.toLocaleString());
   const [rearDistInput, setRearDistInput] = useState(viewModel.rearDistribution.toLocaleString());
   const [frontHeightInput, setFrontHeightInput] = useState(viewModel.frontHeight.toLocaleString());
   const [rearHeightInput, setRearHeightInput] = useState(viewModel.rearHeight.toLocaleString());
-  const [drivetrainPicker, setDrivetrainPicker] = useState(drivetrainOptions[0]);
-  const [layoutPicker, setLayoutPicker] = useState(layoutOptions[0]);
+  const [drivetrainPicker, setDrivetrainPicker] = useState(viewModel.drivetrain);
+  const [layoutPicker, setLayoutPicker] = useState(viewModel.engineLayout);
 
   const labelForDrivetrain = (type: Drivetrain) => {
     switch (type) {

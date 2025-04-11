@@ -18,12 +18,11 @@ export function SourceChooser(props: SourceChooserProps) {
   const navigation = useNavigation<StackNavigation>();
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
-
   return (
     <AppBarContainer
-    onBack={() => {
-      navigation.goBack();
-    }}>
+      onBack={() => {
+        navigation.goBack();
+      }}>
       <View style={styles.root}>
         <Row style={styles.cardRow}>
           <View style={{
@@ -35,7 +34,7 @@ export function SourceChooser(props: SourceChooserProps) {
             </ThemeText>
             <ThemeText style={styles.bodyText}>
               Tuning calculator provides a decent base tune based on the car's
-              specifications. 
+              specifications.
             </ThemeText>
             <ThemeText style={styles.bodyText}>
               Data visualizer allows you to visualize data from
@@ -51,10 +50,10 @@ export function SourceChooser(props: SourceChooserProps) {
             allcapsLabel
             allcapsTitle
             title={'Tuning'}
-            body="Tuning Calculator" 
+            body="Tuning Calculator"
             onPress={() => {
               navigation.navigate(AppRoutes.TUNING_CALCULATOR);
-            }}/>
+            }} />
           <TextCard
             style={{ flex: 1 }}
             centerContent
@@ -89,12 +88,12 @@ function themeStyles(theme: IThemeElements) {
       marginTop: '10%'
     },
     titleText: {
-      fontSize: 24, 
-      fontWeight: 'bold', 
+      fontSize: 24,
+      fontWeight: 'bold',
       marginBottom: 10
     },
     bodyText: {
-      fontSize: 16, 
+      fontSize: 16,
       margin: 10,
       color: theme.colors.text.secondary.onPrimary,
       textAlign: 'center',
