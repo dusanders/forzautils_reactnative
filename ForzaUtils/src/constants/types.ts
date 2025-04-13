@@ -1,6 +1,7 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { TuningPageProps } from "../pages/Tuning";
 import { ITuningViewModel } from "../context/viewModels/TuningViewModel";
+import { useState } from "react";
 
 /**
  * Add Type for react-native-udp 'rinfo' object
@@ -93,4 +94,32 @@ export function randomKey(): string {
     }
     return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
   });
+}
+
+export interface DataWindow<T> {
+  size: number;
+  data: T[];
+  add: (data: T) => void;
+  clear: () => void;
+}
+
+export function useDataWindow<T>(size: number, initialValues?: T[]): DataWindow<T> {
+  const [data, setData] = useState<T[]>(initialValues ? initialValues : []);
+  const add = (data: T) => {
+    setData((prev) => {
+      if (prev.length >= size) {
+        return [...prev.slice(1), data];
+      }
+      return [...prev, data];
+    });
+  };
+  const clear = () => {
+    setData([]);
+  }
+  return {
+    size,
+    data,
+    add,
+    clear,
+  }
 }

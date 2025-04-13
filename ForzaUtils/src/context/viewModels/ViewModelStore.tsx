@@ -23,7 +23,6 @@ export interface ViewModelStore_HocProps {
 
 export function ViewModelStore_Hoc(props: ViewModelStore_HocProps) {
   const tag = 'ViewModelStore_Hoc';
-  console.log(tag, `rendering...`)
   const hpTqVM = useHpTqGraphViewModel();
   const suspensionGraphVm = useSuspensionGraphViewModel();
   const tireTempVm = useTireTempsViewModel();

@@ -5,6 +5,7 @@ import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
 import { useSelector } from "react-redux";
 import { getTheme } from "../../redux/ThemeStore";
+import { CardContainer } from "../../components/CardContainer";
 
 export interface TireInfoProps {
   temp: number;
@@ -28,8 +29,11 @@ export function TireInfo(props: TireInfoProps) {
   const TempView = () => {
     return (
       <View style={{
-        height: '50%',
-        width: '40%',
+        height: '75%',
+        maxHeight: 200,
+        width: "50%",
+        minWidth: 20,
+        maxWidth: 175,
         backgroundColor: colorForTemp(props.temp),
         marginBottom: 12,
         marginTop: 12,
@@ -38,12 +42,14 @@ export function TireInfo(props: TireInfoProps) {
     )
   }
   const DataCard = (props: { children: any }) => (
-    <TextCard style={[
-      style.halfWidth,
-      style.centerContent
-    ]}>
+    <CardContainer 
+    centerContent
+    style={{
+      ...style.halfWidth,
+      ...style.centerContent
+    }}>
       {props.children}
-    </TextCard>
+    </CardContainer>
   )
   return (
     <DataCard>

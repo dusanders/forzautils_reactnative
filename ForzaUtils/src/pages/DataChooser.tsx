@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { TrackMap } from "../components/TrackMap";
 import { useSelector } from "react-redux";
 import { getTheme } from "../redux/ThemeStore";
+import { AvgSuspensionTravel } from "../components/Graphs/AvgSuspensionTravel";
 
 export interface DataChooserProps {
 
@@ -67,6 +68,7 @@ export function DataChooser(props: DataChooserProps) {
           marginBottom: 20,
           width: '95%'
         }}/>
+        <AvgSuspensionTravel />
         <FlatList
           style={styles.listRoot}
           data={options}

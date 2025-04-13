@@ -36,7 +36,9 @@ export interface ITuningViewModel {
   rearHeight: number;
   setRearHeight(height: number): void;
   frontHz: number;
+  setFrontHz(hz: number): void;
   rearHz: number;
+  setRearHz(hz: number): void;
   frontSettings: SuspensionSettings;
   rearSettings: SuspensionSettings;
 }
@@ -44,6 +46,7 @@ let instance: ITuningViewModel | undefined;
 
 export function useTuningViewModel(): ITuningViewModel {
   const tag = 'TuningViewModel';
+  //#region State
   const defaultDamper: SuspensionSettings = {
     rebound: 0,
     bound: 0,
@@ -81,7 +84,9 @@ export function useTuningViewModel(): ITuningViewModel {
   const [frontSprings, setFrontSprings] = useState(0);
   const [rearSprings, setRearSprings] = useState(0);
   const [totalSprings, setTotalSprings] = useState(0);
+  //#endregion
 
+  //#region Helpers
 
   const updateWeight = (value: number) => {
     console.log(tag, `update weight: ${value}`);
@@ -198,6 +203,10 @@ export function useTuningViewModel(): ITuningViewModel {
     };
   }
 
+  //#endregion
+
+  //#region Effects
+
   /**
    * Spring rates changed - update rear settings
    */
@@ -215,7 +224,7 @@ export function useTuningViewModel(): ITuningViewModel {
       ARB: rollCage ? arb * rollCageFrontARB : arb
     }, rearSettings);
     setFrontSettings(adjusted.front);
-  }, [totalSprings, drivetrainType, layoutType, rollCage]);
+  }, [frontHz, totalSprings, drivetrainType, layoutType, rollCage]);
 
   /**
    * Spring rates changed - update front settings
@@ -234,7 +243,7 @@ export function useTuningViewModel(): ITuningViewModel {
       ARB: rollCage ? arb * rollCageRearARB : arb
     })
     setRearSettings(adjusted.rear);
-  }, [totalSprings, drivetrainType, layoutType, rollCage]);
+  }, [rearHz, totalSprings, drivetrainType, layoutType, rollCage]);
 
   /**
    * Rear calcs have changed - update the spring rates
@@ -290,6 +299,8 @@ export function useTuningViewModel(): ITuningViewModel {
     calculateRearWeights();
   }, [rearDist]);
 
+  //#endregion
+
   return {
     totalVehicleWeight: weight,
     setTotalVehicleWeight: (weight) => {
@@ -324,7 +335,13 @@ export function useTuningViewModel(): ITuningViewModel {
       setRearRideHeight(height);
     },
     frontHz: frontHz,
+    setFrontHz: (hz) => {
+      setFrontHz(hz);
+    },
     rearHz: rearHz,
+    setRearHz: (hz) => {
+      setRearHz(hz);
+    },
     frontCornerWeight: frontCornerWeight,
     rearCornerWeight: rearCornerWeight,
     frontWeight: frontWeight,

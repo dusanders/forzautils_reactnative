@@ -101,7 +101,7 @@ export function useMapViewModel(): IMapViewModel {
     playerPosition: position,
     viewBox: viewBox,
     trackId: trackId,
-    svgHeight: 300,
+    svgHeight: 200,
     svgWidth: 350
   }
 }

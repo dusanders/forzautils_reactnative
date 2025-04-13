@@ -6,7 +6,7 @@ import { CardContainer } from "./CardContainer";
 export interface CardProps {
   id?: string;
   children?: any;
-  style?: StyleProp<ViewStyle>;
+  style?: ViewStyle;
   titleStyle?: StyleProp<TextStyle>;
   title?: string;
   body?: string;

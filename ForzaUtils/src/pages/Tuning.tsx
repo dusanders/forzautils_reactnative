@@ -17,7 +17,7 @@ import { useViewModelStore } from "../context/viewModels/ViewModelStore";
 import { EngineLayout } from "../context/viewModels/TuningViewModel";
 
 export interface TuningPageProps {
-    // Nothing
+  // Nothing
 }
 
 export function TuningPage(props: TuningPageProps) {
@@ -42,6 +42,8 @@ export function TuningPage(props: TuningPageProps) {
   const [rearDistInput, setRearDistInput] = useState(viewModel.rearDistribution.toLocaleString());
   const [frontHeightInput, setFrontHeightInput] = useState(viewModel.frontHeight.toLocaleString());
   const [rearHeightInput, setRearHeightInput] = useState(viewModel.rearHeight.toLocaleString());
+  const [frontHzInput, setFrontHzInput] = useState(viewModel.frontHz.toLocaleString());
+  const [rearHzInput, setRearHzInput] = useState(viewModel.rearHz.toLocaleString());
   const [drivetrainPicker, setDrivetrainPicker] = useState(viewModel.drivetrain);
   const [layoutPicker, setLayoutPicker] = useState(viewModel.engineLayout);
 
@@ -75,6 +77,26 @@ export function TuningPage(props: TuningPageProps) {
   }
 
   //#region Effects
+
+  useEffect(() => {
+    if (frontHzInput.endsWith('.')) {
+      return;
+    }
+    let parsed = parseFloat(frontHzInput);
+    if (parsed > 0) {
+      viewModel.setFrontHz(parsed);;
+    }
+  }, [frontHzInput]);
+
+  useEffect(() => {
+    if (rearHzInput.endsWith('.')) {
+      return;
+    }
+    let parsed = parseFloat(rearHzInput);
+    if (parsed > 0) {
+      viewModel.setRearHz(parsed);
+    }
+  }, [rearHzInput])
 
   useEffect(() => {
     if (frontHeightInput.endsWith('.')) {
@@ -194,6 +216,24 @@ export function TuningPage(props: TuningPageProps) {
           value={rearHeightInput}
           onChange={(value) => {
             setRearHeightInput(value);
+          }} />
+      </Row>
+      <Row>
+        <CardInput
+          style={styles.baseCard}
+          label="Front Hz"
+          placeholder="Front Hz"
+          value={frontHzInput.toLocaleString()}
+          onChange={(value) => {
+            setFrontHzInput(value);
+          }} />
+        <CardInput
+          style={styles.baseCard}
+          label={'Rear Hz'}
+          placeholder={'Rear Hz'}
+          value={rearHzInput.toLocaleString()}
+          onChange={(value) => {
+            setRearHzInput(value);
           }} />
       </Row>
       <Row>
@@ -345,6 +385,7 @@ function themeStyles(theme: IThemeElements) {
     },
     baseCard: {
       width: '50%',
+      paddingBottom: 4
     },
     pickerContainer: {
       width: '50%',

@@ -6,25 +6,23 @@ import { getTheme } from "../redux/ThemeStore";
 
 export interface CardContainerProps {
   children: React.ReactNode;
-  style?: StyleProp<ViewStyle>;
+  style?: ViewStyle;
   centerContent?: boolean; // Optional prop to center content
 }
 
 export function CardContainer(props: CardContainerProps) {
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
-  const centerContentStyle: StyleProp<ViewStyle> = {
-    justifyContent: 'center',
-    alignItems: 'center'
+  const doCenter = props.centerContent ? styles.center : {};
+
+  const styleCombined = {
+    ...styles.root,
+    ...props.style,
+    ...doCenter,
   }
   return (
     <View
-      style={[
-        styles.root,
-        props.centerContent
-          ? centerContentStyle
-          : {},
-        props.style]}>
+      style={styleCombined}>
       {props.children}
     </View>
   )
@@ -42,6 +40,10 @@ function themeStyles(theme: IThemeElements) {
       display: 'flex',
       flexDirection: 'column',
       flexGrow: 1
+    },
+    center: {
+      justifyContent: 'center',
+      alignItems: 'center'
     }
   });
 }
