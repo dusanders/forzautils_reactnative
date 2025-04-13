@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AppBarContainer } from "../components/AppBar/AppBarContainer";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { IThemeElements } from "../constants/Themes";
 import { CardInput } from "../components/CardInput";
@@ -162,207 +162,209 @@ export function TuningPage(props: TuningPageProps) {
     <AppBarContainer onBack={() => {
       navigation.goBack();
     }}>
-      <Row>
-        <CardInput
-          style={styles.baseCard}
-          label="Vehicle Weight"
-          value={weightInput} // This will be bound to state in a real application
-          onChange={(value: string) => {
-            setWeightInput(value);
-          }}
-          placeholder="Vehicle Weight" />
-        <CardContainer
-          style={styles.baseCard}
-          centerContent>
-          <ThemeSwitch
-            value={viewModel.hasRollCage}
-            onValueChange={(ev) => viewModel.setHasRollCage(ev)} />
-          <LabelText>
-            Roll Cage
-          </LabelText>
-        </CardContainer>
-      </Row>
-      <Row>
-        <CardInput
-          style={styles.baseCard}
-          label="Front Distribution"
-          placeholder="Front Distribution"
-          value={frontDistInput}
-          onChange={(value) => {
-            setFrontDistInput(value);
-          }} />
-        <CardInput
-          style={styles.baseCard}
-          label={'Rear Distribution'}
-          placeholder={'Rear Distribution'}
-          value={rearDistInput}
-          onChange={(value) => {
-            setRearDistInput(value);
-          }} />
-      </Row>
-      <Row>
-        <CardInput
-          style={styles.baseCard}
-          label="Front Height"
-          placeholder="Front Height"
-          value={frontHeightInput}
-          onChange={(value) => {
-            setFrontHeightInput(value);
-          }} />
-        <CardInput
-          style={styles.baseCard}
-          label={'Rear Height'}
-          placeholder={'Rear Height'}
-          value={rearHeightInput}
-          onChange={(value) => {
-            setRearHeightInput(value);
-          }} />
-      </Row>
-      <Row>
-        <CardInput
-          style={styles.baseCard}
-          label="Front Hz"
-          placeholder="Front Hz"
-          value={frontHzInput.toLocaleString()}
-          onChange={(value) => {
-            setFrontHzInput(value);
-          }} />
-        <CardInput
-          style={styles.baseCard}
-          label={'Rear Hz'}
-          placeholder={'Rear Hz'}
-          value={rearHzInput.toLocaleString()}
-          onChange={(value) => {
-            setRearHzInput(value);
-          }} />
-      </Row>
-      <Row>
-        <CardContainer
-          style={styles.pickerContainer}>
-          <View style={styles.column}>
-            <Picker
-              dropdownIconColor={theme.colors.text.primary.onPrimary}
-              selectedValue={drivetrainPicker}
-              onValueChange={(value, index) => {
-                setDrivetrainPicker(value);
-                viewModel.setDrivetrain(value);
-              }}>
-              {drivetrainOptions.map((i) => (
-                <Picker.Item key={i}
-                  value={i}
-                  label={labelForDrivetrain(i)}
-                  style={styles.pickerItemStyle} />
-              ))}
-            </Picker>
-            <LabelText style={{ textAlign: 'center' }}>
-              Drivetrain
+      <ScrollView>
+        <Row>
+          <CardInput
+            style={styles.baseCard}
+            label="Vehicle Weight"
+            value={weightInput} // This will be bound to state in a real application
+            onChange={(value: string) => {
+              setWeightInput(value);
+            }}
+            placeholder="Vehicle Weight" />
+          <CardContainer
+            style={styles.baseCard}
+            centerContent>
+            <ThemeSwitch
+              value={viewModel.hasRollCage}
+              onValueChange={(ev) => viewModel.setHasRollCage(ev)} />
+            <LabelText>
+              Roll Cage
             </LabelText>
-          </View>
-        </CardContainer>
-        <CardContainer
-          style={styles.pickerContainer}>
-          <View style={styles.column}>
-            <Picker
-              dropdownIconColor={theme.colors.text.primary.onPrimary}
-              selectedValue={layoutPicker}
-              onValueChange={(value, index) => {
-                setLayoutPicker(value);
-                viewModel.setEngineLayout(value)
-              }}>
-              {layoutOptions.map((i) => (
-                <Picker.Item
-                  key={i}
-                  value={i}
-                  label={labelForLayout(i)}
-                  style={styles.pickerItemStyle} />
-              ))}
-            </Picker>
-            <LabelText style={{ textAlign: 'center' }}>
-              Engine Layout
-            </LabelText>
-          </View>
-        </CardContainer>
-      </Row>
-      <Row>
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.frontCornerWeight.toFixed(2)}
-          body={'LF Weight'} />
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.frontWeight.toFixed(2)}
-          body={'Front Weight'} />
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.frontCornerWeight.toFixed(2)}
-          body={'RF Weight'} />
-      </Row>
-      <Row>
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.rearCornerWeight.toFixed(2)}
-          body={'LR Weight'} />
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.rearWeight.toFixed(2)}
-          body={'Rear Weight'} />
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.rearCornerWeight.toFixed(2)}
-          body={'RR Weight'} />
-      </Row>
-      <Row>
-        <TextCard
-          style={styles.springCard}
-          centerContent
-          title={viewModel.frontSettings.springRate.toFixed(2)}
-          body="Front Spring" />
-        <TextCard
-          style={styles.springCard}
-          centerContent
-          title={viewModel.rearSettings.springRate.toFixed(2)}
-          body="Rear Spring" />
-      </Row>
-      <Row>
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.frontSettings.bound.toFixed(2)}
-          body="Front Bump" />
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.frontSettings.rebound.toFixed(2)}
-          body="Front Rebound" />
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.frontSettings.ARB.toFixed(2)}
-          body="Front ARB" />
-      </Row>
-      <Row>
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.rearSettings.bound.toFixed(2)}
-          body="Rear Bump" />
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.rearSettings.rebound.toFixed(2)}
-          body="Rear Rebound" />
-        <TextCard
-          style={styles.weightCard}
-          centerContent
-          title={viewModel.rearSettings.ARB.toFixed(2)}
-          body="Rear ARB" />
-      </Row>
+          </CardContainer>
+        </Row>
+        <Row>
+          <CardInput
+            style={styles.baseCard}
+            label="Front Distribution"
+            placeholder="Front Distribution"
+            value={frontDistInput}
+            onChange={(value) => {
+              setFrontDistInput(value);
+            }} />
+          <CardInput
+            style={styles.baseCard}
+            label={'Rear Distribution'}
+            placeholder={'Rear Distribution'}
+            value={rearDistInput}
+            onChange={(value) => {
+              setRearDistInput(value);
+            }} />
+        </Row>
+        <Row>
+          <CardInput
+            style={styles.baseCard}
+            label="Front Height"
+            placeholder="Front Height"
+            value={frontHeightInput}
+            onChange={(value) => {
+              setFrontHeightInput(value);
+            }} />
+          <CardInput
+            style={styles.baseCard}
+            label={'Rear Height'}
+            placeholder={'Rear Height'}
+            value={rearHeightInput}
+            onChange={(value) => {
+              setRearHeightInput(value);
+            }} />
+        </Row>
+        <Row>
+          <CardInput
+            style={styles.baseCard}
+            label="Front Hz"
+            placeholder="Front Hz"
+            value={frontHzInput.toLocaleString()}
+            onChange={(value) => {
+              setFrontHzInput(value);
+            }} />
+          <CardInput
+            style={styles.baseCard}
+            label={'Rear Hz'}
+            placeholder={'Rear Hz'}
+            value={rearHzInput.toLocaleString()}
+            onChange={(value) => {
+              setRearHzInput(value);
+            }} />
+        </Row>
+        <Row>
+          <CardContainer
+            style={styles.pickerContainer}>
+            <View style={styles.column}>
+              <Picker
+                dropdownIconColor={theme.colors.text.primary.onPrimary}
+                selectedValue={drivetrainPicker}
+                onValueChange={(value, index) => {
+                  setDrivetrainPicker(value);
+                  viewModel.setDrivetrain(value);
+                }}>
+                {drivetrainOptions.map((i) => (
+                  <Picker.Item key={i}
+                    value={i}
+                    label={labelForDrivetrain(i)}
+                    style={styles.pickerItemStyle} />
+                ))}
+              </Picker>
+              <LabelText style={{ textAlign: 'center' }}>
+                Drivetrain
+              </LabelText>
+            </View>
+          </CardContainer>
+          <CardContainer
+            style={styles.pickerContainer}>
+            <View style={styles.column}>
+              <Picker
+                dropdownIconColor={theme.colors.text.primary.onPrimary}
+                selectedValue={layoutPicker}
+                onValueChange={(value, index) => {
+                  setLayoutPicker(value);
+                  viewModel.setEngineLayout(value)
+                }}>
+                {layoutOptions.map((i) => (
+                  <Picker.Item
+                    key={i}
+                    value={i}
+                    label={labelForLayout(i)}
+                    style={styles.pickerItemStyle} />
+                ))}
+              </Picker>
+              <LabelText style={{ textAlign: 'center' }}>
+                Engine Layout
+              </LabelText>
+            </View>
+          </CardContainer>
+        </Row>
+        <Row>
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.frontCornerWeight.toFixed(2)}
+            body={'LF Weight'} />
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.frontWeight.toFixed(2)}
+            body={'Front Weight'} />
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.frontCornerWeight.toFixed(2)}
+            body={'RF Weight'} />
+        </Row>
+        <Row>
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.rearCornerWeight.toFixed(2)}
+            body={'LR Weight'} />
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.rearWeight.toFixed(2)}
+            body={'Rear Weight'} />
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.rearCornerWeight.toFixed(2)}
+            body={'RR Weight'} />
+        </Row>
+        <Row>
+          <TextCard
+            style={styles.springCard}
+            centerContent
+            title={viewModel.frontSettings.springRate.toFixed(2)}
+            body="Front Spring" />
+          <TextCard
+            style={styles.springCard}
+            centerContent
+            title={viewModel.rearSettings.springRate.toFixed(2)}
+            body="Rear Spring" />
+        </Row>
+        <Row>
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.frontSettings.bound.toFixed(2)}
+            body="Front Bump" />
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.frontSettings.rebound.toFixed(2)}
+            body="Front Rebound" />
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.frontSettings.ARB.toFixed(2)}
+            body="Front ARB" />
+        </Row>
+        <Row>
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.rearSettings.bound.toFixed(2)}
+            body="Rear Bump" />
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.rearSettings.rebound.toFixed(2)}
+            body="Rear Rebound" />
+          <TextCard
+            style={styles.weightCard}
+            centerContent
+            title={viewModel.rearSettings.ARB.toFixed(2)}
+            body="Rear ARB" />
+        </Row>
+      </ScrollView>
     </AppBarContainer>
   )
 }
