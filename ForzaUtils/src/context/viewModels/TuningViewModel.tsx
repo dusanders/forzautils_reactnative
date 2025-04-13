@@ -66,8 +66,8 @@ export function useTuningViewModel(): ITuningViewModel {
   const reboundScalar = 1.5;
   const baseARB = 15;
   const [weight, setWeight] = useState(3000);
-  const [frontDist, setFrontDist] = useState(55);
-  const [rearDist, setRearDist] = useState(46);
+  const [frontDist, setFrontDist] = useState(53);
+  const [rearDist, setRearDist] = useState(47);
   const [rollCage, setRollCage] = useState(false);
   const [drivetrainType, setDrivetrainType] = useState(Drivetrain.FWD);
   const [layoutType, setLayout] = useState(EngineLayout.FRONT);
@@ -75,8 +75,8 @@ export function useTuningViewModel(): ITuningViewModel {
   const [rearWeight, setRearWeight] = useState(0);
   const [frontCornerWeight, setFrontCornerWeight] = useState(0);
   const [rearCornerWeight, setRearCornerWeight] = useState(0);
-  const [frontRideHeight, setFrontRideHeight] = useState(5.5);
-  const [rearRideHeight, setRearRideHeight] = useState(5.5);
+  const [frontRideHeight, setFrontRideHeight] = useState(4.0);
+  const [rearRideHeight, setRearRideHeight] = useState(4.0);
   const [frontHz, setFrontHz] = useState(hzBase);
   const [rearHz, setRearHz] = useState(hzBase);
   const [frontSettings, setFrontSettings] = useState(defaultDamper);
@@ -100,26 +100,12 @@ export function useTuningViewModel(): ITuningViewModel {
     setRearDist(value);
     setFrontDist(100 - value);
   };
-  const calculateFrontWeights = () => {
-    if (frontDist == 0) {
-      setFrontWeight(0);
-      setFrontCornerWeight(0);
-      return;
+  const calculateWeight = (total: number, distribution: number) => {
+    if(total == 0) {
+      return 0;
     }
-    const scalar = (frontDist / 100);
-    setFrontWeight(weight * scalar);
-    setFrontCornerWeight((weight * scalar) / 2);
-  };
-  const calculateRearWeights = () => {
-    if (rearDist == 0) {
-      setRearWeight(0);
-      setRearCornerWeight(0);
-      return;
-    }
-    const scalar = (rearDist / 100);
-    setRearWeight(weight * scalar);
-    setRearCornerWeight((weight * scalar) / 2);
-  };
+    return (total * (distribution / 100));
+  }
   const calculateTargetHz = (height: number) => {
     if (height <= 3.5) {
       return hzLowHeight
@@ -128,6 +114,12 @@ export function useTuningViewModel(): ITuningViewModel {
     }
     return hzBase;
   };
+  const calculateARB = (springRate: number, totalSpringRate: number, weightDist: number) => {
+    const springDist = springRate / totalSpringRate;
+    const base = baseARB * springDist * 2;
+    const axleSplit = ((weightDist / 100) / 0.5);
+    return base * axleSplit;
+  }
   const adjustForLayout = (front: SuspensionSettings, rear: SuspensionSettings)
     : { front: SuspensionSettings, rear: SuspensionSettings } => {
     switch (layoutType) {
@@ -137,8 +129,8 @@ export function useTuningViewModel(): ITuningViewModel {
             front.bound *= 1.15;
             rear.bound *= 0.9;
             rear.rebound *= 0.9;
-            front.ARB *= 1.15;
-            rear.ARB += 0.85;
+            front.ARB *= 0.85;
+            rear.ARB += 1.15;
             break;
           case Drivetrain.RWD:
             front.rebound *= 0.9;
@@ -213,10 +205,7 @@ export function useTuningViewModel(): ITuningViewModel {
   useEffect(() => {
     const bound = (frontSprings * damperScalar);
     const rebound = (bound * reboundScalar);
-    const arb = (
-      (baseARB * (frontSprings / totalSprings) * 2)
-      * ((frontDist / 100) / 0.5)
-    )
+    const arb = calculateARB(frontSprings, totalSprings, frontDist);
     const adjusted = adjustForLayout({
       springRate: frontSprings,
       bound: rollCage ? bound * rollCageFrontBump : bound,
@@ -224,7 +213,7 @@ export function useTuningViewModel(): ITuningViewModel {
       ARB: rollCage ? arb * rollCageFrontARB : arb
     }, rearSettings);
     setFrontSettings(adjusted.front);
-  }, [frontHz, totalSprings, drivetrainType, layoutType, rollCage]);
+  }, [frontSprings, totalSprings, drivetrainType, layoutType, rollCage]);
 
   /**
    * Spring rates changed - update front settings
@@ -232,10 +221,7 @@ export function useTuningViewModel(): ITuningViewModel {
   useEffect(() => {
     const bound = (rearSprings * damperScalar);
     const rebound = (bound * reboundScalar);
-    const arb = (
-      (baseARB * (rearSprings / totalSprings) * 2)
-      * ((frontDist / 100) / 0.5)
-    )
+    const arb = calculateARB(rearSprings, totalSprings, rearDist);
     const adjusted = adjustForLayout(frontSettings, {
       springRate: rearSprings,
       bound: rollCage ? bound * rollCageRearBump : bound,
@@ -243,61 +229,41 @@ export function useTuningViewModel(): ITuningViewModel {
       ARB: rollCage ? arb * rollCageRearARB : arb
     })
     setRearSettings(adjusted.rear);
-  }, [rearHz, totalSprings, drivetrainType, layoutType, rollCage]);
-
-  /**
-   * Rear calcs have changed - update the spring rates
-   */
-  useEffect(() => {
-    const rate = rearHz * (rearWeight / (2 * rearRideHeight));
-    setRearSprings(rate);
-    setTotalSprings(rate + frontSprings);
-  }, [weight, rearRideHeight, rearWeight, rearHz]);
-
-  /**
-   * Front calcs have changed - update the spring rates
-   */
-  useEffect(() => {
-    const rate = frontHz * (frontWeight / (2 * frontRideHeight));
-    setFrontSprings(rate);
-    setTotalSprings(rate + rearSprings);
-  }, [weight, frontRideHeight, frontWeight, frontHz]);
+  }, [rearSprings, totalSprings, drivetrainType, layoutType, rollCage]);
 
   /**
    * Front ride height changed - update target Hz
    */
   useEffect(() => {
-    setFrontHz(calculateTargetHz(frontRideHeight));
-  }, [frontRideHeight]);
+    const hz = calculateTargetHz(frontRideHeight);
+    const rate = hz * (frontWeight / (2 * frontRideHeight));
+    setFrontSprings(rate);
+    setTotalSprings(rate + rearSprings);
+    setFrontHz(hz);
+  }, [frontRideHeight, frontWeight, rearSprings]);
 
   /**
    * Rear ride height changed - update target Hz
    */
   useEffect(() => {
-    setRearHz(calculateTargetHz(rearRideHeight));
-  }, [rearRideHeight]);
+    const hz = calculateTargetHz(rearRideHeight);
+    const rate = hz * (rearWeight / (2 * rearRideHeight));
+    setRearSprings(rate);
+    setTotalSprings(rate + frontSprings);
+    setRearHz(hz);
+  }, [rearRideHeight, rearWeight, frontSprings]);
 
   /**
    * Weight changed - recalc the front/rear weights
    */
   useEffect(() => {
-    calculateFrontWeights();
-    calculateRearWeights();
-  }, [weight]);
-
-  /**
-   * Front distribution changed - recalc the front weights
-   */
-  useEffect(() => {
-    calculateFrontWeights();
-  }, [frontDist]);
-
-  /**
-   * Rear distribution changed - recalc the rear weights
-   */
-  useEffect(() => {
-    calculateRearWeights();
-  }, [rearDist]);
+    const frontWeight = calculateWeight(weight, frontDist);
+    const rearWeight = calculateWeight(weight, rearDist);
+    setFrontWeight(frontWeight);
+    setRearWeight(rearWeight);
+    setFrontCornerWeight(frontWeight / 2);
+    setRearCornerWeight(rearWeight / 2);
+  }, [weight, frontDist, rearDist]);
 
   //#endregion
 
