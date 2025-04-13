@@ -22,6 +22,8 @@ describe("SuspensionGraphViewModel", () => {
       leftRear: 0,
       rightFront: 0,
       rightRear: 0,
+      windowSize: 20,
+      avgTravel: []
     });
   });
 
@@ -43,6 +45,13 @@ describe("SuspensionGraphViewModel", () => {
       leftRear: 0.6,
       rightFront: 0.7,
       rightRear: 0.8,
+      windowSize: 20,
+      avgTravel: [
+        {
+          front: 0.6,
+          rear: 0.7
+        }
+      ]
     });
   });
 
@@ -57,6 +66,8 @@ describe("SuspensionGraphViewModel", () => {
       leftRear: 0,
       rightFront: 0,
       rightRear: 0,
+      windowSize: 20,
+      avgTravel: []
     });
   });
 });

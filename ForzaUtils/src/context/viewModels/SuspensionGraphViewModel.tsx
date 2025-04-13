@@ -15,92 +15,93 @@ export interface ISuspensionGraphViewModel {
   windowSize: number;
   avgTravel: AvgTravel[];
 }
+const debugData = [
+  {
+    front: 0.7,
+    rear: -1.0
+  },
+  {
+    front: -2.3,
+    rear: 2.6
+  },
+  {
+    front: 2.3,
+    rear: -2.6
+  },
+  {
+    front: -2.3,
+    rear: 2.6
+  },
+  {
+    front: 2.3,
+    rear: -2.6
+  },
+  {
+    front: -2.3,
+    rear: 2.6
+  },
+  {
+    front: 2.3,
+    rear: 2.6
+  },
+  {
+    front: -2.3,
+    rear: 2.6
+  },
+  {
+    front: 2.3,
+    rear: -2.6
+  },
+  {
+    front: -2.3,
+    rear: 2.6
+  },
+  {
+    front: 2.3,
+    rear: 2.6
+  },
+  {
+    front: -2.3,
+    rear: 2.6
+  },
+  {
+    front: 2.3,
+    rear: -2.6
+  },
+  {
+    front: -2.3,
+    rear: 2.6
+  },
+  {
+    front: 2.3,
+    rear: 2.6
+  },
+  {
+    front: -2.3,
+    rear: 2.6
+  },
+  {
+    front: 2.3,
+    rear: -2.6
+  },
+  {
+    front: -2.3,
+    rear: 2.6
+  },
+  {
+    front: 2.3,
+    rear: 2.6
+  },
+  {
+    front: -2.3,
+    rear: 2.6
+  }
+]
 export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
   const windowSize = 20;
   const forza = useSelector(getForzaPacket);
-  const avgTravelWindow = useDataWindow<AvgTravel>(windowSize, [
-    {
-      front: 0.7,
-      rear: -1.0
-    },
-    {
-      front: -2.3,
-      rear: 2.6
-    },
-    {
-      front: 2.3,
-      rear: -2.6
-    },
-    {
-      front: -2.3,
-      rear: 2.6
-    },
-    {
-      front: 2.3,
-      rear: -2.6
-    },
-    {
-      front: -2.3,
-      rear: 2.6
-    },
-    {
-      front: 2.3,
-      rear: 2.6
-    },
-    {
-      front: -2.3,
-      rear: 2.6
-    },
-    {
-      front: 2.3,
-      rear: -2.6
-    },
-    {
-      front: -2.3,
-      rear: 2.6
-    },
-    {
-      front: 2.3,
-      rear: 2.6
-    },
-    {
-      front: -2.3,
-      rear: 2.6
-    },
-    {
-      front: 2.3,
-      rear: -2.6
-    },
-    {
-      front: -2.3,
-      rear: 2.6
-    },
-    {
-      front: 2.3,
-      rear: 2.6
-    },
-    {
-      front: -2.3,
-      rear: 2.6
-    },
-    {
-      front: 2.3,
-      rear: -2.6
-    },
-    {
-      front: -2.3,
-      rear: 2.6
-    },
-    {
-      front: 2.3,
-      rear: 2.6
-    },
-    {
-      front: -2.3,
-      rear: 2.6
-    }
-  ]);
+  const avgTravelWindow = useDataWindow<AvgTravel>(windowSize);
 
   useEffect(() => {
     if (forza?.normalizedSuspensionTravel) {

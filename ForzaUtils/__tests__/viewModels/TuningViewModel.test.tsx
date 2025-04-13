@@ -7,13 +7,13 @@ describe("TuningViewModel", () => {
     const { result } = renderHook(() => useTuningViewModel());
 
     expect(result.current.totalVehicleWeight).toBe(3000);
-    expect(result.current.frontDistribution).toBe(55);
-    expect(result.current.rearDistribution).toBe(46);
+    expect(result.current.frontDistribution).toBe(53);
+    expect(result.current.rearDistribution).toBe(47);
     expect(result.current.hasRollCage).toBe(false);
     expect(result.current.drivetrain).toBe(Drivetrain.FWD);
     expect(result.current.engineLayout).toBe(EngineLayout.FRONT);
-    expect(result.current.frontHeight).toBe(5.5);
-    expect(result.current.rearHeight).toBe(5.5);
+    expect(result.current.frontHeight).toBe(4.0);
+    expect(result.current.rearHeight).toBe(4.0);
     expect(result.current.frontHz).toBe(2.6);
     expect(result.current.rearHz).toBe(2.6);
   });
