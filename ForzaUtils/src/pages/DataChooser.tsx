@@ -9,6 +9,7 @@ import { TrackMap } from "../components/TrackMap";
 import { useSelector } from "react-redux";
 import { getTheme } from "../redux/ThemeStore";
 import { AvgSuspensionTravel } from "../components/Graphs/AvgSuspensionTravel";
+import { AvgTireTemps } from "../components/Graphs/AvgTireTemp";
 
 export interface DataChooserProps {
 
@@ -69,6 +70,7 @@ export function DataChooser(props: DataChooserProps) {
           width: '95%'
         }}/>
         <AvgSuspensionTravel />
+        <AvgTireTemps />
         <FlatList
           style={styles.listRoot}
           data={options}

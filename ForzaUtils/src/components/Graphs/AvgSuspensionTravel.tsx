@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, {  } from "react";
 import { useSelector } from "react-redux";
 import { getTheme } from "../../redux/ThemeStore";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
-import { Paper } from "../Paper";
-import { StyleSheet, View } from "react-native";
-import Svg, { Circle, Path } from "react-native-svg";
+import { StyleSheet } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
 import { BaseLineGraph } from "./BaseLineGraph";
 import { CardContainer } from "../CardContainer";
@@ -22,6 +20,7 @@ export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
       centerContent
       style={styles.card}>
       <BaseLineGraph
+        title={'Suspension Travel'}
         dataLength={20}
         data={[
           {
@@ -44,10 +43,9 @@ function themeStyles(theme: IThemeElements) {
     card: {
       height: '20%',
       width: '100%',
-      flexGrow: 0,
       padding: 0,
-      paddingTop: 12,
-      paddingBottom: 12,
+      paddingTop: 24,
+      paddingBottom: 24,
     },
   })
 }

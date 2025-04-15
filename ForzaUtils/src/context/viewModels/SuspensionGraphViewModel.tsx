@@ -101,7 +101,7 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
   const windowSize = 20;
   const forza = useSelector(getForzaPacket);
-  const avgTravelWindow = useDataWindow<AvgTravel>(windowSize);
+  const avgTravelWindow = useDataWindow<AvgTravel>(windowSize, debugData);
 
   useEffect(() => {
     if (forza?.normalizedSuspensionTravel) {

@@ -17,6 +17,8 @@ describe("useTireTempsViewModel", () => {
       rightFront: 0,
       leftRear: 0,
       rightRear: 0,
+      avgTempWindowSize: 20,
+      avgTemps: [],
     });
   });
 
@@ -27,6 +29,8 @@ describe("useTireTempsViewModel", () => {
         rightFront: 80.5678,
         leftRear: 70.9876,
         rightRear: 85.4321,
+        avgTempWindowSize: 20,
+        avgTemps: [],
       },
     });
 
@@ -37,6 +41,11 @@ describe("useTireTempsViewModel", () => {
       rightFront: 80.57,
       leftRear: 70.99,
       rightRear: 85.43,
+      avgTempWindowSize: 20,
+      avgTemps: [{
+        front: 77.84,
+        rear: 78.21
+      }],
     });
   });
 
@@ -47,6 +56,8 @@ describe("useTireTempsViewModel", () => {
         rightFront: undefined,
         leftRear: null,
         rightRear: 85.4321,
+        avgTempWindowSize: 20,
+        avgTemps: [],
       },
     });
 
@@ -57,6 +68,11 @@ describe("useTireTempsViewModel", () => {
       rightFront: 0,
       leftRear: 0,
       rightRear: 85.43,
+      avgTempWindowSize: 20,
+      avgTemps: [{
+        front: 37.56,
+        rear: 42.72
+      }],
     });
   });
 });

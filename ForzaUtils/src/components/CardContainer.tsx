@@ -39,7 +39,7 @@ function themeStyles(theme: IThemeElements) {
       borderWidth: 0.8,
       display: 'flex',
       flexDirection: 'column',
-      flexGrow: 1
+      overflow: 'hidden'
     },
     center: {
       justifyContent: 'center',
