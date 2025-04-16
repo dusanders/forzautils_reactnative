@@ -16,6 +16,7 @@ export function NetworkWatcher(props: INetworkState) {
   const tag = "NetworkWatcher.tsx";
   const logger = useLogger();
   const [port, setPort] = useState(0);
+  const [isListening, setIsListening] = useState(false);
   const updateWifiState = useSetWifiState();
   const updatePacket = useSetPacket();
   const updatePort = useSetPort();
@@ -23,6 +24,7 @@ export function NetworkWatcher(props: INetworkState) {
   const [wifiConnected, setWifiConnected] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const throttledPacket = useRef<ForzaTelemetryApi>(undefined);
+  const flushInterval = useRef<NodeJS.Timeout | undefined>(undefined);
   const socketCallbacks = useMemo<ISocketCallback>(() => ({
     onClose: (ev) => { 
       logger.debug(tag, `socket did close ${(ev as Error)?.message}`);
@@ -76,26 +78,31 @@ export function NetworkWatcher(props: INetworkState) {
    * Throttle the packet data to avoid flooding the UI
    */
   useEffect(() => {
-    const flush = setInterval(() => {
-      if (throttledPacket.current) {
-        updatePacket(throttledPacket.current);
+    updateUdpListening(isListening);
+    if(isListening) {
+      logger.debug(tag, `Starting packet flush interval`);
+      flushInterval.current = setInterval(() => {
+        if (throttledPacket.current) {
+          updatePacket(throttledPacket.current);
+        }
+      }, 10);
+    } else {
+      logger.debug(tag, `Stopping packet flush interval`);
+      if(flushInterval.current) {
+        clearInterval(flushInterval.current);
       }
-    }, 10);
-    return () => {
-      clearInterval(flush)
     }
-  }, []);
+    return () => {
+      clearInterval(flushInterval.current)
+    }
+  }, [isListening]);
 
   /**
    * Handle port changes - change redux UDP listening 
    */
   useEffect(() => {
     logger.debug(tag, `port update: ${port}`);
-    if (port > 0) {
-      updateUdpListening(true);
-    } else {
-      updateUdpListening(false);
-    }
+    setIsListening(port > 0);
     updatePort(port);
   }, [port]);
 

@@ -75,6 +75,7 @@ export class Socket implements ISocket {
     });
   }
   close(): void {
+    this.udpSocket?.removeAllListeners();
     this.udpSocket?.close();
     this.udpSocket = undefined;
   }
