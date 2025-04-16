@@ -43,7 +43,7 @@ export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 20;
   const forza = useSelector(getForzaPacket);
-  const avgTempWindow = useDataWindow<AverageTempData>(windowSize, debugData);
+  const avgTempWindow = useDataWindow<AverageTempData>(windowSize);
 
   useEffect(() => {
     if(forza?.tireTemp) {
