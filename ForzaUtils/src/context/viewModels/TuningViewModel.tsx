@@ -1,5 +1,6 @@
 import { Drivetrain } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
+import { ICache, useCache } from "../Cache";
 
 export enum EngineLayout {
   FRONT,
@@ -42,11 +43,13 @@ export interface ITuningViewModel {
   frontSettings: SuspensionSettings;
   rearSettings: SuspensionSettings;
 }
-let instance: ITuningViewModel | undefined;
 
 export function useTuningViewModel(): ITuningViewModel {
   const tag = 'TuningViewModel';
+
   //#region State
+
+  const cache = useCache();
   const defaultDamper: SuspensionSettings = {
     rebound: 0,
     bound: 0,
@@ -84,6 +87,7 @@ export function useTuningViewModel(): ITuningViewModel {
   const [frontSprings, setFrontSprings] = useState(0);
   const [rearSprings, setRearSprings] = useState(0);
   const [totalSprings, setTotalSprings] = useState(0);
+
   //#endregion
 
   //#region Helpers
@@ -101,7 +105,7 @@ export function useTuningViewModel(): ITuningViewModel {
     setFrontDist(100 - value);
   };
   const calculateWeight = (total: number, distribution: number) => {
-    if(total == 0) {
+    if (total == 0) {
       return 0;
     }
     return (total * (distribution / 100));
@@ -194,10 +198,52 @@ export function useTuningViewModel(): ITuningViewModel {
       rear: rear
     };
   }
+  const getCacheModel = (): ICache<ITuningViewModel> => {
+    return {
+      totalVehicleWeight: weight,
+      frontDistribution: frontDist,
+      rearDistribution: rearDist,
+      hasRollCage: rollCage,
+      drivetrain: drivetrainType,
+      engineLayout: layoutType,
+      frontHeight: frontRideHeight,
+      rearHeight: rearRideHeight,
+      frontHz: frontHz,
+      rearHz: rearHz,
+      frontCornerWeight: frontCornerWeight,
+      rearCornerWeight: rearCornerWeight,
+      frontWeight: frontWeight,
+      rearWeight: rearWeight,
+      frontSettings: frontSettings,
+      rearSettings: rearSettings
+    }
+  }
 
   //#endregion
 
   //#region Effects
+
+  useEffect(() => {
+    const tryCache = async () => {
+      const found = await cache.getItem<ICache<ITuningViewModel>>(tag);
+      if (found) {
+        console.log(tag, `found cached tuning settings`);
+        setWeight(found.totalVehicleWeight);
+        setFrontDist(found.frontDistribution);
+        setRearDist(found.rearDistribution);
+        setRollCage(found.hasRollCage);
+        setDrivetrainType(found.drivetrain);
+        setLayout(found.engineLayout);
+        setFrontRideHeight(found.frontHeight);
+        setRearRideHeight(found.rearHeight);
+        setFrontHz(found.frontHz);
+        setRearHz(found.rearHz);
+      } else {
+        console.log(tag, `no cached tuning settings found`)
+      }
+    }
+    tryCache();
+  }, [cache]);
 
   /**
    * Spring rates changed - update rear settings
@@ -213,6 +259,7 @@ export function useTuningViewModel(): ITuningViewModel {
       ARB: rollCage ? arb * rollCageFrontARB : arb
     }, rearSettings);
     setFrontSettings(adjusted.front);
+    cache.setItem<ICache<ITuningViewModel>>(tag, getCacheModel());
   }, [frontSprings, totalSprings, drivetrainType, layoutType, rollCage]);
 
   /**
@@ -229,6 +276,7 @@ export function useTuningViewModel(): ITuningViewModel {
       ARB: rollCage ? arb * rollCageRearARB : arb
     })
     setRearSettings(adjusted.rear);
+    cache.setItem<ICache<ITuningViewModel>>(tag, getCacheModel());
   }, [rearSprings, totalSprings, drivetrainType, layoutType, rollCage]);
 
   /**
