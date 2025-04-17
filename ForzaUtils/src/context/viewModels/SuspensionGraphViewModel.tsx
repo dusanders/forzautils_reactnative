@@ -1,7 +1,6 @@
-import { useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
-import { getForzaPacket } from "../../redux/WifiStore";
+import { useContext, useEffect, useMemo } from "react";
 import { useDataWindow } from "../../constants/types";
+import { ForzaPacketContext } from "../Network";
 
 interface AvgTravel {
   front: number;
@@ -100,7 +99,7 @@ const debugData = [
 export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
   const windowSize = 20;
-  const forza = useSelector(getForzaPacket);
+  const forza = useContext(ForzaPacketContext).packet;
   const avgTravelWindow = useDataWindow<AvgTravel>(windowSize);
 
   useEffect(() => {

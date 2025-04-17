@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 import { TireData } from "ForzaTelemetryApi";
 import { useSelector } from "react-redux";
-import { getForzaPacket } from "../../redux/WifiStore";
+import { ForzaPacketContext } from "../Network";
 
 
 export interface IGripViewModel {
@@ -12,7 +12,7 @@ export interface IGripViewModel {
 }
 
 export function useGripViewModel(): IGripViewModel {
-  const forza = useSelector(getForzaPacket);
+  const forza = useContext(ForzaPacketContext).packet;
   const steering = useMemo(() => {
     return forza?.steer || 0
   }, [forza?.steer]);

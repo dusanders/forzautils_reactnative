@@ -50,8 +50,6 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     const newPaths = props.data.map((data) => {
       return data.data.map((value, index) => {
         const xMove = (index + 1) * deltaX;
-        // const yMove = ((value - yLimits.minY) / deltaY) * height;
-        // const yMove = ((yLimits.maxY - value) / deltaY) * height; // Map minY to the top and maxY to the bottom
         const yMove = height - ((value - yLimits.minY) / deltaY) * height; // Map minY to the top and maxY to the bottom
         if (index === 0) {
           return `M${24},${yMove}`;
@@ -92,7 +90,7 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
 
 
   useEffect(() => {
-    const minX = -1;
+    const minX = -4;
     const minY = -4;
     const width = renderedLayout.width;
     const height = renderedLayout.height - 12;

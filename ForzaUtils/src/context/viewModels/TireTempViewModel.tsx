@@ -1,7 +1,6 @@
-import { useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
-import { getForzaPacket } from "../../redux/WifiStore";
+import { useContext, useEffect, useMemo } from "react";
 import { useDataWindow } from "../../constants/types";
+import { ForzaPacketContext } from "../Network";
 
 export interface AverageTempData {
   front: number;
@@ -16,37 +15,37 @@ export interface ITireTempViewModel {
   avgTemps: AverageTempData[];
 }
 const debugData: AverageTempData[] = [
-  {front: 180, rear: 180},
-  {front: 180, rear: 180},
-  {front: 180, rear: 180},
-  {front: 180, rear: 180},
-  {front: 212, rear: 210},
-  {front: 212, rear: 210},
-  {front: 212, rear: 210},
-  {front: 212, rear: 210},
-  {front: 198, rear: 195},
-  {front: 196, rear: 194},
-  {front: 195, rear: 192},
-  {front: 198,rear: 193},
-  {front: 201, rear: 198},
-  {front: 208, rear: 205},
-  {front: 210, rear: 207},
-  {front: 212, rear: 210},
-  {front: 212, rear: 210},
-  {front: 212, rear: 210},
-  {front: 212, rear: 210},
-  {front: 198, rear: 195},
-  {front: 196, rear: 194},
-  {front: 195, rear: 192},
+  { front: 180, rear: 180 },
+  { front: 180, rear: 180 },
+  { front: 180, rear: 180 },
+  { front: 180, rear: 180 },
+  { front: 212, rear: 210 },
+  { front: 212, rear: 210 },
+  { front: 212, rear: 210 },
+  { front: 212, rear: 210 },
+  { front: 198, rear: 195 },
+  { front: 196, rear: 194 },
+  { front: 195, rear: 192 },
+  { front: 198, rear: 193 },
+  { front: 201, rear: 198 },
+  { front: 208, rear: 205 },
+  { front: 210, rear: 207 },
+  { front: 212, rear: 210 },
+  { front: 212, rear: 210 },
+  { front: 212, rear: 210 },
+  { front: 212, rear: 210 },
+  { front: 198, rear: 195 },
+  { front: 196, rear: 194 },
+  { front: 195, rear: 192 },
 ]
 export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 20;
-  const forza = useSelector(getForzaPacket);
+  const forza = useContext(ForzaPacketContext).packet;
   const avgTempWindow = useDataWindow<AverageTempData>(windowSize);
 
   useEffect(() => {
-    if(forza?.tireTemp) {
+    if (forza?.tireTemp) {
       const leftFront = Number(forza.tireTemp.leftFront?.toFixed(2)) || 0;
       const rightFront = Number(forza.tireTemp.rightFront?.toFixed(2)) || 0;
       const leftRear = Number(forza.tireTemp.leftRear?.toFixed(2)) || 0;

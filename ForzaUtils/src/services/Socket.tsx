@@ -4,6 +4,7 @@ import UdpSockets from "react-native-udp";
 import UdpSocket from "react-native-udp/lib/types/UdpSocket";
 import { ILogger } from "../context/Logger";
 import { Upd_rinfo } from "../constants/types";
+import { FileService } from "./Files";
 
 export interface ISocketCallback {
   onError(error: Error): void;
@@ -13,6 +14,7 @@ export interface ISocketCallback {
 
 export interface ISocket {
   bind(port: number, callbacks: ISocketCallback): Promise<number>;
+  writeToFile(filename: string): Promise<void>;
   close(): void;
 }
 
@@ -33,14 +35,19 @@ export class Socket implements ISocket {
     this.logger = logger
   }
 
+  async writeToFile(filename: string): Promise<void> {
+    const fs = await FileService.getInstance();
+  }
+
   bind(port: number, callbacks: ISocketCallback): Promise<number> {
     return new Promise((resolve, reject) => {
       // If we already have a socket...
-      if(this.udpSocket) {
+      if (this.udpSocket) {
         // update the callbacks and return the current use port
         this.callbacks = callbacks;
         return resolve(this.udpSocket?.address().port || 0);
       }
+      this.writeToFile('')
       this.callbacks = callbacks;
       const bindErrorHandler = (e: Error | any) => {
         this.udpSocket = undefined;
@@ -59,7 +66,7 @@ export class Socket implements ISocket {
             .addListener('error', this.errorHandler.bind(this))
             .addListener('close', this.closeHandler.bind(this))
             .addListener('message', this.dataHandler.bind(this));
-            resolve(port);
+          resolve(port);
         } else {
           this.logger.debug(this.tag, `Socket is undefined at listening event`);
           reject(new Error('Socket instance is undefined on listening event!!'));
@@ -85,7 +92,7 @@ export class Socket implements ISocket {
     try {
       this.udpSocket?.close();
       this.udpSocket = undefined
-    }catch(e: unknown) {
+    } catch (e: unknown) {
       const err = e as Error;
       this.logger.error(this.tag, `Socket error: ${err?.message}`);
     }
@@ -96,8 +103,9 @@ export class Socket implements ISocket {
     this.logger.error(this.tag, `Socket closed: ${ev?.message}`);
   }
   private dataHandler(data: Buffer, rinfo: Upd_rinfo) {
+    const forzaPacket = new ForzaTelemetryApi(rinfo.size, data);
     this.callbacks?.onPacket(
-      new ForzaTelemetryApi(rinfo.size, data)
+      forzaPacket
     )
   }
 }

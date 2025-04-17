@@ -285,7 +285,7 @@ export function useTuningViewModel(): ITuningViewModel {
   useEffect(() => {
     const hz = calculateTargetHz(frontRideHeight);
     const rate = hz * (frontWeight / (2 * frontRideHeight));
-    setFrontSprings(rate);
+    setFrontSprings(rate * 2);
     setTotalSprings(rate + rearSprings);
     setFrontHz(hz);
   }, [frontRideHeight, frontWeight, rearSprings]);
@@ -296,7 +296,7 @@ export function useTuningViewModel(): ITuningViewModel {
   useEffect(() => {
     const hz = calculateTargetHz(rearRideHeight);
     const rate = hz * (rearWeight / (2 * rearRideHeight));
-    setRearSprings(rate);
+    setRearSprings(rate * 2);
     setTotalSprings(rate + frontSprings);
     setRearHz(hz);
   }, [rearRideHeight, rearWeight, frontSprings]);

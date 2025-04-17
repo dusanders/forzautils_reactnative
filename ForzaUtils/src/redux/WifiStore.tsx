@@ -32,23 +32,16 @@ const wifiSlice = createSlice({
     setPort: (state, action: PayloadAction<number>) => {
       state.port = action.payload;
     },
-    setPacket: (state, action: PayloadAction<ForzaTelemetryApi>) => {
-      state.packet = action.payload;
-    },
     setUdpListening: (state, action: PayloadAction<boolean>) => {
       state.isUdpListening = action.payload;
     },
   }
 });
-export const { setWifiState, setPort, setPacket, setUdpListening } = wifiSlice.actions;
+export const { setWifiState, setPort, setUdpListening } = wifiSlice.actions;
 export const wifiReducer = wifiSlice.reducer;
 export const useSetWifiState = () => {
   const dispatch = useDispatch();
   return (state: IWifiState) => dispatch(setWifiState(state));
-}
-export const useSetPacket = () => {
-  const dispatch = useDispatch();
-  return (packet: ForzaTelemetryApi) => dispatch(setPacket(packet));
 }
 export const useSetPort = () => {
   const dispatch = useDispatch();
@@ -63,4 +56,3 @@ export const getIsConnected = (state: AppStoreState) => state.wifi.isConnected;
 export const getIsUdpListening = (state: AppStoreState) => state.wifi.isUdpListening;
 export const getWifiPort = (state: AppStoreState) => state.wifi.port;
 export const getWifiIp = (state: AppStoreState) => state.wifi.ip;
-export const getForzaPacket = (state: AppStoreState) => state.wifi.packet;
