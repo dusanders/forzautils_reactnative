@@ -39,12 +39,23 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     maxY: 0
   });
 
+  const isValidNumber = (value: number) => {
+    return typeof value === 'number' && !isNaN(value) && isFinite(value);
+  }
+
   const reRenderData = () => {
+    if (widthScalar === 0) {
+      console.warn(tag, 'widthScalar is 0, cannot render graph');
+      return;
+    }
     const height = viewBox.height / 1.5;
     const width = viewBox.width;
     const deltaY = yLimits.maxY - yLimits.minY;
     const deltaX = width / widthScalar;
-
+    if (!isValidNumber(deltaY) || !isValidNumber(deltaX)) {
+      console.warn(tag, 'Invalid deltaY or deltaX', { deltaY, deltaX });
+      return;
+    }
     console.log(tag, `deltaX: ${deltaX}, deltaY: ${deltaY}`);
 
     const newPaths = props.data.map((data) => {
@@ -57,7 +68,6 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
         return ` L${xMove},${yMove}`;
       }).join(' ');
     });
-
     setPaths(newPaths);
   }
 
@@ -120,18 +130,22 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
               height: ev.nativeEvent.layout.height
             })
           }}>
-          <Text
-            fontSize={fontSize}
-            y={0 + (fontSize / 1.4)}
-            fill={theme.colors.text.primary.onPrimary}>
-            {yLimits.maxY}
-          </Text>
-          <Text
-            fontSize={fontSize}
-            y={viewBox.height - (fontSize / 1.4)}
-            fill={theme.colors.text.primary.onPrimary}>
-            {yLimits.minY}
-          </Text>
+          {(isValidNumber(yLimits.minY) && isValidNumber(yLimits.maxY)) && (
+            <>
+              <Text
+                fontSize={fontSize}
+                y={0 + (fontSize / 1.4)}
+                fill={theme.colors.text.primary.onPrimary}>
+                {yLimits.maxY}
+              </Text>
+              <Text
+                fontSize={fontSize}
+                y={viewBox.height - (fontSize / 1.4)}
+                fill={theme.colors.text.primary.onPrimary}>
+                {yLimits.minY}
+              </Text>
+            </>
+          )}
           {paths.map((path, index) =>
             <Path
               key={index}

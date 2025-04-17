@@ -69,8 +69,8 @@ export function DataChooser(props: DataChooserProps) {
           marginBottom: 20,
           width: '95%'
         }}/>
-        {/* <AvgSuspensionTravel />
-        <AvgTireTemps /> */}
+        <AvgSuspensionTravel />
+        <AvgTireTemps />
         <FlatList
           style={styles.listRoot}
           data={options}
