@@ -1,16 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLogger } from './Logger';
 import { addEventListener, NetInfoState, NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
-import { useSetPort, useSetUdpListening, useSetWifiState } from '../redux/WifiStore';
+import { getWifiState, useSetPacket, useSetWifiState } from '../redux/WifiStore';
 import { Splash } from '../pages/Splash';
 import { LISTEN_PORT } from '../constants/types';
-import { ForzaTelemetryApi } from 'ForzaTelemetryApi';
+import { ITelemetryData } from 'ForzaTelemetryApi';
 import { ISocketCallback, Socket } from '../services/Socket';
-
-export interface IForzaPacketEvent {
-  packet: ForzaTelemetryApi | undefined;
-}
-export const ForzaPacketContext = React.createContext<IForzaPacketEvent>({} as IForzaPacketEvent);
+import { useSelector } from 'react-redux';
 
 export interface INetworkState {
   children?: any;
@@ -20,14 +16,12 @@ export function NetworkWatcher(props: INetworkState) {
   const tag = "NetworkWatcher.tsx";
   const logger = useLogger();
   const [port, setPort] = useState(0);
-  const [isListening, setIsListening] = useState(false);
-  const updateWifiState = useSetWifiState();
-  const updatePort = useSetPort();
-  const updateUdpListening = useSetUdpListening();
-  const [wifiConnected, setWifiConnected] = useState(false);
+  const updateReduxWifiState = useSetWifiState();
+  const reduxWifiState = useSelector(getWifiState);
+  const updatePacket = useSetPacket();
   const [loaded, setLoaded] = useState(false);
-  const [forzaPacket, setForzaPacket] = useState<ForzaTelemetryApi | undefined>(undefined);
-  const throttledPacket = useRef<ForzaTelemetryApi>(undefined);
+  const [wifiInfo, setWifiInfo] = useState<NetInfoState | undefined>(undefined);
+  const throttledPacket = useRef<ITelemetryData>(undefined);
   const animationFrameId = useRef<number | undefined>(undefined);
 
   const socketCallbacks = useMemo<ISocketCallback>(() => ({
@@ -44,6 +38,17 @@ export function NetworkWatcher(props: INetworkState) {
     }
   }), []);
 
+  const netInfoCallback = useCallback((state: NetInfoState) => {
+    setWifiInfo((prevWifiInfo) => {
+      console.log(tag, `netSub trigger: ${JSON.stringify(state)} -> ${JSON.stringify(prevWifiInfo)}`);
+      if (state.type !== prevWifiInfo?.type || state.isConnected !== prevWifiInfo?.isConnected) {
+        return state; // Update the state only if it has changed
+      }
+      return prevWifiInfo; // Keep the previous state if nothing has changed
+    });
+    setLoaded(true);
+  }, []);
+
   /**
    * Update the packet state with the latest throttled packet
    * This is called at a regular interval to avoid flooding the UI
@@ -51,8 +56,10 @@ export function NetworkWatcher(props: INetworkState) {
   const updatePacketState = () => {
     if (throttledPacket.current) {
       // console.log(tag, `Flushing packet: ${JSON.stringify(throttledPacket.current)}`);
-      setForzaPacket(throttledPacket.current);
+      // setForzaPacket(throttledPacket.current);
+      updatePacket(throttledPacket.current);
     }
+    animationFrameId.current = requestAnimationFrame(updatePacketState);
   }
 
   /**
@@ -73,16 +80,8 @@ export function NetworkWatcher(props: INetworkState) {
    * Gather and update the Wifi state
    */
   useEffect(() => {
-    let netInfoSub: NetInfoSubscription = addEventListener((state) => {
-      updateWifiState({
-        isConnected: isWifiConnected(state) || false,
-        isUdpListening: false,
-        port: 0,
-        ip: (state.details as any)?.ipAddress || "",
-      });
-      setWifiConnected(isWifiConnected(state));
-      setLoaded(true);
-    });
+    console.log(tag, `attach net into sub`);
+    let netInfoSub: NetInfoSubscription = addEventListener(netInfoCallback);
     return () => {
       if (netInfoSub) {
         netInfoSub();
@@ -94,8 +93,7 @@ export function NetworkWatcher(props: INetworkState) {
    * Throttle the packet data to avoid flooding the UI
    */
   useEffect(() => {
-    updateUdpListening(isListening);
-    if (isListening) {
+    if (reduxWifiState.isUdpListening) {
       logger.debug(tag, `Starting packet flush interval`);
       animationFrameId.current = requestAnimationFrame(updatePacketState);
     } else {
@@ -111,29 +109,26 @@ export function NetworkWatcher(props: INetworkState) {
         animationFrameId.current = undefined;
       }
     }
-  }, [isListening]);
-
-  /**
-   * Handle port changes - change redux UDP listening 
-   */
-  useEffect(() => {
-    logger.debug(tag, `port update: ${port}`);
-    setIsListening(port > 0);
-    updatePort(port);
-  }, [port]);
+  }, [reduxWifiState.isUdpListening]);
 
   /**
    * Handle Wifi connection state changes
    */
   useEffect(() => {
-    console.log(tag, `Wifi state changed! ${JSON.stringify(wifiConnected)}`);
+    console.log(tag, `Wifi state changed! ${JSON.stringify(wifiInfo?.isConnected)}`);
     let socket: Socket | undefined;
     const tryConnect = async () => {
       socket = Socket.getInstance(logger);
       let listeningPort = await socket.bind(LISTEN_PORT, socketCallbacks);
-      setPort(listeningPort);
+      socket.DEBUG();
+      updateReduxWifiState({
+        ip: (wifiInfo?.details as any).ipAddress,
+        port: listeningPort,
+        isConnected: isWifiConnected(wifiInfo),
+        isUdpListening: listeningPort > 0
+      })
     }
-    if (wifiConnected) {
+    if (wifiInfo?.isConnected) {
       tryConnect();
     } else {
       logger.debug(tag, `Wifi disconnected!`);
@@ -142,17 +137,23 @@ export function NetworkWatcher(props: INetworkState) {
     setLoaded(true);
     return () => {
       if (socket) {
+        socket.STOP_DEBUG();
         socket.close();
       }
     }
-  }, [wifiConnected]);
+  }, [wifiInfo?.isConnected]);
+
+  useEffect(() => {
+    if (wifiInfo && wifiInfo.isConnected) {
+      updateReduxWifiState({
+        ip: (wifiInfo.details as any).ipAddress,
+        port: port,
+        isConnected: isWifiConnected(wifiInfo),
+        isUdpListening: port > 0
+      });
+    }
+  }, [wifiInfo]);
 
   if (!loaded) return (<Splash />);
-  return (
-    <ForzaPacketContext.Provider value={{
-      packet: forzaPacket
-    }}>
-      {props.children}
-    </ForzaPacketContext.Provider>
-  )
+  return props.children
 }

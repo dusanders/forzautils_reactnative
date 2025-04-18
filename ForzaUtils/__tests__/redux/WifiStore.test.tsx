@@ -1,6 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { wifiReducer, setWifiState, setPort, setPacket, setUdpListening } from "../../src/redux/WifiStore";
-import { ForzaTelemetryApi } from "ForzaTelemetryApi";
+import { wifiReducer, setWifiState, setPort, setUdpListening } from "../../src/redux/WifiStore";
 
 describe("WifiStore Redux Slice", () => {
   const store = configureStore({ reducer: { wifi: wifiReducer } });
@@ -33,13 +32,6 @@ describe("WifiStore Redux Slice", () => {
     store.dispatch(setPort(3000));
     const state = store.getState().wifi;
     expect(state.port).toBe(3000);
-  });
-
-  it("should handle setPacket", () => {
-    const mockPacket: ForzaTelemetryApi = { /* mock data */ } as any;
-    store.dispatch(setPacket(mockPacket));
-    const state = store.getState().wifi;
-    expect(state.packet).toBe(mockPacket);
   });
 
   it("should handle setUdpListening", () => {

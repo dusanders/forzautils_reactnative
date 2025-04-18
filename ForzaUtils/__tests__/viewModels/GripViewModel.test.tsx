@@ -2,7 +2,7 @@ import React from "react";
 import { IGripViewModel, useGripViewModel } from "../../src/context/viewModels/GripViewModel";
 import { useSelector } from "react-redux";
 import { renderHook } from "@testing-library/react-native";
-import { ForzaTelemetryApi } from "ForzaTelemetryApi";
+import { ITelemetryData } from "ForzaTelemetryApi";
 
 jest.mock("react-redux", () => ({
   useSelector: jest.fn(),
@@ -28,7 +28,7 @@ describe("useGripViewModel", () => {
   });
 
   it("should return correct values when data is available in Redux state", () => {
-    const mockData: Partial<ForzaTelemetryApi> = {
+    const mockData: Partial<ITelemetryData> = {
       steer: 0.5,
       throttle: 0.8,
       brake: 0.2,
@@ -59,7 +59,7 @@ describe("useGripViewModel", () => {
   });
 
   it("should handle missing tireSlipRatio gracefully", () => {
-    const mockData: Partial<ForzaTelemetryApi> = {
+    const mockData: Partial<ITelemetryData> = {
       steer: 0.3,
       throttle: 0.6,
       brake: 0.1,

@@ -1,6 +1,5 @@
 import { useSelector } from "react-redux";
 import { useSuspensionGraphViewModel } from "../../src/context/viewModels/SuspensionGraphViewModel";
-import { getForzaPacket } from "../../src/redux/WifiStore";
 import { renderHook } from "@testing-library/react-native";
 
 jest.mock("react-redux", () => ({

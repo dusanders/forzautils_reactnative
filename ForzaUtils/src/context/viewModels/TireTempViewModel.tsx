@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo } from "react";
 import { useDataWindow } from "../../constants/types";
-import { ForzaPacketContext } from "../Network";
+import { useSelector } from "react-redux";
+import { getForzaPacket } from "../../redux/WifiStore";
 
 export interface AverageTempData {
   front: number;
@@ -41,7 +42,7 @@ const debugData: AverageTempData[] = [
 export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 20;
-  const forza = useContext(ForzaPacketContext).packet;
+  const forza = useSelector(getForzaPacket);
   const avgTempWindow = useDataWindow<AverageTempData>(windowSize);
 
   useEffect(() => {

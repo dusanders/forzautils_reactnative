@@ -29,14 +29,14 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   const tag = 'BaseLineGraph';
   const fontSize = 12;
   const widthScalar = props.dataLength;
-  const [renderedLayout, setRenderedLayout] = useState({ width: 0, height: 0 });
-  const [viewBox, setViewBox] = useState({ minX: 0, minY: 0, width: 0, height: 0 });
+  const [renderedLayout, setRenderedLayout] = useState({ width: 1, height: 1 });
+  const [viewBox, setViewBox] = useState({ minX: -1, minY: 1, width: 1, height: 1 });
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
   const [paths, setPaths] = useState<string[]>([]);
   const [yLimits, setYLimits] = useState<YValueLimits>({
-    minY: 0,
-    maxY: 0
+    minY: -1,
+    maxY: 1
   });
 
   const isValidNumber = (value: number) => {
@@ -56,8 +56,6 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
       console.warn(tag, 'Invalid deltaY or deltaX', { deltaY, deltaX });
       return;
     }
-    console.log(tag, `deltaX: ${deltaX}, deltaY: ${deltaY}`);
-
     const newPaths = props.data.map((data) => {
       return data.data.map((value, index) => {
         const xMove = (index + 1) * deltaX;
@@ -78,7 +76,6 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     if (yLimits.minY === 0 || yLimits.maxY === 0) {
       return;
     }
-    console.log(tag, `re-render on limits miny: ${yLimits.minY}, maxY: ${yLimits.maxY}`);
     reRenderData();
   }, [yLimits, viewBox]);
 
@@ -88,6 +85,9 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     }
     const minY = (Math.min(...props.data.map((point) => Math.min(...point.data))));
     const maxY = (Math.max(...props.data.map((point) => Math.max(...point.data))));
+    if(!isValidNumber(minY) || !isValidNumber(maxY)) {
+      return;
+    }
     if (minY !== yLimits.minY || maxY !== yLimits.maxY) {
       setYLimits({
         minY,
@@ -104,6 +104,9 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     const minY = -4;
     const width = renderedLayout.width;
     const height = renderedLayout.height - 12;
+    if(!isValidNumber(width) || !isValidNumber(height)) {
+      return;
+    }
     setViewBox({
       minX,
       minY,
@@ -136,13 +139,13 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
                 fontSize={fontSize}
                 y={0 + (fontSize / 1.4)}
                 fill={theme.colors.text.primary.onPrimary}>
-                {yLimits.maxY}
+                {yLimits.maxY.toFixed(2)}
               </Text>
               <Text
                 fontSize={fontSize}
                 y={viewBox.height - (fontSize / 1.4)}
                 fill={theme.colors.text.primary.onPrimary}>
-                {yLimits.minY}
+                {yLimits.minY.toFixed(2)}
               </Text>
             </>
           )}

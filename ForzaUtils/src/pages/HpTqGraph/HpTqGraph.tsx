@@ -22,7 +22,7 @@ export function HptqGraph(props: HpTqGraphProps) {
   const navigation = useNavigation<StackNavigation>();
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
-  const store = useViewModelStore();
+  const store = useViewModelStore().hpTqGraph;
   const windowMeasure = withScaledWindow(0.9, 1);
 
   const separator = () => {
@@ -42,7 +42,7 @@ export function HptqGraph(props: HpTqGraphProps) {
         {
           id: randomKey(),
           onPress: () => {
-            store.hpTqGraph.clearCache();
+            store.clearCache();
           },
           renderItem: () => (
             <ThemeText
@@ -55,7 +55,7 @@ export function HptqGraph(props: HpTqGraphProps) {
       ]}>
       <View
         style={styles.contentWrapper}>
-        {store.hpTqGraph.gears.length < 1 && (
+        {store.gears.length < 1 && (
           <Paper style={styles.waitPaper}>
             <ThemeText
               fontFamily="bold"
@@ -70,14 +70,14 @@ export function HptqGraph(props: HpTqGraphProps) {
             <ActivityIndicator />
           </Paper>
         )}
-        {store.hpTqGraph.gears.length > 0 && (
+        {store.gears.length > 0 && (
 
           <FlatList
             ItemSeparatorComponent={separator}
             style={{
               flexGrow: 1
             }}
-            data={store.hpTqGraph.gears}
+            data={store.gears}
             keyExtractor={(item) => `${item.gear}`}
             // renderItem={renderItem}
             renderItem={(item) => {

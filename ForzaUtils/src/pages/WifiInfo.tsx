@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, FlatList, ScrollView, StyleSheet, View } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
@@ -19,6 +19,7 @@ export interface WifiInfoProps {
 }
 
 export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps> {
+  const tag = "WifiInfo.tsx";
   const theme = useSelector(getTheme);
   const wifiInfo = useSelector(getWifiState);
   const styles = themeStyles(theme);
@@ -26,21 +27,21 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
 
   return (
     <AppBarContainer hideBack>
-      <View style={{margin: 23}}></View>
+      <View style={{ margin: 23 }}></View>
       <FlatList
-      data={[]}
-      renderItem={(i) => {
-        return (
-          <View style={{
-            height: 50,
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <ThemeIcon name={'wifi'+ i.item} />
-          </View>
-        )
-      }}>
+        data={[]}
+        renderItem={(i) => {
+          return (
+            <View style={{
+              height: 50,
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <ThemeIcon name={'wifi' + i.item} />
+            </View>
+          )
+        }}>
 
       </FlatList>
       <ScrollView bounces={false}>

@@ -1,20 +1,20 @@
-import { ForzaTelemetryApi } from "ForzaTelemetryApi";
+import { ForzaTelemetryApi, getRandomTelemetryData, ITelemetryData } from "ForzaTelemetryApi";
 import React, { useContext } from "react";
 import UdpSockets from "react-native-udp";
 import UdpSocket from "react-native-udp/lib/types/UdpSocket";
 import { ILogger } from "../context/Logger";
 import { Upd_rinfo } from "../constants/types";
-import { FileService } from "./Files";
 
 export interface ISocketCallback {
   onError(error: Error): void;
   onClose(ev: Error | unknown): void;
-  onPacket(packet: ForzaTelemetryApi): void;
+  onPacket(packet: ITelemetryData): void;
 }
 
 export interface ISocket {
+  DEBUG(): void;
+  STOP_DEBUG(): void;
   bind(port: number, callbacks: ISocketCallback): Promise<number>;
-  writeToFile(filename: string): Promise<void>;
   close(): void;
 }
 
@@ -30,13 +30,10 @@ export class Socket implements ISocket {
   private udpSocket?: UdpSocket;
   private callbacks?: ISocketCallback;
   private logger: ILogger;
+  private debugInterval?: NodeJS.Timeout;
 
   constructor(logger: ILogger) {
     this.logger = logger
-  }
-
-  async writeToFile(filename: string): Promise<void> {
-    const fs = await FileService.getInstance();
   }
 
   bind(port: number, callbacks: ISocketCallback): Promise<number> {
@@ -47,7 +44,7 @@ export class Socket implements ISocket {
         this.callbacks = callbacks;
         return resolve(this.udpSocket?.address().port || 0);
       }
-      this.writeToFile('')
+      
       this.callbacks = callbacks;
       const bindErrorHandler = (e: Error | any) => {
         this.udpSocket = undefined;
@@ -86,7 +83,19 @@ export class Socket implements ISocket {
     this.udpSocket?.close();
     this.udpSocket = undefined;
   }
-
+  DEBUG(): void {
+    this.debugInterval = setInterval(() => {
+      const randomPacket = getRandomTelemetryData();
+      // console.log(this.tag, `sending random: ${JSON.stringify(randomPacket)}`);
+      this.callbacks?.onPacket(randomPacket);
+    }, 100);
+  }
+  STOP_DEBUG(): void {
+    if(this.debugInterval) {
+      clearInterval(this.debugInterval);
+      this.debugInterval = undefined;
+    }
+  }
   private errorHandler(ev: Error | any) {
     this.callbacks?.onError(ev);
     try {
@@ -103,7 +112,7 @@ export class Socket implements ISocket {
     this.logger.error(this.tag, `Socket closed: ${ev?.message}`);
   }
   private dataHandler(data: Buffer, rinfo: Upd_rinfo) {
-    const forzaPacket = new ForzaTelemetryApi(rinfo.size, data);
+    const forzaPacket = ForzaTelemetryApi.parseData(rinfo.size, data);
     this.callbacks?.onPacket(
       forzaPacket
     )

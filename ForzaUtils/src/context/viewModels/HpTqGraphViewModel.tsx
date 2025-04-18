@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { useLogger } from "../Logger";
 import { delay } from "../../constants/types";
-import { ForzaTelemetryApi } from "ForzaTelemetryApi";
-import { ForzaPacketContext } from "../Network";
+import { ForzaTelemetryApi, ITelemetryData } from "ForzaTelemetryApi";
+import { useSelector } from "react-redux";
+import { getForzaPacket } from "../../redux/WifiStore";
 
 export interface IHpTqGraphViewModel {
   gears: GearData[];
@@ -121,7 +122,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   }
   const tag = 'HpTqGraphViewModel';
   const logger = useLogger();
-  const forza = useContext(ForzaPacketContext).packet;
+  const forza = useSelector(getForzaPacket);
   const [gears, setGears] = useState<GearData[]>([]);
 
 
@@ -131,7 +132,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
       forza.throttle < 50 ||
       forza.gear <= 0 ||
       forza.gear >= 11 ||
-      forza.getHorsepower() < 0
+      ForzaTelemetryApi.getHorsepower(forza.power) < 0
     ) {
       // Ignore packet - there is no useful information here
       return true;
@@ -192,10 +193,10 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
     });
   }
 
-  const eventFromPacket = (packet: ForzaTelemetryApi): DataEvent => {
+  const eventFromPacket = (packet: ITelemetryData): DataEvent => {
     return {
       gear: packet.gear,
-      hp: packet.getHorsepower(),
+      hp: ForzaTelemetryApi.getHorsepower(packet.power),
       tq: packet.torque,
       rpm: roundToNearestRpmRange(packet.rpmData.current)
     }

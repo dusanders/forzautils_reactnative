@@ -1,7 +1,7 @@
 import { DirectionalData } from "ForzaTelemetryApi";
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { ForzaPacketContext } from "../Network";
+import { getForzaPacket } from "../../redux/WifiStore";
 
 export interface PlayerPosition {
   x: number;
@@ -46,7 +46,7 @@ const initialViewBox: SvgViewBoxMeasures = {
 }
 
 export function useMapViewModel(): IMapViewModel {
-  const forza = useContext(ForzaPacketContext).packet;
+  const forza = useSelector(getForzaPacket);
   const [trackId, setTrackId] = useState(0);
   const [svg, setSvg] = useState('');
   const [viewBox, setViewBox] = useState<SvgViewBoxMeasures>(initialViewBox);

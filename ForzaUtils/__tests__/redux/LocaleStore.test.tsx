@@ -1,7 +1,5 @@
-import { renderHook } from "@testing-library/react-native";
-import { act } from "react";
 import { useLocaleStore } from "../../src/redux/AppStore";
-import { ILocaleState, localeReducer, setLocale, useSetLocale } from "../../src/redux/LocaleStore";
+import { ILocaleState, localeReducer, setLocale } from "../../src/redux/LocaleStore";
 import { Strings_enUS } from "../../src/locale/enUS";
 import { ISupportLocale } from "../../src/locale/strings";
 import { Strings_fr } from "../../src/locale/fr";
