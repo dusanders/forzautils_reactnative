@@ -120,7 +120,6 @@ export function NetworkWatcher(props: INetworkState) {
     const tryConnect = async () => {
       socket = Socket.getInstance(logger);
       let listeningPort = await socket.bind(LISTEN_PORT, socketCallbacks);
-      socket.DEBUG();
       updateReduxWifiState({
         ip: (wifiInfo?.details as any).ipAddress,
         port: listeningPort,
@@ -137,7 +136,6 @@ export function NetworkWatcher(props: INetworkState) {
     setLoaded(true);
     return () => {
       if (socket) {
-        socket.STOP_DEBUG();
         socket.close();
       }
     }

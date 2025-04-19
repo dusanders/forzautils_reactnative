@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { AppBarContainer } from "../components/AppBar/AppBarContainer";
+import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { IThemeElements } from "../constants/Themes";
-import { CardInput } from "../components/CardInput";
-import { Row } from "../components/Row";
-import { CardContainer } from "../components/CardContainer";
-import { ThemeSwitch } from "../components/ThemeSwitch";
-import { LabelText } from "../components/ThemeText";
+import { IThemeElements } from "../../constants/Themes";
+import { CardInput } from "../../components/CardInput";
+import { Row } from "../../components/Row";
+import { CardContainer } from "../../components/CardContainer";
+import { ThemeSwitch } from "../../components/ThemeSwitch";
+import { LabelText } from "../../components/ThemeText";
 import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
-import { Picker } from "@react-native-picker/picker";
+import { getTheme } from "../../redux/ThemeStore";
+import { Picker, PickerIOS } from "@react-native-picker/picker";
 import { Drivetrain } from "ForzaTelemetryApi";
-import { TextCard } from "../components/TextCard";
-import { useViewModelStore } from "../context/viewModels/ViewModelStore";
-import { EngineLayout } from "../context/viewModels/TuningViewModel";
+import { TextCard } from "../../components/TextCard";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
+import { EngineLayout } from "../../context/viewModels/TuningViewModel";
+import { Dropdown } from "./Dropdown";
 
 export interface TuningPageProps {
   // Nothing
@@ -46,6 +47,8 @@ export function TuningPage(props: TuningPageProps) {
   const [rearHzInput, setRearHzInput] = useState(viewModel.rearHz.toLocaleString());
   const [drivetrainPicker, setDrivetrainPicker] = useState(viewModel.drivetrain);
   const [layoutPicker, setLayoutPicker] = useState(viewModel.engineLayout);
+
+
 
   const labelForDrivetrain = (type: Drivetrain) => {
     switch (type) {
@@ -241,20 +244,15 @@ export function TuningPage(props: TuningPageProps) {
           <CardContainer
             style={styles.pickerContainer}>
             <View style={styles.column}>
-              <Picker
-                dropdownIconColor={theme.colors.text.primary.onPrimary}
-                selectedValue={drivetrainPicker}
-                onValueChange={(value, index) => {
-                  setDrivetrainPicker(value);
-                  viewModel.setDrivetrain(value);
-                }}>
-                {drivetrainOptions.map((i) => (
-                  <Picker.Item key={i}
-                    value={i}
-                    label={labelForDrivetrain(i)}
-                    style={styles.pickerItemStyle} />
-                ))}
-              </Picker>
+              <Dropdown
+                options={[
+                  { value: Drivetrain.FWD, label: labelForDrivetrain(Drivetrain.FWD) },
+                  { value: Drivetrain.RWD, label: labelForDrivetrain(Drivetrain.RWD) },
+                  { value: Drivetrain.AWD, label: labelForDrivetrain(Drivetrain.AWD) }
+                ]}
+                onValueChanged={(option) => {
+                  viewModel.setEngineLayout(option.value)
+                }} />
               <LabelText style={{ textAlign: 'center' }}>
                 Drivetrain
               </LabelText>
@@ -263,28 +261,22 @@ export function TuningPage(props: TuningPageProps) {
           <CardContainer
             style={styles.pickerContainer}>
             <View style={styles.column}>
-              <Picker
-                dropdownIconColor={theme.colors.text.primary.onPrimary}
-                selectedValue={layoutPicker}
-                onValueChange={(value, index) => {
-                  setLayoutPicker(value);
-                  viewModel.setEngineLayout(value)
-                }}>
-                {layoutOptions.map((i) => (
-                  <Picker.Item
-                    key={i}
-                    value={i}
-                    label={labelForLayout(i)}
-                    style={styles.pickerItemStyle} />
-                ))}
-              </Picker>
+              <Dropdown
+                options={[
+                  { value: EngineLayout.FRONT, label: labelForLayout(EngineLayout.FRONT) },
+                  { value: EngineLayout.MID, label: labelForLayout(EngineLayout.MID) },
+                  { value: EngineLayout.REAR, label: labelForLayout(EngineLayout.REAR) }
+                ]}
+                onValueChanged={(option) => {
+                  viewModel.setEngineLayout(option.value)
+                }} />
               <LabelText style={{ textAlign: 'center' }}>
                 Engine Layout
               </LabelText>
             </View>
           </CardContainer>
         </Row>
-        <Row>
+        <Row >
           <TextCard
             style={styles.weightCard}
             centerContent
@@ -371,9 +363,6 @@ export function TuningPage(props: TuningPageProps) {
 
 function themeStyles(theme: IThemeElements) {
   return StyleSheet.create({
-    pickerItemStyle: {
-      color: theme.colors.text.primary.onPrimary
-    },
     weightCard: {
       padding: 4,
       width: '33%'
@@ -391,7 +380,7 @@ function themeStyles(theme: IThemeElements) {
     },
     pickerContainer: {
       width: '50%',
-      padding: 4
+      padding: 4,
     },
     column: {
       display: 'flex',

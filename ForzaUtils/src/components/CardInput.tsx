@@ -55,6 +55,7 @@ function themeStyles(theme: IThemeElements) {
       backgroundColor: theme.colors.background.onPrimary,
       width: '100%',
       color: theme.colors.text.primary.onPrimary,
+      padding: 8
     },
     label: {
       textAlign: 'center',

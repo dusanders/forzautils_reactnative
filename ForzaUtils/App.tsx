@@ -16,7 +16,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Grip } from './src/pages/Grip/Grip';
 import { SourceChooser } from './src/pages/SourceChooser';
-import { TuningPage } from './src/pages/Tuning';
+import { TuningPage } from './src/pages/Tuning/Tuning';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
