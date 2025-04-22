@@ -86,7 +86,6 @@ export class Socket implements ISocket {
   DEBUG(): void {
     this.debugInterval = setInterval(() => {
       const randomPacket = getRandomTelemetryData();
-      // console.log(this.tag, `sending random: ${JSON.stringify(randomPacket)}`);
       this.callbacks?.onPacket(randomPacket);
     }, 100);
   }

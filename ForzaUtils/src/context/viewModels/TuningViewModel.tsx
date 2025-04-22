@@ -93,7 +93,6 @@ export function useTuningViewModel(): ITuningViewModel {
   //#region Helpers
 
   const updateWeight = (value: number) => {
-    console.log(tag, `update weight: ${value}`);
     setWeight(value);
   };
   const updateFrontDist = (value: number) => {
@@ -227,7 +226,6 @@ export function useTuningViewModel(): ITuningViewModel {
     const tryCache = async () => {
       const found = await cache.getItem<ICache<ITuningViewModel>>(tag);
       if (found) {
-        console.log(tag, `found cached tuning settings`);
         setWeight(found.totalVehicleWeight);
         setFrontDist(found.frontDistribution);
         setRearDist(found.rearDistribution);
@@ -238,8 +236,6 @@ export function useTuningViewModel(): ITuningViewModel {
         setRearRideHeight(found.rearHeight);
         setFrontHz(found.frontHz);
         setRearHz(found.rearHz);
-      } else {
-        console.log(tag, `no cached tuning settings found`)
       }
     }
     tryCache();

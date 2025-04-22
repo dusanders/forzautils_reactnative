@@ -196,7 +196,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   const eventFromPacket = (packet: ITelemetryData): DataEvent => {
     return {
       gear: packet.gear,
-      hp: ForzaTelemetryApi.getHorsepower(packet.power),
+      hp: Math.round(ForzaTelemetryApi.getHorsepower(packet.power)),
       tq: packet.torque,
       rpm: roundToNearestRpmRange(packet.rpmData.current)
     }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { StyleSheet, View } from "react-native";
 import { TextCard } from "../components/TextCard";
@@ -9,15 +9,43 @@ import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "../components/ThemeText";
 import { useSelector } from "react-redux";
 import { getTheme } from "../redux/ThemeStore";
+import { ReplayContext, useReplay } from "../context/Replay";
+import { useLogger } from "../context/Logger";
+import { ISessionInfo } from "../services/Database/DatabaseInterfaces";
+import { Dirs, FileSystem } from 'react-native-file-access';
 
 export interface SourceChooserProps {
   // None
 }
 
 export function SourceChooser(props: SourceChooserProps) {
+  const tag = 'SourceChooser.tsx';
   const navigation = useNavigation<StackNavigation>();
+  const logger = useLogger();
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
+  const replay = useReplay();
+
+  const getAll = async () => {
+    const rows = await replay.getAllSessions();
+    logger.log(tag, `all rows: ${JSON.stringify(rows)}`);
+    return rows;
+  }
+
+  const create = async (info: ISessionInfo) => {
+    const created = await replay.getOrCreate(info);
+    return created;
+    logger.log(tag, `created: ${created.info.name}`);
+  }
+
+  useEffect(() => {
+    logger.log(tag, `loaded with replay...`);
+    const init = async () => {
+      await getAll();
+    }
+    init();
+  }, [replay]);
+
   return (
     <AppBarContainer
       onBack={() => {

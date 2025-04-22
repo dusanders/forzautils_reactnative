@@ -2,6 +2,13 @@ import { Drivetrain } from "ForzaTelemetryApi";
 import { useTuningViewModel, EngineLayout } from "../../src/context/viewModels/TuningViewModel";
 import { act, renderHook } from "@testing-library/react-native";
 
+jest.mock("../../src/context/Cache", () => ({
+  useCache: jest.fn(() => ({
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+  })),
+}));
+
 describe("TuningViewModel", () => {
   it("should initialize with default values", () => {
     const { result } = renderHook(() => useTuningViewModel());

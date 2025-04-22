@@ -40,7 +40,6 @@ export function NetworkWatcher(props: INetworkState) {
 
   const netInfoCallback = useCallback((state: NetInfoState) => {
     setWifiInfo((prevWifiInfo) => {
-      console.log(tag, `netSub trigger: ${JSON.stringify(state)} -> ${JSON.stringify(prevWifiInfo)}`);
       if (state.type !== prevWifiInfo?.type || state.isConnected !== prevWifiInfo?.isConnected) {
         return state; // Update the state only if it has changed
       }
@@ -55,8 +54,6 @@ export function NetworkWatcher(props: INetworkState) {
    */
   const updatePacketState = () => {
     if (throttledPacket.current) {
-      // console.log(tag, `Flushing packet: ${JSON.stringify(throttledPacket.current)}`);
-      // setForzaPacket(throttledPacket.current);
       updatePacket(throttledPacket.current);
     }
     animationFrameId.current = requestAnimationFrame(updatePacketState);
@@ -80,7 +77,6 @@ export function NetworkWatcher(props: INetworkState) {
    * Gather and update the Wifi state
    */
   useEffect(() => {
-    console.log(tag, `attach net into sub`);
     let netInfoSub: NetInfoSubscription = addEventListener(netInfoCallback);
     return () => {
       if (netInfoSub) {
@@ -115,7 +111,6 @@ export function NetworkWatcher(props: INetworkState) {
    * Handle Wifi connection state changes
    */
   useEffect(() => {
-    console.log(tag, `Wifi state changed! ${JSON.stringify(wifiInfo?.isConnected)}`);
     let socket: Socket | undefined;
     const tryConnect = async () => {
       socket = Socket.getInstance(logger);
@@ -152,6 +147,7 @@ export function NetworkWatcher(props: INetworkState) {
     }
   }, [wifiInfo]);
 
-  if (!loaded) return (<Splash />);
-  return props.children
+  return loaded
+    ? props.children
+    : (<Splash />);
 }

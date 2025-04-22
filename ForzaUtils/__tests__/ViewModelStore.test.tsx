@@ -6,6 +6,12 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { useViewModelStore, ViewModelStore_Hoc } from '../src/context/viewModels/ViewModelStore';
 import { Text } from 'react-native';
 
+jest.mock("../src/context/Cache", () => ({
+  useCache: jest.fn(() => ({
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+  })),
+}));
 jest.mock('react-redux', () => ({
   useSelector: jest.fn(),
   useDispatch: jest.fn(),

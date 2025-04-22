@@ -21,7 +21,9 @@ const logger: ILogger = {
     console.warn(`${tag} :: ${msg}`);
   }
 }
-
+export function Logger() {
+  return logger;
+}
 const LoggerContext = createContext(logger);
 export function useLogger(): ILogger {
   return useContext(LoggerContext);

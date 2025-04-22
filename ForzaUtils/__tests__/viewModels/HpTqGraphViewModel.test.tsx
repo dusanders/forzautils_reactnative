@@ -22,7 +22,7 @@ describe("useHpTqGraphViewModel", () => {
     isRaceOn: true,
     throttle: 60,
     gear: 3,
-    getHorsepower: jest.fn(() => 200),
+    power: 149253.7313428,
     torque: 300,
     rpmData: { current: 4500 },
     ...overrides,
@@ -83,7 +83,7 @@ describe("useHpTqGraphViewModel", () => {
     expect(result.current.gears[0].events[0].hp).toBe(200);
 
     const updatedPacket = mockForzaPacket({
-      getHorsepower: jest.fn(() => 250),
+      power: 186425.25838541,
       torque: 350,
     });
 
@@ -104,7 +104,7 @@ describe("useHpTqGraphViewModel", () => {
     expect(result.current.gears[0].events[0].hp).toBe(200);
 
     const updatedPacket = mockForzaPacket({
-      getHorsepower: jest.fn(() => 150),
+      power: 111855.15503124,
       torque: 250,
     });
 
