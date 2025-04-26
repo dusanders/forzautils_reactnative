@@ -10,7 +10,6 @@ import { ThemeSwitch } from "../../components/ThemeSwitch";
 import { LabelText } from "../../components/ThemeText";
 import { useSelector } from "react-redux";
 import { getTheme } from "../../redux/ThemeStore";
-import { Picker, PickerIOS } from "@react-native-picker/picker";
 import { Drivetrain } from "ForzaTelemetryApi";
 import { TextCard } from "../../components/TextCard";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
@@ -23,32 +22,18 @@ export interface TuningPageProps {
 
 export function TuningPage(props: TuningPageProps) {
   const tag = 'TuningPage.tsx';
-  const drivetrainOptions: Drivetrain[] = [
-    Drivetrain.FWD,
-    Drivetrain.RWD,
-    Drivetrain.AWD
-  ]
-  const layoutOptions: EngineLayout[] = [
-    EngineLayout.FRONT,
-    EngineLayout.MID,
-    EngineLayout.REAR
-  ]
-  // const viewModel = useTuningViewModel();
   const viewModel = useViewModelStore().tuning;
   const navigation = useNavigation();
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
   const [weightInput, setWeightInput] = useState(viewModel.totalVehicleWeight.toString());
   const [frontDistInput, setFrontDistInput] = useState(viewModel.frontDistribution.toLocaleString());
-  const [rearDistInput, setRearDistInput] = useState(viewModel.rearDistribution.toLocaleString());
   const [frontHeightInput, setFrontHeightInput] = useState(viewModel.frontHeight.toLocaleString());
   const [rearHeightInput, setRearHeightInput] = useState(viewModel.rearHeight.toLocaleString());
   const [frontHzInput, setFrontHzInput] = useState(viewModel.frontHz.toLocaleString());
   const [rearHzInput, setRearHzInput] = useState(viewModel.rearHz.toLocaleString());
-  const [drivetrainPicker, setDrivetrainPicker] = useState(viewModel.drivetrain);
-  const [layoutPicker, setLayoutPicker] = useState(viewModel.engineLayout);
-
-
+  const [selectedDrivetrain, setDrivetrain] = useState(viewModel.drivetrain);
+  const [selectedLayout, setLayout] = useState(viewModel.engineLayout);
 
   const labelForDrivetrain = (type: Drivetrain) => {
     switch (type) {
@@ -80,6 +65,10 @@ export function TuningPage(props: TuningPageProps) {
   }
 
   //#region Effects
+
+  useEffect(() => {
+    setDrivetrain(viewModel.drivetrain)
+  }, [viewModel.drivetrain]);
 
   useEffect(() => {
     if (frontHzInput.endsWith('.')) {
@@ -142,22 +131,8 @@ export function TuningPage(props: TuningPageProps) {
   }, [frontDistInput]);
 
   useEffect(() => {
-    if (rearDistInput.endsWith('.')) {
-      return;
-    }
-    let parsed = parseFloat(rearDistInput);
-    if (parsed > 0 && parsed !== viewModel.rearDistribution) {
-      viewModel.setRearDistribution(parsed);
-    }
-  }, [rearDistInput]);
-
-  useEffect(() => {
     setFrontDistInput(viewModel.frontDistribution.toLocaleString());
   }, [viewModel.frontDistribution]);
-
-  useEffect(() => {
-    setRearDistInput(viewModel.rearDistribution.toLocaleString());
-  }, [viewModel.rearDistribution]);
 
   //#endregion
 
@@ -195,14 +170,10 @@ export function TuningPage(props: TuningPageProps) {
             onChange={(value) => {
               setFrontDistInput(value);
             }} />
-          <CardInput
+          <TextCard
             style={styles.baseCard}
-            label={'Rear Distribution'}
-            placeholder={'Rear Distribution'}
-            value={rearDistInput}
-            onChange={(value) => {
-              setRearDistInput(value);
-            }} />
+            body={'Rear Distribution'}
+            title={viewModel.rearDistribution.toFixed(0)} />
         </Row>
         <Row>
           <CardInput
@@ -222,7 +193,7 @@ export function TuningPage(props: TuningPageProps) {
               setRearHeightInput(value);
             }} />
         </Row>
-        <Row>
+        {/* <Row>
           <CardInput
             style={styles.baseCard}
             label="Front Hz"
@@ -239,29 +210,13 @@ export function TuningPage(props: TuningPageProps) {
             onChange={(value) => {
               setRearHzInput(value);
             }} />
-        </Row>
+        </Row> */}
         <Row>
           <CardContainer
             style={styles.pickerContainer}>
             <View style={styles.column}>
               <Dropdown
-                options={[
-                  { value: Drivetrain.FWD, label: labelForDrivetrain(Drivetrain.FWD) },
-                  { value: Drivetrain.RWD, label: labelForDrivetrain(Drivetrain.RWD) },
-                  { value: Drivetrain.AWD, label: labelForDrivetrain(Drivetrain.AWD) }
-                ]}
-                onValueChanged={(option) => {
-                  viewModel.setEngineLayout(option.value)
-                }} />
-              <LabelText style={{ textAlign: 'center' }}>
-                Drivetrain
-              </LabelText>
-            </View>
-          </CardContainer>
-          <CardContainer
-            style={styles.pickerContainer}>
-            <View style={styles.column}>
-              <Dropdown
+                value={selectedLayout}
                 options={[
                   { value: EngineLayout.FRONT, label: labelForLayout(EngineLayout.FRONT) },
                   { value: EngineLayout.MID, label: labelForLayout(EngineLayout.MID) },
@@ -275,39 +230,57 @@ export function TuningPage(props: TuningPageProps) {
               </LabelText>
             </View>
           </CardContainer>
+          <CardContainer
+            style={styles.pickerContainer}>
+            <View style={styles.column}>
+              <Dropdown
+                value={selectedDrivetrain}
+                options={[
+                  { value: Drivetrain.FWD, label: labelForDrivetrain(Drivetrain.FWD) },
+                  { value: Drivetrain.RWD, label: labelForDrivetrain(Drivetrain.RWD) },
+                  { value: Drivetrain.AWD, label: labelForDrivetrain(Drivetrain.AWD) }
+                ]}
+                onValueChanged={(option) => {
+                  viewModel.setDrivetrain(option.value)
+                }} />
+              <LabelText style={{ textAlign: 'center' }}>
+                Drivetrain
+              </LabelText>
+            </View>
+          </CardContainer>
         </Row>
         <Row >
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.frontCornerWeight.toFixed(2)}
+            title={viewModel.weights.frontCorner.toFixed(2)}
             body={'LF Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.frontWeight.toFixed(2)}
+            title={viewModel.weights.frontAxle.toFixed(2)}
             body={'Front Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.frontCornerWeight.toFixed(2)}
+            title={viewModel.weights.frontCorner.toFixed(2)}
             body={'RF Weight'} />
         </Row>
         <Row>
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.rearCornerWeight.toFixed(2)}
+            title={viewModel.weights.rearCorner.toFixed(2)}
             body={'LR Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.rearWeight.toFixed(2)}
+            title={viewModel.weights.rearAxle.toFixed(2)}
             body={'Rear Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.rearCornerWeight.toFixed(2)}
+            title={viewModel.weights.rearCorner.toFixed(2)}
             body={'RR Weight'} />
         </Row>
         <Row>

@@ -82,6 +82,9 @@ export function NetworkWatcher(props: INetworkState) {
       if (netInfoSub) {
         netInfoSub();
       }
+      if(animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
     }
   }, []);
 

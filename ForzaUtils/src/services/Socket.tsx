@@ -1,4 +1,4 @@
-import { ForzaTelemetryApi, getRandomTelemetryData, ITelemetryData } from "ForzaTelemetryApi";
+import { ForzaTelemetryApi, getRandomTelemetryData, ITelemetryData, packetToBuffer } from "ForzaTelemetryApi";
 import React, { useContext } from "react";
 import UdpSockets from "react-native-udp";
 import UdpSocket from "react-native-udp/lib/types/UdpSocket";
@@ -8,7 +8,7 @@ import { Upd_rinfo } from "../constants/types";
 export interface ISocketCallback {
   onError(error: Error): void;
   onClose(ev: Error | unknown): void;
-  onPacket(packet: ITelemetryData): void;
+  onPacket(packet: ITelemetryData, bytes: Buffer): void;
 }
 
 export interface ISocket {
@@ -86,7 +86,7 @@ export class Socket implements ISocket {
   DEBUG(): void {
     this.debugInterval = setInterval(() => {
       const randomPacket = getRandomTelemetryData();
-      this.callbacks?.onPacket(randomPacket);
+      this.callbacks?.onPacket(randomPacket, packetToBuffer(randomPacket));
     }, 100);
   }
   STOP_DEBUG(): void {
@@ -113,7 +113,8 @@ export class Socket implements ISocket {
   private dataHandler(data: Buffer, rinfo: Upd_rinfo) {
     const forzaPacket = ForzaTelemetryApi.parseData(rinfo.size, data);
     this.callbacks?.onPacket(
-      forzaPacket
+      forzaPacket,
+      data
     )
   }
 }

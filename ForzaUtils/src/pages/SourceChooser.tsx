@@ -12,7 +12,6 @@ import { getTheme } from "../redux/ThemeStore";
 import { ReplayContext, useReplay } from "../context/Replay";
 import { useLogger } from "../context/Logger";
 import { ISessionInfo } from "../services/Database/DatabaseInterfaces";
-import { Dirs, FileSystem } from 'react-native-file-access';
 
 export interface SourceChooserProps {
   // None

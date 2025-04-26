@@ -11,6 +11,7 @@ export interface IDropdownOption {
 }
 
 export interface DropdownProps {
+  value: IDropdownOption['value'];
   options: IDropdownOption[];
   onValueChanged(option: IDropdownOption): void;
 }
@@ -18,7 +19,7 @@ export interface DropdownProps {
 export function Dropdown(props: DropdownProps) {
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
-  const [value, setValue] = useState(props.options[0].value);
+  const [value, setValue] = useState(props.value);
 
   return (
     <Picker
