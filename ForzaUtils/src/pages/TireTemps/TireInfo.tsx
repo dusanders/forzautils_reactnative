@@ -1,9 +1,11 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Card } from "../../components/Card";
-import { useTheme } from "../../hooks/useTheme";
+import { TextCard } from "../../components/TextCard";
 import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
+import { useSelector } from "react-redux";
+import { getTheme } from "../../redux/ThemeStore";
+import { CardContainer } from "../../components/CardContainer";
 
 export interface TireInfoProps {
   temp: number;
@@ -11,7 +13,7 @@ export interface TireInfoProps {
 }
 
 export function TireInfo(props: TireInfoProps) {
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   const style = themeStyles(theme);
 
   const colorForTemp = (temp: number) => {
@@ -27,8 +29,11 @@ export function TireInfo(props: TireInfoProps) {
   const TempView = () => {
     return (
       <View style={{
-        height: '50%',
-        width: '40%',
+        height: '75%',
+        maxHeight: 200,
+        width: "50%",
+        minWidth: 20,
+        maxWidth: 175,
         backgroundColor: colorForTemp(props.temp),
         marginBottom: 12,
         marginTop: 12,
@@ -37,12 +42,14 @@ export function TireInfo(props: TireInfoProps) {
     )
   }
   const DataCard = (props: { children: any }) => (
-    <Card style={[
-      style.halfWidth,
-      style.centerContent
-    ]}>
+    <CardContainer 
+    centerContent
+    style={{
+      ...style.halfWidth,
+      ...style.centerContent
+    }}>
       {props.children}
-    </Card>
+    </CardContainer>
   )
   return (
     <DataCard>

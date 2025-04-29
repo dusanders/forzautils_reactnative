@@ -4,7 +4,8 @@ import { ProgressChart } from "react-native-chart-kit";
 import { ThemeText } from "../../components/ThemeText";
 import { Row } from "../../components/Row";
 import { GlobalStyles, IThemeElements } from "../../constants/Themes";
-import { useTheme } from "../../hooks/useTheme";
+import { useSelector } from "react-redux";
+import { getTheme } from "../../redux/ThemeStore";
 
 export interface BrakeThrottleChartProps {
   throttle: number;
@@ -40,7 +41,7 @@ function LabeledDot(props: LabeledDotProps) {
   )
 }
 export const BrakeThrottleChart = memo((props: BrakeThrottleChartProps) => {
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
   return (
     <View style={[GlobalStyles.centerContent]}>

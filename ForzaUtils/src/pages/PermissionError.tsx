@@ -2,9 +2,10 @@ import React from "react";
 import { Container } from "../components/Container";
 import { View } from "react-native";
 import { ThemeText } from "../components/ThemeText";
-import { useTheme } from "../hooks/useTheme";
 import { Paper } from "../components/Paper";
 import { ThemeButton } from "../components/ThemeButton";
+import { getTheme } from "../redux/ThemeStore";
+import { useSelector } from "react-redux";
 
 
 export interface PermissionErrorProps {
@@ -13,7 +14,7 @@ export interface PermissionErrorProps {
 }
 
 export function PermissionError(props: PermissionErrorProps) {
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   return (
     <Container fill="parent"
       flex="column"

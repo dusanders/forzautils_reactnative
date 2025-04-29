@@ -1,14 +1,16 @@
-import React, { useState } from "react";
-import { Button, ButtonProps, Pressable, PressableProps, StyleSheet } from "react-native";
+import React from "react";
+import { Pressable, PressableProps, StyleSheet } from "react-native";
 import { IThemeElements } from "../constants/Themes";
-import { useTheme } from "../hooks/useTheme";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export interface ThemeButtonProps extends PressableProps {
   children?: any;
 }
 
 export function ThemeButton(props: ThemeButtonProps) {
-  const styles = themeStyles(useTheme().theme);
+  const theme = useSelector(getTheme);
+  const styles = themeStyles(theme);
 
   return (
     <Pressable

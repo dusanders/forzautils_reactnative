@@ -1,14 +1,15 @@
 import { IconProps } from "@react-native-vector-icons/common";
 import Icon from "@react-native-vector-icons/material-icons";
 import React from "react";
-import { useTheme } from "../hooks/useTheme";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export interface ThemeIconProps<T> extends IconProps<T> {
   
 }
 
 export function ThemeIcon<T>(props: ThemeIconProps<T>) {
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   return (
     <Icon name={props.name as any}
       color={theme.colors.text.primary.onPrimary}

@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { StyleSheet } from "react-native";
-import { AppBarContainer } from "../../components/AppBarContainer";
-import { useTheme } from "../../hooks/useTheme";
+import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { IThemeElements } from "../../constants/Themes";
 import { BarChart } from "react-native-chart-kit";
 import { ChartData, Dataset } from "react-native-chart-kit/dist/HelperTypes";
@@ -10,6 +9,8 @@ import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
+import { useSelector } from "react-redux";
+import { getTheme } from "../../redux/ThemeStore";
 
 export interface SuspensionTravelProps {
   // Nothing
@@ -38,7 +39,7 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   const store = useViewModelStore();
   const viewModel = store.suspensionGraph;
   const navigation = useNavigation<StackNavigation>();
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   const dimensions = withScaledWindow(0.9, 0.3);
   const style = themeStyles(theme);
 

@@ -76,7 +76,7 @@ const defaultButton: IThemeElements['sizes']['button'] = {
   size: 75
 }
 
-export const LighColors: IThemeElements = {
+export const LightColors: IThemeElements = {
   colors: {
     text: {
       primary: {

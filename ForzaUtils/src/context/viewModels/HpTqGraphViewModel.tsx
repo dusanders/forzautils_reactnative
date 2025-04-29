@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { useForzaData } from "../../hooks/useForzaData";
+import { useContext, useEffect, useState } from "react";
 import { useLogger } from "../Logger";
 import { delay } from "../../constants/types";
-import { ForzaTelemetryApi } from "ForzaTelemetryApi";
+import { ForzaTelemetryApi, ITelemetryData } from "ForzaTelemetryApi";
+import { useSelector } from "react-redux";
+import { getForzaPacket } from "../../redux/WifiStore";
 
 export interface IHpTqGraphViewModel {
   gears: GearData[];
@@ -121,34 +122,25 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   }
   const tag = 'HpTqGraphViewModel';
   const logger = useLogger();
-  const forza = useForzaData();
+  const forza = useSelector(getForzaPacket);
   const [gears, setGears] = useState<GearData[]>([]);
 
 
   const ignorePacket = () => {
-    if (!forza.packet) {
-      logger.debug(tag, `undefined data packet`);
+    if (!forza ||
+      !forza.isRaceOn ||
+      forza.throttle < 50 ||
+      forza.gear <= 0 ||
+      forza.gear >= 11 ||
+      ForzaTelemetryApi.getHorsepower(forza.power) < 0
+    ) {
+      // Ignore packet - there is no useful information here
       return true;
     }
-    if (!forza.packet.isRaceOn) {
-      return true;
-    }
-    if (forza.packet.throttle < 50) {
-      return true;
-    }
-    if (forza.packet.gear <= 0) {
-      return true;
-    }
-    if (forza.packet.gear >= 11) {
-      return true;
-    }
-    if (forza.packet.getHorsepower() < 0) {
-      return true;
-    }
-    const existing = gears.find((ele) => ele.gear === forza.packet?.gear);
+    const existing = gears.find((ele) => ele.gear === forza?.gear);
     if (existing && existing.events?.length) {
       const last = existing.events[existing.events.length];
-      if (last && (forza.packet.rpmData.current < last.rpm)) {
+      if (last && (forza.rpmData.current < last.rpm)) {
         console.log(`skip decel`)
         return;
       }
@@ -167,7 +159,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
       copy.tq = newEvent.tq
       didUpdate = true;
     }
-    return didUpdate ? copy : newEvent;
+    return didUpdate ? copy : ev;
   }
 
   const insertEvent = (newEvent: DataEvent) => {
@@ -177,7 +169,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
         return [...prev, {
           gear: newEvent.gear,
           events: [newEvent]
-        }]
+        }];
       }
 
       const newState = prev.map((gear, index) => {
@@ -201,10 +193,10 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
     });
   }
 
-  const eventFromPacket = (packet: ForzaTelemetryApi): DataEvent => {
+  const eventFromPacket = (packet: ITelemetryData): DataEvent => {
     return {
       gear: packet.gear,
-      hp: packet.getHorsepower(),
+      hp: Math.round(ForzaTelemetryApi.getHorsepower(packet.power)),
       tq: packet.torque,
       rpm: roundToNearestRpmRange(packet.rpmData.current)
     }
@@ -212,9 +204,9 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
 
   useEffect(() => {
     if (!ignorePacket()) {
-      insertEvent(eventFromPacket(forza.packet!));
+      insertEvent(eventFromPacket(forza!));
     }
-  }, [forza.packet]);
+  }, [forza]);
 
   return {
     gears: gears,

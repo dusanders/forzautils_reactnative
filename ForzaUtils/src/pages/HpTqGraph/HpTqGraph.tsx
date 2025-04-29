@@ -1,10 +1,9 @@
 import React, {  } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
-import { useTheme } from "../../hooks/useTheme";
 import { IThemeElements } from "../../constants/Themes";
 import { Assets } from "../../assets";
 import { Paper } from "../../components/Paper";
-import { AppBarContainer } from "../../components/AppBarContainer";
+import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { ThemeText } from "../../components/ThemeText";
 import { randomKey } from "../../constants/types";
 import { HpTqCurves } from "./HpTqCurves";
@@ -12,6 +11,8 @@ import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
+import { useSelector } from "react-redux";
+import { getTheme } from "../../redux/ThemeStore";
 
 export interface HpTqGraphProps {
   // Nothing
@@ -19,9 +20,9 @@ export interface HpTqGraphProps {
 
 export function HptqGraph(props: HpTqGraphProps) {
   const navigation = useNavigation<StackNavigation>();
-  const theme = useTheme();
-  const styles = themeStyles(theme.theme);
-  const store = useViewModelStore();
+  const theme = useSelector(getTheme);
+  const styles = themeStyles(theme);
+  const store = useViewModelStore().hpTqGraph;
   const windowMeasure = withScaledWindow(0.9, 1);
 
   const separator = () => {
@@ -41,7 +42,7 @@ export function HptqGraph(props: HpTqGraphProps) {
         {
           id: randomKey(),
           onPress: () => {
-            store.hpTqGraph.clearCache();
+            store.clearCache();
           },
           renderItem: () => (
             <ThemeText
@@ -54,7 +55,7 @@ export function HptqGraph(props: HpTqGraphProps) {
       ]}>
       <View
         style={styles.contentWrapper}>
-        {store.hpTqGraph.gears.length < 1 && (
+        {store.gears.length < 1 && (
           <Paper style={styles.waitPaper}>
             <ThemeText
               fontFamily="bold"
@@ -69,14 +70,14 @@ export function HptqGraph(props: HpTqGraphProps) {
             <ActivityIndicator />
           </Paper>
         )}
-        {store.hpTqGraph.gears.length > 0 && (
+        {store.gears.length > 0 && (
 
           <FlatList
             ItemSeparatorComponent={separator}
             style={{
               flexGrow: 1
             }}
-            data={store.hpTqGraph.gears}
+            data={store.gears}
             keyExtractor={(item) => `${item.gear}`}
             // renderItem={renderItem}
             renderItem={(item) => {

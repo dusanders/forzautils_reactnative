@@ -1,7 +1,8 @@
 import React from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
 import { BackgroundVariantType, IThemeElements } from "../constants/Themes";
-import { useTheme } from "../hooks/useTheme";
+import { useSelector } from "react-redux";
+import { getTheme } from "../redux/ThemeStore";
 
 export type ContainerFlex = 'row' | 'column';
 export type ContainerFill = 'parent' | 'width' | 'height';
@@ -13,8 +14,8 @@ export interface ContainerProps extends ViewProps {
 }
 
 export function Container(props: ContainerProps) {
-  const theme = useTheme();
-  const styles = themeStyles(theme.theme);
+  const theme = useSelector(getTheme);
+  const styles = themeStyles(theme);
   let baseStyle = styles.rootPrimary;
   switch(props.variant) {
     case 'secondary': 

@@ -1,21 +1,22 @@
 import React, { useMemo } from "react";
-import { AppBarContainer } from "../../components/AppBarContainer";
+import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
-import { useTheme } from "../../hooks/useTheme";
 import { BrakeThrottleChart, BrakeThrottleChartProps } from "./BrakeThrottleChart";
 import { SteeringChart } from "./SteeringChart";
 import { TireSlip } from "./TireSlip";
 import { ScrollView } from "react-native";
 import { TireData } from "ForzaTelemetryApi";
+import { useSelector } from "react-redux";
+import { getTheme } from "../../redux/ThemeStore";
 
 export interface GripProps {
   // Nothing
 }
 
 export function Grip(props: GripProps) {
-  const theme = useTheme().theme;
+  const theme = useSelector(getTheme);
   const navigation = useNavigation<StackNavigation>();
   const viewModel = useViewModelStore().grip;
   const brakeThrottle = useMemo<BrakeThrottleChartProps>(() => {
