@@ -60,9 +60,9 @@ export function useTuningViewModel(): ITuningViewModel {
     springRate: 0,
     ARB: 0
   }
-  const hzLowHeight = 2.8;
-  const hzBase = 2.2;
-  const hzHighHeight = 1.8;
+  const hzLowHeight = 3.2;
+  const hzBase = 2.8;
+  const hzHighHeight = 2;
   const baseARB = 20;
   const minARB = 1;
   const maxARB = 40;
@@ -71,7 +71,7 @@ export function useTuningViewModel(): ITuningViewModel {
   const maxDamper = 14;
   const rollCageBump = 0.95;
   const rollCageRebound = 1.05;
-  const rollCageARB = 0.75;
+  const rollCageARB = 0.90;
   const [totalWeight, setTotalWeight] = useState(3000);
   const [frontDist, setFrontDist] = useState(53);
   const [rearDist, setRearDist] = useState(47);
@@ -96,7 +96,8 @@ export function useTuningViewModel(): ITuningViewModel {
   const calculateFreqHz = (height: number) => {
     if (height <= 2) return hzLowHeight;
     if (height >= 6) return hzHighHeight;
-    const freq = hzLowHeight - 0.2 * (height - 2);
+    const rideHeightAdjust = (height - 2) * 0.1;
+    const freq = hzBase - rideHeightAdjust;
     return freq;
   }
   const calculateSpring = (axleWeight: number, height: number) => {
@@ -114,8 +115,10 @@ export function useTuningViewModel(): ITuningViewModel {
     const totalSpring = springs.front + springs.rear;
     const frontSpringRatio = springs.front / totalSpring;
     const rearSpringRatio = springs.rear / totalSpring;
-    frontARB = arbBase * frontSpringRatio * ((weightDist.front / 100) / 0.5);
-    rearARB = arbBase * rearSpringRatio * ((weightDist.rear / 100) / 0.5);
+    const frontWeightScalar = (weightDist.front / 100) / 0.5;
+    const rearWeightScalar = (weightDist.rear / 100) / 0.5;
+    frontARB = arbBase * frontSpringRatio * 2 * frontWeightScalar;
+    rearARB = arbBase * rearSpringRatio * 2 * rearWeightScalar;
     return {
       front: Number(frontARB.toFixed(2)),
       rear: Number(rearARB.toFixed(2))
@@ -231,6 +234,10 @@ export function useTuningViewModel(): ITuningViewModel {
     }
     front.ARB = Math.max(minARB, Math.min(maxARB, front.ARB));
     rear.ARB = Math.max(minARB, Math.min(maxARB, rear.ARB));
+    front.bound = Math.min(maxDamper, front.bound);
+    front.rebound = Math.min(maxDamper, front.rebound);
+    rear.bound = Math.min(maxDamper, rear.bound);
+    rear.rebound = Math.min(maxDamper, rear.rebound);
     return {
       front: front,
       rear: rear
