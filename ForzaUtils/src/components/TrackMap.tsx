@@ -12,12 +12,19 @@ export interface TrackMapProps {
 }
 
 export function TrackMap(props: TrackMapProps) {
+  const isValidNumber = (value: number) => {
+    return typeof value === 'number' && !isNaN(value) && isFinite(value);
+  }
   const theme = useSelector(getTheme);
   const viewModel = useViewModelStore().map;
-  const minSvgX = viewModel.viewBox.minX;
-  const minSvgY = viewModel.viewBox.minY;
+  const minSvgX = isValidNumber(viewModel.viewBox.minX)
+    ? viewModel.viewBox.minX
+    : 0;
+  const minSvgY = isValidNumber(viewModel.viewBox.minY)
+    ? viewModel.viewBox.minY
+    : 0;
   const totalSvgHeight = Math.abs(viewModel.viewBox.minY) + Math.abs(viewModel.viewBox.maxY);
-  const totalSvgWidth = Math.abs(viewModel.viewBox.minX) + Math.abs(viewModel.viewBox.maxX) * 1.3;
+  const totalSvgWidth = Math.abs(viewModel.viewBox.minX) + Math.abs(viewModel.viewBox.maxX) * 1.0;
   return (
     <Paper style={props.style}>
       <View>

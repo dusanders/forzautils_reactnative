@@ -60,6 +60,9 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
       return data.data.map((value, index) => {
         const xMove = (index + 1) * deltaX;
         const yMove = height - ((value - yLimits.minY) / deltaY) * height; // Map minY to the top and maxY to the bottom
+        if(!isValidNumber(yMove) || !isValidNumber(xMove)) {
+          return '';
+        }
         if (index === 0) {
           return `M${24},${yMove}`;
         }

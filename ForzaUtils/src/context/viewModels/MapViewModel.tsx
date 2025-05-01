@@ -52,6 +52,10 @@ export function useMapViewModel(): IMapViewModel {
   const [viewBox, setViewBox] = useState<SvgViewBoxMeasures>(initialViewBox);
   const [position, setPosition] = useState<PlayerPosition | undefined>(undefined);
 
+  const isValidNumber = (value: number) => {
+    return typeof value === 'number' && !isNaN(value) && isFinite(value);
+  }
+
   useEffect(() => {
     let newMinY = Math.min(viewBox.minY, (position?.y || -1));
     let newMinX = Math.min(viewBox.minX, (position?.x || -1));
@@ -84,6 +88,9 @@ export function useMapViewModel(): IMapViewModel {
     const playerPosition: PlayerPosition = {
       x: formatted.x,
       y: formatted.z
+    }
+    if (!isValidNumber(playerPosition.x) || !isValidNumber(playerPosition.y)) {
+      return;
     }
     let path = svg
     if (!path.length) {
