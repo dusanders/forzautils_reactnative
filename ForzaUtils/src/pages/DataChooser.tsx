@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { AppRoutes, randomKey, StackNavigation } from "../constants/types";
 import { IThemeElements } from "../constants/Themes";
@@ -10,6 +10,8 @@ import { useSelector } from "react-redux";
 import { getTheme } from "../redux/ThemeStore";
 import { AvgSuspensionTravel } from "../components/Graphs/AvgSuspensionTravel";
 import { AvgTireTemps } from "../components/Graphs/AvgTireTemp";
+import { Socket } from "../services/Socket";
+import { useLogger } from "../context/Logger";
 
 export interface DataChooserProps {
 
@@ -52,7 +54,17 @@ const options: DataOption[] = [
 export function DataChooser(props: DataChooserProps) {
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
+  const logger = useLogger();
   const navigation = useNavigation<StackNavigation>();
+  
+  const dataElements = [
+    (<AvgSuspensionTravel />),
+    (<AvgTireTemps />)
+  ]
+
+  useEffect(() => {
+    Socket.getInstance(logger).DEBUG()
+  }, []);
 
   return (
     <AppBarContainer
@@ -64,13 +76,17 @@ export function DataChooser(props: DataChooserProps) {
         height: '100%',
         alignItems: 'center'
       }}>
-        <TrackMap 
-        style={{
-          marginBottom: 20,
-          width: '95%'
-        }}/>
-        <AvgSuspensionTravel />
-        <AvgTireTemps />
+        <TrackMap
+          style={{
+            marginBottom: 20,
+            width: '95%'
+          }} />
+        {/* <AvgSuspensionTravel />
+        <AvgTireTemps /> */}
+        <FlatList
+          style={styles.listRoot}
+          data={dataElements}
+          renderItem={(item) => item.item} />
         <FlatList
           style={styles.listRoot}
           data={options}
