@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Paper } from "../Paper";
-import { CardContainer } from "../CardContainer";
 import { StyleSheet, View } from "react-native";
 import { useSelector } from "react-redux";
 import { IThemeElements } from "../../constants/Themes";
@@ -35,8 +34,8 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   const styles = themeStyles(theme);
   const [paths, setPaths] = useState<string[]>([]);
   const [yLimits, setYLimits] = useState<YValueLimits>({
-    minY: -1,
-    maxY: 1
+    minY: Number.MAX_SAFE_INTEGER,
+    maxY: Number.MIN_SAFE_INTEGER
   });
 
   const isValidNumber = (value: number) => {
@@ -60,9 +59,10 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
       return data.data.map((value, index) => {
         const xMove = (index + 1) * deltaX;
         const yMove = height - ((value - yLimits.minY) / deltaY) * height; // Map minY to the top and maxY to the bottom
-        if(!isValidNumber(yMove) || !isValidNumber(xMove)) {
+        if (!isValidNumber(yMove) || !isValidNumber(xMove)) {
           return '';
         }
+
         if (index === 0) {
           return `M${24},${yMove}`;
         }
@@ -76,9 +76,6 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     if (!props.data.length || viewBox.height == 0 || viewBox.width === 0) {
       return;
     }
-    if (yLimits.minY === 0 || yLimits.maxY === 0) {
-      return;
-    }
     reRenderData();
   }, [yLimits, viewBox]);
 
@@ -86,9 +83,13 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     if (!props.data.length || viewBox.height == 0 || viewBox.width === 0) {
       return;
     }
-    const minY = (Math.min(...props.data.map((point) => Math.min(...point.data))));
-    const maxY = (Math.max(...props.data.map((point) => Math.max(...point.data))));
-    if(!isValidNumber(minY) || !isValidNumber(maxY)) {
+    const minY = Math.min(
+      ...props.data.map((graph) => Math.min(...graph.data)),
+      yLimits.minY);
+    const maxY = Math.max(
+      ...props.data.map((graph) => Math.max(...graph.data)),
+      yLimits.maxY);
+    if (!isValidNumber(minY) || !isValidNumber(maxY)) {
       return;
     }
     if (minY !== yLimits.minY || maxY !== yLimits.maxY) {
@@ -107,7 +108,7 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     const minY = -4;
     const width = renderedLayout.width;
     const height = renderedLayout.height - 12;
-    if(!isValidNumber(width) || !isValidNumber(height)) {
+    if (!isValidNumber(width) || !isValidNumber(height)) {
       return;
     }
     setViewBox({
