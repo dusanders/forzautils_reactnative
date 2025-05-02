@@ -40,7 +40,7 @@ export function AvgTireTemps(props: AvgTireTempProps) {
 function themeStyles(theme: any) {
   return StyleSheet.create({
     card: {
-      height: '20%',
+      height: 180,
       width: '100%',
       padding: 0,
       paddingTop: 24,
