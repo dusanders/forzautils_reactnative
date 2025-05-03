@@ -21,7 +21,7 @@ export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
       style={styles.card}>
       <BaseLineGraph
         title={'Suspension Travel'}
-        dataLength={20}
+        dataLength={viewModel.windowSize}
         data={[
           {
             data: viewModel.avgTravel.map((point) => point.front),

@@ -99,7 +99,7 @@ const debugData = [
 ]
 export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
-  const windowSize = 20;
+  const windowSize = 50;
   const forza = useSelector(getForzaPacket);
   const avgTravelWindow = useDataWindow<AvgTravel>(windowSize);
 

@@ -41,7 +41,7 @@ const debugData: AverageTempData[] = [
 ]
 export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
-  const windowSize = 20;
+  const windowSize = 50;
   const forza = useSelector(getForzaPacket);
   const avgTempWindow = useDataWindow<AverageTempData>(windowSize);
 
