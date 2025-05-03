@@ -2,6 +2,7 @@ import { DirectionalData } from "ForzaTelemetryApi";
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getForzaPacket } from "../../redux/WifiStore";
+import { useLogger } from "../Logger";
 
 export interface PlayerPosition {
   x: number;
@@ -46,6 +47,8 @@ const initialViewBox: SvgViewBoxMeasures = {
 }
 
 export function useMapViewModel(): IMapViewModel {
+  const tag = 'MapViewModel';
+  const logger = useLogger();
   const forza = useSelector(getForzaPacket);
   const [trackId, setTrackId] = useState(0);
   const [svg, setSvg] = useState('');
@@ -76,7 +79,7 @@ export function useMapViewModel(): IMapViewModel {
     }
     if (trackId && forza?.trackId) {
       if (forza.trackId !== trackId) {
-        console.log(`clean map`);
+        logger.log(tag, `clean map`);
         setSvg('');
         setViewBox(initialViewBox);
         setPosition(undefined);
@@ -94,9 +97,11 @@ export function useMapViewModel(): IMapViewModel {
     }
     let path = svg
     if (!path.length) {
-      path = `M${playerPosition.x},${playerPosition.y}`;
+      path = `M${playerPosition.x.toFixed(1)},${playerPosition.y.toFixed(1)}`;
+    } else if (path.length < 1024) {
+      path += `L${playerPosition.x.toFixed(1)},${playerPosition.y.toFixed(1)}`;
     } else {
-      path += `L${playerPosition.x},${playerPosition.y}`;
+      logger.log(tag, `SVG path hit limit`);
     }
     setSvg(path);
     setPosition(playerPosition);
