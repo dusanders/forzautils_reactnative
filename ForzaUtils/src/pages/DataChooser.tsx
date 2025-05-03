@@ -19,40 +19,6 @@ export interface DataChooserProps {
 
 }
 
-interface DataOption {
-  id: string;
-  route: AppRoutes;
-  name: string;
-  description: string;
-}
-
-const options: DataOption[] = [
-  {
-    id: randomKey(),
-    route: AppRoutes.HP_TQ_GRAPH,
-    name: 'HP / TQ Graph',
-    description: 'Graph horsepower and torque'
-  },
-  {
-    id: randomKey(),
-    route: AppRoutes.SUSPENSION_GRAPH,
-    name: 'Suspension Travel',
-    description: 'Graph suspension travel'
-  },
-  {
-    id: randomKey(),
-    route: AppRoutes.TIRE_TEMPS,
-    name: 'Tire Temps',
-    description: 'Graph tire temps'
-  },
-  {
-    id: randomKey(),
-    route: AppRoutes.GRIP,
-    name: 'Grip',
-    description: 'Compare tire slip, steering angle, throttle, and brake'
-  }
-]
-
 export function DataChooser(props: DataChooserProps) {
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
@@ -62,7 +28,79 @@ export function DataChooser(props: DataChooserProps) {
 
   const dataElements = [
     (<AvgSuspensionTravel />),
-    (<AvgTireTemps />)
+    (<AvgTireTemps />),
+    (
+      <View style={{ display: 'flex', flexDirection: 'row' }}>
+        <TextCard
+          allcapsTitle
+          centerContent
+          title={'HP / TQ Graph'}
+          body={'Graph Horsepower and Torque'}
+          titleStyle={{
+            fontSize: theme.sizes.font.medium,
+            textAlign: 'center'
+          }}
+          bodyStyle={{
+            textAlign: 'center',
+            fontSize: theme.sizes.font.small
+          }}
+          onPress={(id) => {
+            navigation.navigate(AppRoutes.HP_TQ_GRAPH)
+          }} />
+        <TextCard
+          allcapsTitle
+          centerContent
+          title={'Suspension Travel'}
+          body={'Visually display suspension travel'}
+          titleStyle={{
+            fontSize: theme.sizes.font.medium,
+            textAlign: 'center'
+          }}
+          bodyStyle={{
+            textAlign: 'center',
+            fontSize: theme.sizes.font.small
+          }}
+          onPress={(id) => {
+            navigation.navigate(AppRoutes.SUSPENSION_GRAPH)
+          }} />
+      </View>
+    ),
+    (
+      <View style={{ display: 'flex', flexDirection: 'row' }}>
+        <TextCard
+          allcapsTitle
+          centerContent
+          title={'Tire Temps'}
+          body={'Display tire temperature information'}
+          titleStyle={{
+            fontSize: theme.sizes.font.medium,
+            textAlign: 'center'
+          }}
+          bodyStyle={{
+            textAlign: 'center',
+            fontSize: theme.sizes.font.small
+          }}
+          onPress={(id) => {
+            navigation.navigate(AppRoutes.TIRE_TEMPS)
+          }} />
+        <TextCard
+          allcapsTitle
+          centerContent
+          title={'Grip'}
+          body={'Compare tire slip, steering angle, throttle, and brake'}
+          titleStyle={{
+            fontSize: theme.sizes.font.medium,
+            textAlign: 'center'
+          }}
+          bodyStyle={{
+            textAlign: 'center',
+            fontSize: theme.sizes.font.small
+          }}
+          onPress={(id) => {
+            navigation.navigate(AppRoutes.GRIP)
+          }} />
+      </View>
+    )
   ]
 
   useEffect(() => {
@@ -106,42 +144,10 @@ export function DataChooser(props: DataChooserProps) {
             marginBottom: 20,
             width: '95%'
           }} />
-        {/* <AvgSuspensionTravel />
-        <AvgTireTemps /> */}
         <FlatList
           style={styles.listRoot}
           data={dataElements}
           renderItem={(item) => item.item} />
-        <FlatList
-          style={styles.listRoot}
-          data={options}
-          numColumns={2}
-          renderItem={(info) => {
-            return (
-              <TextCard
-                id={info.item.id}
-                key={info.item.id}
-                allcapsTitle
-                centerContent
-                title={info.item.name}
-                body={info.item.description}
-                titleStyle={{
-                  fontSize: theme.sizes.font.medium,
-                  textAlign: 'center'
-                }}
-                bodyStyle={{
-                  textAlign: 'center',
-                  fontSize: theme.sizes.font.small
-                }}
-                onPress={(id) => {
-                  for (const i of options) {
-                    if (i.id === id) {
-                      navigation.navigate(i.route);
-                    }
-                  }
-                }} />
-            )
-          }} />
       </View>
     </AppBarContainer>
   )
