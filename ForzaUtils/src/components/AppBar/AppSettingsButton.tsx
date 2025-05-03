@@ -25,15 +25,13 @@ export function AppSettingsButton(props: AppSettingsButtonProps) {
     <Pressable
       testID={props.testID}
       style={{
-        backgroundColor: theme.colors.background.primary,
-        borderRadius: theme.sizes.borderRadius,
-        margin: 4,
-        marginTop: 8,
-        padding: 6,
-        justifyContent: 'center',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        elevation: 12,
-        zIndex: 12
+        paddingTop: 12,
+        paddingBottom: 12
       }}
       onPress={handleClick}
     >

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { AppRoutes, randomKey, StackNavigation } from "../constants/types";
 import { IThemeElements } from "../constants/Themes";
@@ -12,6 +12,8 @@ import { AvgSuspensionTravel } from "../components/Graphs/AvgSuspensionTravel";
 import { AvgTireTemps } from "../components/Graphs/AvgTireTemp";
 import { Socket } from "../services/Socket";
 import { useLogger } from "../context/Logger";
+import { ThemeText } from "../components/ThemeText";
+import { ThemeSwitch } from "../components/ThemeSwitch";
 
 export interface DataChooserProps {
 
@@ -56,7 +58,8 @@ export function DataChooser(props: DataChooserProps) {
   const styles = themeStyles(theme);
   const logger = useLogger();
   const navigation = useNavigation<StackNavigation>();
-  
+  const [isRecording, setIsRecording] = useState(false);
+
   const dataElements = [
     (<AvgSuspensionTravel />),
     (<AvgTireTemps />)
@@ -71,7 +74,29 @@ export function DataChooser(props: DataChooserProps) {
       title="Data Chooser"
       onBack={() => {
         navigation.goBack();
-      }}>
+      }}
+      injectElements={[
+        {
+          id: 'record-button',
+          onPress: () => {
+
+          },
+          renderItem: () => (
+            <>
+              <ThemeText
+                variant={'primary'}
+                onBackground={'onSecondary'}>
+                Record
+              </ThemeText>
+              <ThemeSwitch
+                value={isRecording}
+                onChange={(ev) => {
+                  setIsRecording(!isRecording)
+                }} />
+            </>
+          )
+        }
+      ]}>
       <View style={{
         height: '100%',
         alignItems: 'center'
