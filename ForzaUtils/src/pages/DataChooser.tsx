@@ -96,9 +96,6 @@ export function DataChooser(props: DataChooserProps) {
               <TextCard
                 id={info.item.id}
                 key={info.item.id}
-                style={{
-                  width: '50%',
-                }}
                 allcapsTitle
                 centerContent
                 title={info.item.name}

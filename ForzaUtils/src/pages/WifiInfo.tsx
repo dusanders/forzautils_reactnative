@@ -64,18 +64,12 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
           </View>
           <Row>
             <TextCard
-              style={{
-                width: '50%'
-              }}
               allcapsLabel
               allcapsTitle
               centerContent
               title={wifiInfo.ip || '-'}
               body="IP Address" />
             <TextCard
-              style={{
-                width: '50%'
-              }}
               allcapsLabel
               allcapsTitle
               centerContent
@@ -84,18 +78,12 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
           </Row>
           <Row>
             <TextCard
-              style={{
-                width: '50%'
-              }}
               allcapsLabel
               allcapsTitle
               centerContent
               title={wifiInfo.isUdpListening ? 'Listening' : 'Error'}
               body="Forza Data" />
             <TextCard
-              style={{
-                width: '50%'
-              }}
               allcapsLabel
               allcapsTitle
               centerContent

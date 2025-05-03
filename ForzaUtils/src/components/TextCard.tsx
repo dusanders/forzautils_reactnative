@@ -23,7 +23,11 @@ export function TextCard(props: CardProps) {
     alignItems: 'center'
   }
   return (
-    <CardContainer style={props.style}
+    <CardContainer 
+      style={{
+        width: '50%',
+        ...props.style
+      }}
       centerContent={props.centerContent}>
       <TouchableOpacity
         disabled={!Boolean(props.onPress)}
