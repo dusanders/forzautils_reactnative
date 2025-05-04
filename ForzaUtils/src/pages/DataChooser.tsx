@@ -14,6 +14,9 @@ import { Socket } from "../services/Socket";
 import { useLogger } from "../context/Logger";
 import { ThemeText } from "../components/ThemeText";
 import { ThemeSwitch } from "../components/ThemeSwitch";
+import { useReplay } from "../context/Replay";
+import { getForzaPacket } from "../redux/WifiStore";
+import { useNetworkContext } from "../context/Network";
 
 export interface DataChooserProps {
 
@@ -22,8 +25,11 @@ export interface DataChooserProps {
 export function DataChooser(props: DataChooserProps) {
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
+  const packet = useSelector(getForzaPacket);
+  const network = useNetworkContext();
   const logger = useLogger();
   const navigation = useNavigation<StackNavigation>();
+  const replay = useReplay();
   const [isRecording, setIsRecording] = useState(false);
 
   const dataElements = [
@@ -103,9 +109,28 @@ export function DataChooser(props: DataChooserProps) {
     )
   ]
 
+  const setRecording = async () => {
+    if (!isRecording) {
+      const file = await replay.getOrCreate();
+      replay.setSession(file);
+      setIsRecording(true);
+    } else {
+      replay.closeSession();
+      setIsRecording(false);
+    }
+  }
+
   useEffect(() => {
-    Socket.getInstance(logger).DEBUG()
-  }, []);
+    if (!network.replay) {
+      Socket.getInstance(logger).DEBUG();
+    }
+  }, [network.replay]);
+
+  useEffect(() => {
+    if (packet && isRecording) {
+      replay.submitPacket(packet);
+    }
+  }, [packet]);
 
   return (
     <AppBarContainer
@@ -129,7 +154,7 @@ export function DataChooser(props: DataChooserProps) {
               <ThemeSwitch
                 value={isRecording}
                 onChange={(ev) => {
-                  setIsRecording(!isRecording)
+                  setRecording();
                 }} />
             </>
           )

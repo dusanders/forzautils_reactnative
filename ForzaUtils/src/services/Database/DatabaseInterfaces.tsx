@@ -19,7 +19,7 @@ export interface ISessionInfo {
 
 export interface ISession {
   info: ISessionInfo;
-  addPacket(buffer: Buffer): Promise<void>;
+  addPacket(packet: ITelemetryData): Promise<void>;
   readPacket(offset?: number): Promise<ITelemetryData | null>;
   close(): void;
 }

@@ -35,6 +35,7 @@ export type RootStackParamList = {
   [AppRoutes.GRIP]: undefined;
   [AppRoutes.SOURCE_CHOOSER]: undefined;
   [AppRoutes.TUNING_CALCULATOR]: undefined;
+  [AppRoutes.REPLAY_LIST]: undefined;
 }
 
 /**
@@ -60,6 +61,7 @@ export enum AppRoutes {
   GRIP = 'grip',
   SOURCE_CHOOSER = 'source_chooser',
   TUNING_CALCULATOR = 'tuning_calculator',
+  REPLAY_LIST = 'replay_list'
 }
 
 /**

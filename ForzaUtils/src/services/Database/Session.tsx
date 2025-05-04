@@ -1,12 +1,11 @@
-import { DB, open as SqliteOpen } from '@op-engineering/op-sqlite';
+import { DB, QueryResult, open as SqliteOpen } from '@op-engineering/op-sqlite';
 import { ITelemetryData, ForzaTelemetryApi } from "ForzaTelemetryApi";
 import { ISession, ISessionInfo, SESSION_DB_NAME_PREFIX, DB_FILE_EXT, MASTER_DB_NAME } from "./DatabaseInterfaces";
 import { ILogger, Logger, useLogger } from '../../context/Logger';
 
 interface IPacketData {
   id: number;
-  buffLength: number;
-  data: Buffer;
+  json: string;
 }
 
 export class Session implements ISession {
@@ -34,23 +33,23 @@ export class Session implements ISession {
       `SELECT * FROM packets WHERE id = ?`,
       [this.readCounter++]
     );
-    const casted = found as IPacketData[];
-    if (casted.length > 0) {
-      const packetData = casted[0];
-      return ForzaTelemetryApi.parseData(packetData.buffLength, packetData.data);
+    const casted = (found!.rows[0] as any) as IPacketData;
+    if (casted.json.length > 0) {
+      return JSON.parse(casted.json);
     }
     return null;
   }
-  async addPacket(buffer: Buffer): Promise<void> {
+  async addPacket(packet: ITelemetryData): Promise<void> {
     if (!this.db) {
       throw new Error(`Failed to add packet - session not initialized`);
     }
     this.executeQuery(
-      `INSERT INTO packets (id, buffer) VALUES (?,?)`,
-      [this.info.length++, buffer]
+      `INSERT INTO packets (id, json) VALUES (?,?)`,
+      [this.info.length++, JSON.stringify(packet)]
     );
   }
   close(): void {
+    this.logger.log(this.tag, `closing @ ${this.info.length} - ${this.info.endTime} with master: ${Boolean(this.masterDb)}`);
     this.info.endTime = Date.now();
     this.masterDb?.executeRaw(
       `UPDATE sessions SET length = ?, endTime = ? WHERE name = ?`,
@@ -67,10 +66,10 @@ export class Session implements ISession {
       name: MASTER_DB_NAME
     });
     this.logger.log(this.tag, `${this.db.getDbPath()}`);
-    this.executeQuery(`CREATE TABLE IF NOT EXISTS packets (id INT PRIMARY KEY, buffer BLOB)`);
+    this.executeQuery(`CREATE TABLE IF NOT EXISTS packets (id INT PRIMARY KEY, json VARCHAR)`);
     return this;
   }
-  private async executeQuery(query: string, params: any[] = []): Promise<any> {
+  private async executeQuery(query: string, params: any[] = []): Promise<QueryResult|undefined> {
     try {
       return await this.db?.execute(query, params);
     } catch (error) {

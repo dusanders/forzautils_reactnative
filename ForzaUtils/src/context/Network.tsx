@@ -1,18 +1,30 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLogger } from './Logger';
 import { addEventListener, NetInfoState, NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
 import { getWifiState, useSetPacket, useSetWifiState } from '../redux/WifiStore';
 import { Splash } from '../pages/Splash';
-import { LISTEN_PORT } from '../constants/types';
+import { delay, LISTEN_PORT } from '../constants/types';
 import { ITelemetryData } from 'ForzaTelemetryApi';
 import { ISocketCallback, Socket } from '../services/Socket';
 import { useSelector } from 'react-redux';
+import { ISession } from '../services/Database/DatabaseInterfaces';
 
-export interface INetworkState {
+export interface INetworkContext {
+  replay?: ISession;
+  setReplaySession(session?: ISession): void;
+}
+
+export const NetworkContext = createContext({} as INetworkContext);
+
+export function useNetworkContext() {
+  return useContext(NetworkContext);
+}
+
+export interface NetworkWatcherProps {
   children?: any;
 }
 
-export function NetworkWatcher(props: INetworkState) {
+export function NetworkWatcher(props: NetworkWatcherProps) {
   const tag = "NetworkWatcher.tsx";
   const logger = useLogger();
   const [port, setPort] = useState(0);
@@ -21,6 +33,8 @@ export function NetworkWatcher(props: INetworkState) {
   const updatePacket = useSetPacket();
   const [loaded, setLoaded] = useState(false);
   const [wifiInfo, setWifiInfo] = useState<NetInfoState | undefined>(undefined);
+  const [isReplay, setIsReplay] = useState(false);
+  const replaySession = useRef<ISession | undefined>(undefined);
   const throttledPacket = useRef<ITelemetryData>(undefined);
   const animationFrameId = useRef<number | undefined>(undefined);
 
@@ -34,7 +48,9 @@ export function NetworkWatcher(props: INetworkState) {
       setPort(0);
     },
     onPacket: (packet) => {
-      throttledPacket.current = packet;
+      if (!replaySession.current) {
+        throttledPacket.current = packet;
+      }
     }
   }), []);
 
@@ -48,11 +64,24 @@ export function NetworkWatcher(props: INetworkState) {
     setLoaded(true);
   }, []);
 
+  const closeAnimationFrame = () => {
+    logger.log(tag, `closing animationFrame: ${animationFrameId.current}`);
+    if (animationFrameId.current) {
+      cancelAnimationFrame(animationFrameId.current);
+      animationFrameId.current = undefined;
+    }
+  }
+
   /**
    * Update the packet state with the latest throttled packet
    * This is called at a regular interval to avoid flooding the UI
    */
-  const updatePacketState = () => {
+  const updatePacketState = async () => {
+    if (replaySession.current) {
+      throttledPacket.current = (await replaySession.current.readPacket()) || undefined;
+      logger.log(tag, `use replay: ${throttledPacket.current?.timeStampMS}`);
+      await delay(2000);
+    }
     if (throttledPacket.current) {
       updatePacket(throttledPacket.current);
     }
@@ -82,9 +111,7 @@ export function NetworkWatcher(props: INetworkState) {
       if (netInfoSub) {
         netInfoSub();
       }
-      if(animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-      }
+      closeAnimationFrame();
     }
   }, []);
 
@@ -97,16 +124,11 @@ export function NetworkWatcher(props: INetworkState) {
       animationFrameId.current = requestAnimationFrame(updatePacketState);
     } else {
       logger.debug(tag, `Stopping packet flush interval`);
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-        animationFrameId.current = undefined;
-      }
+      closeAnimationFrame();
     }
     return () => {
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-        animationFrameId.current = undefined;
-      }
+      logger.log(tag, `effect return on UDP listener!!!`);
+      closeAnimationFrame();
     }
   }, [reduxWifiState.isUdpListening]);
 
@@ -133,9 +155,11 @@ export function NetworkWatcher(props: INetworkState) {
     }
     setLoaded(true);
     return () => {
+      logger.log(tag, `useEffect returns isConnected!!!`);
       if (socket) {
         socket.close();
       }
+      closeAnimationFrame();
     }
   }, [wifiInfo?.isConnected]);
 
@@ -150,7 +174,23 @@ export function NetworkWatcher(props: INetworkState) {
     }
   }, [wifiInfo]);
 
-  return loaded
-    ? props.children
-    : (<Splash />);
+  useEffect(() => {
+    logger.log(tag, `setting replay session: ${replaySession.current?.info.name} : ${animationFrameId.current}`);
+    if(isReplay) {
+      updatePacketState();
+    }
+  }, [isReplay]);
+
+  return (
+    <NetworkContext.Provider value={{
+      replay: replaySession.current,
+      setReplaySession: (session) => {
+        replaySession.current = session;
+        setIsReplay(Boolean(session));
+      }
+    }}>
+      {loaded && props.children}
+      {!loaded && (<Splash />)}
+    </NetworkContext.Provider>
+  );
 }

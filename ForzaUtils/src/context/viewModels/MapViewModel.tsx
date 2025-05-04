@@ -98,10 +98,8 @@ export function useMapViewModel(): IMapViewModel {
     let path = svg
     if (!path.length) {
       path = `M${playerPosition.x.toFixed(1)},${playerPosition.y.toFixed(1)}`;
-    } else if (path.length < 1024) {
+    } else if (path.length < 512) {
       path += `L${playerPosition.x.toFixed(1)},${playerPosition.y.toFixed(1)}`;
-    } else {
-      logger.log(tag, `SVG path hit limit`);
     }
     setSvg(path);
     setPosition(playerPosition);

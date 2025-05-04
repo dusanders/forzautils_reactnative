@@ -7,7 +7,6 @@ import {
 import { AppRoutes, RootStackParamList } from './src/constants/types';
 import { WifiInfo } from './src/pages/WifiInfo';
 import { DataChooser } from './src/pages/DataChooser';
-import { useViewModelStore } from './src/context/viewModels/ViewModelStore';
 import { HptqGraph } from './src/pages/HpTqGraph/HpTqGraph';
 import { SuspensionTravel } from './src/pages/SuspensionTravel/SuspensionTravel';
 import { TireTemps } from './src/pages/TireTemps/TireTemps';
@@ -17,6 +16,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { Grip } from './src/pages/Grip/Grip';
 import { SourceChooser } from './src/pages/SourceChooser';
 import { TuningPage } from './src/pages/Tuning/Tuning';
+import { ReplayList } from './src/pages/ReplayList';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -67,6 +67,9 @@ function App(): React.JSX.Element {
             <Stack.Screen
               name={AppRoutes.TUNING_CALCULATOR}
               component={TuningPage} />
+            <Stack.Screen
+              name={AppRoutes.REPLAY_LIST}
+              component={ReplayList} />
           </Stack.Navigator>
         </SafeStack>
       </NavigationContainer>
