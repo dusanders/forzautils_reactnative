@@ -2,6 +2,7 @@ import { DB, QueryResult, open as SqliteOpen } from '@op-engineering/op-sqlite';
 import { ITelemetryData, ForzaTelemetryApi } from "ForzaTelemetryApi";
 import { ISession, ISessionInfo, SESSION_DB_NAME_PREFIX, DB_FILE_EXT, MASTER_DB_NAME } from "./DatabaseInterfaces";
 import { ILogger, Logger, useLogger } from '../../context/Logger';
+import { FileSystem } from 'react-native-file-access';
 
 interface IPacketData {
   id: number;
@@ -23,8 +24,10 @@ export class Session implements ISession {
     this.tag = info.name;
     this.info = info;
   }
-  delete() {
-    this.db?.delete();
+  async delete() {
+    if(this.db?.getDbPath()) {
+      await FileSystem.unlink(this.db.getDbPath());
+    }
   }
   async readPacket(offset?: number): Promise<ITelemetryData | null> {
     let readOffset = offset || this.readCounter;
@@ -43,12 +46,22 @@ export class Session implements ISession {
     if (!this.db) {
       throw new Error(`Failed to add packet - session not initialized`);
     }
+    if (this.info.endTime) {
+      return;
+    }
     this.executeQuery(
       `INSERT INTO packets (id, json) VALUES (?,?)`,
       [this.info.length++, JSON.stringify(packet)]
     );
   }
   close(): void {
+    if (!this.db || !this.masterDb) {
+      throw new Error(`Failed to add packet - session not initialized`);
+    }
+    if (this.info.endTime) {
+      this.logger.log(this.tag, `Session already has end time: ${this.info.endTime}`);
+      return;
+    }
     this.logger.log(this.tag, `closing @ ${this.info.length} - ${this.info.endTime} with master: ${Boolean(this.masterDb)}`);
     this.info.endTime = Date.now();
     this.masterDb?.executeRaw(
@@ -67,9 +80,10 @@ export class Session implements ISession {
     });
     this.logger.log(this.tag, `${this.db.getDbPath()}`);
     this.executeQuery(`CREATE TABLE IF NOT EXISTS packets (id INT PRIMARY KEY, json VARCHAR)`);
+    this.logger.log(this.tag, `initialized with ${JSON.stringify(this.info)}`);
     return this;
   }
-  private async executeQuery(query: string, params: any[] = []): Promise<QueryResult|undefined> {
+  private async executeQuery(query: string, params: any[] = []): Promise<QueryResult | undefined> {
     try {
       return await this.db?.execute(query, params);
     } catch (error) {

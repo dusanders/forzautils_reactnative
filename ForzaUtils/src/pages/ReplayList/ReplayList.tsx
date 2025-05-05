@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
-import { AppBarContainer } from "../components/AppBar/AppBarContainer";
+import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
-import { Row } from "../components/Row";
-import { ThemeText } from "../components/ThemeText";
-import { IThemeElements } from "../constants/Themes";
+import { Row } from "../../components/Row";
+import { ThemeText } from "../../components/ThemeText";
+import { IThemeElements } from "../../constants/Themes";
 import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
-import { ISessionInfo } from "../services/Database/DatabaseInterfaces";
-import { useReplay } from "../context/Replay";
-import { useLogger } from "../context/Logger";
-import { useNetworkContext } from "../context/Network";
-import { AppRoutes, StackNavigation } from "../constants/types";
+import { getTheme } from "../../redux/ThemeStore";
+import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
+import { useReplay } from "../../context/Replay";
+import { useLogger } from "../../context/Logger";
+import { useNetworkContext } from "../../context/Network";
+import { AppRoutes, StackNavigation } from "../../constants/types";
+import { DeleteDialog } from "./DeleteDialog";
 
 export interface ReplayListProps {
 
@@ -26,6 +27,7 @@ export function ReplayList(props: ReplayListProps) {
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
   const [sessions, setSessions] = useState<ISessionInfo[]>([]);
+  const [toDelete, setToDelete] = useState<ISessionInfo | undefined>(undefined);
 
   const getSessions = async () => {
     const allSessions = await replay.getAllSessions();
@@ -42,6 +44,16 @@ export function ReplayList(props: ReplayListProps) {
         navigation.goBack();
       }}>
       <View style={styles.root}>
+        {Boolean(toDelete) && (
+          <DeleteDialog
+            session={toDelete!}
+            onCancel={() => { setToDelete(undefined) }}
+            onConfirm={async () => {
+              await replay.delete(toDelete!);
+              setToDelete(undefined);
+              getSessions();
+            }} />
+        )}
         <Row style={styles.titleRow}>
           <View style={styles.titleText}>
             <ThemeText style={styles.titleText}>
@@ -71,7 +83,7 @@ export function ReplayList(props: ReplayListProps) {
               <Pressable
                 style={styles.listItemRoot}
                 onLongPress={() => {
-                  replay.delete(info.item)
+                  setToDelete(info.item);
                 }}
                 onPress={async () => {
                   logger.log(tag, `Setting replay: ${info.item.name}`);

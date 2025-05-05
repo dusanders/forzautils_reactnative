@@ -11,7 +11,7 @@ export interface IReplay {
   closeSession(): void;
   submitPacket(packet: ITelemetryData): void;
   getOrCreate(info?: ISessionInfo): Promise<ISession>;
-  delete(info: ISessionInfo): void;
+  delete(info: ISessionInfo): Promise<void>;
 }
 
 export interface ReplayProviderProps {
@@ -42,6 +42,9 @@ export function ReplayProvider(props: ReplayProviderProps) {
   }
 
   const doGetOrCreate = async (info?: ISessionInfo) => {
+    if(currentFile.current) {
+      return currentFile.current
+    }
     let session: ISession | null = null;
     if (info) {
       session = await dbService.current.getSessionByName(info.name);
@@ -58,11 +61,13 @@ export function ReplayProvider(props: ReplayProviderProps) {
       session: currentFile.current,
       getAllSessions: () => getAllInfos(),
       getOrCreate: (info) => doGetOrCreate(info),
-      delete: (info) => {
-        dbService.current.deleteSession(info.name);
+      delete: async (info) => {
+        await dbService.current.deleteSession(info.name);
       },
       setSession: (session) => {
-        currentFile.current = session;
+        if (!currentFile.current) {
+          currentFile.current = session;
+        }
       },
       submitPacket: (packet) => {
         if (currentFile.current) {
@@ -72,6 +77,7 @@ export function ReplayProvider(props: ReplayProviderProps) {
       closeSession: () => {
         if (currentFile.current) {
           currentFile.current.close();
+          currentFile.current = undefined;
         }
       }
     }}>

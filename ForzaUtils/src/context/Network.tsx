@@ -80,7 +80,7 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
     if (replaySession.current) {
       throttledPacket.current = (await replaySession.current.readPacket()) || undefined;
       logger.log(tag, `use replay: ${throttledPacket.current?.timeStampMS}`);
-      await delay(2000);
+      await delay(500);
     }
     if (throttledPacket.current) {
       updatePacket(throttledPacket.current);

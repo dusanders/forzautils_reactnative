@@ -16,7 +16,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { Grip } from './src/pages/Grip/Grip';
 import { SourceChooser } from './src/pages/SourceChooser';
 import { TuningPage } from './src/pages/Tuning/Tuning';
-import { ReplayList } from './src/pages/ReplayList';
+import { ReplayList } from './src/pages/ReplayList/ReplayList';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

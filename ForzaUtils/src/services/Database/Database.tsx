@@ -1,6 +1,7 @@
 import { DB, open as SqliteOpen } from '@op-engineering/op-sqlite';
 import { ISessionInfo, ISession, MASTER_DB_NAME, SESSION_DB_NAME_PREFIX, QueryResult } from './DatabaseInterfaces';
 import { Session } from './Session';
+import { Logger } from '../../context/Logger';
 
 export interface IDatabaseService {
   getAllSessions(): Promise<ISessionInfo[]>;
@@ -12,6 +13,7 @@ export interface IDatabaseService {
 
 export class DatabaseService implements IDatabaseService {
   private tag = "DatabaseService.tsx";
+  private logger = Logger();
   private static instance: DatabaseService | undefined;
   private db: DB; // Replace 'any' with your actual database type
 
@@ -49,8 +51,9 @@ export class DatabaseService implements IDatabaseService {
       name: `${SESSION_DB_NAME_PREFIX}${Date.now()}`,
       length: 0, // Initialize length to 0 or any default value
       startTime: Date.now(),
-      endTime: Date.now() // Default to 1 hour later
+      endTime: 0// Default to 1 hour later
     };
+    this.logger.log(this.tag, `generate ${JSON.stringify(session)}`);
     await this.executeQuery(
       'INSERT INTO sessions (name, length, startTime, endtime) VALUES (?, ?, ?, ?)',
       [session.name, session.length, session.startTime, session.endTime]
@@ -61,7 +64,7 @@ export class DatabaseService implements IDatabaseService {
   async deleteSession(name: string): Promise<void> {
     const found = await this.getSessionByName(name);
     if(found) {
-      (found as Session).delete();
+      await (found as Session).delete();
     }
     await this.executeQuery(
       'DELETE FROM sessions WHERE name = ?',

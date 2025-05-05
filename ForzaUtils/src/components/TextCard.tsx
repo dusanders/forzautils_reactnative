@@ -45,8 +45,7 @@ export function TextCard(props: CardProps) {
         }}>
         <TitleText
           style={props.titleStyle}
-          allcaps={props.allcapsTitle}
-          fontSize={'small'}>
+          allcaps={props.allcapsTitle}>
           {props.title}
         </TitleText>
         {props.body && (
