@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import { TireData } from "ForzaTelemetryApi";
 import { useSelector } from "react-redux";
 import { getForzaPacket } from "../../redux/WifiStore";

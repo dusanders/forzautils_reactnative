@@ -1,5 +1,5 @@
 import { DirectionalData } from "ForzaTelemetryApi";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getForzaPacket } from "../../redux/WifiStore";
 import { useLogger } from "../Logger";

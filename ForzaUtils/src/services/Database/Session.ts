@@ -1,7 +1,7 @@
 import { DB, QueryResult, open as SqliteOpen } from '@op-engineering/op-sqlite';
-import { ITelemetryData, ForzaTelemetryApi } from "ForzaTelemetryApi";
+import { ITelemetryData } from "ForzaTelemetryApi";
 import { ISession, ISessionInfo, SESSION_DB_NAME_PREFIX, DB_FILE_EXT, MASTER_DB_NAME } from "./DatabaseInterfaces";
-import { ILogger, Logger, useLogger } from '../../context/Logger';
+import { ILogger, Logger } from '../../context/Logger';
 import { FileSystem } from 'react-native-file-access';
 
 interface IPacketData {

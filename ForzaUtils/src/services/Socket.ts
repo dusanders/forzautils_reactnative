@@ -1,5 +1,4 @@
 import { ForzaTelemetryApi, getRandomTelemetryData, ITelemetryData } from "ForzaTelemetryApi";
-import React, { useContext } from "react";
 import UdpSockets from "react-native-udp";
 import UdpSocket from "react-native-udp/lib/types/UdpSocket";
 import { ILogger } from "../context/Logger";

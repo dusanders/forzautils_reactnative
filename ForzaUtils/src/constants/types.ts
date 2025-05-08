@@ -1,6 +1,4 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { TuningPageProps } from "../pages/Tuning/Tuning";
-import { ITuningViewModel } from "../context/viewModels/TuningViewModel";
 import { useState } from "react";
 
 /**
