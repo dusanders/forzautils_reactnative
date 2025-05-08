@@ -11,6 +11,8 @@ import { ISession } from '../services/Database/DatabaseInterfaces';
 
 export interface INetworkContext {
   replay?: ISession;
+  DEBUG(): void;
+  STOP_DEBUG(): void;
   setReplaySession(session?: ISession): void;
 }
 
@@ -38,6 +40,9 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   const throttledPacket = useRef<ITelemetryData>(undefined);
   const animationFrameId = useRef<number | undefined>(undefined);
 
+  /**
+   * Handler for the Socket service instance
+   */
   const socketCallbacks = useMemo<ISocketCallback>(() => ({
     onClose: (ev) => {
       logger.debug(tag, `socket did close ${(ev as Error)?.message}`);
@@ -54,6 +59,9 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
     }
   }), []);
 
+  /**
+   * Handler attached to the network state listener
+   */
   const netInfoCallback = useCallback((state: NetInfoState) => {
     setWifiInfo((prevWifiInfo) => {
       if (state.type !== prevWifiInfo?.type || state.isConnected !== prevWifiInfo?.isConnected) {
@@ -64,6 +72,9 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
     setLoaded(true);
   }, []);
 
+  /**
+   * Close the animation frame request
+   */
   const closeAnimationFrame = () => {
     logger.log(tag, `closing animationFrame: ${animationFrameId.current}`);
     if (animationFrameId.current) {
@@ -163,6 +174,9 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
     }
   }, [wifiInfo?.isConnected]);
 
+  /**
+   * Update wifi state when the network state changes
+   */
   useEffect(() => {
     if (wifiInfo && wifiInfo.isConnected) {
       updateReduxWifiState({
@@ -174,6 +188,9 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
     }
   }, [wifiInfo]);
 
+  /**
+   * Update replay state
+   */
   useEffect(() => {
     logger.log(tag, `setting replay session: ${replaySession.current?.info.name} : ${animationFrameId.current}`);
     if(isReplay) {
@@ -187,6 +204,12 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
       setReplaySession: (session) => {
         replaySession.current = session;
         setIsReplay(Boolean(session));
+      },
+      DEBUG: () => {
+        Socket.getInstance(logger).DEBUG();
+      },
+      STOP_DEBUG: () => {
+        Socket.getInstance(logger).STOP_DEBUG();
       }
     }}>
       {loaded && props.children}

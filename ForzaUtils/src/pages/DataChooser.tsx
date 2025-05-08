@@ -10,7 +10,6 @@ import { useSelector } from "react-redux";
 import { getTheme } from "../redux/ThemeStore";
 import { AvgSuspensionTravel } from "../components/Graphs/AvgSuspensionTravel";
 import { AvgTireTemps } from "../components/Graphs/AvgTireTemp";
-import { Socket } from "../services/Socket";
 import { useLogger } from "../context/Logger";
 import { ThemeText } from "../components/ThemeText";
 import { ThemeSwitch } from "../components/ThemeSwitch";
@@ -122,7 +121,9 @@ export function DataChooser(props: DataChooserProps) {
 
   useEffect(() => {
     if (!network.replay) {
-      Socket.getInstance(logger).DEBUG();
+      network.DEBUG();
+    } else {
+      network.STOP_DEBUG();
     }
   }, [network.replay]);
 
