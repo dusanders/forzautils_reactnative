@@ -21,8 +21,8 @@ describe("TuningViewModel", () => {
     expect(result.current.engineLayout).toBe(EngineLayout.FRONT);
     expect(result.current.frontHeight).toBe(4.0);
     expect(result.current.rearHeight).toBe(4.0);
-    expect(result.current.frontHz).toBe(2.6);
-    expect(result.current.rearHz).toBe(2.6);
+    expect(result.current.frontHz).toBe(2.8);
+    expect(result.current.rearHz).toBe(2.8);
   });
 
   it("should update total vehicle weight", () => {
@@ -46,7 +46,7 @@ describe("TuningViewModel", () => {
     expect(result.current.rearDistribution).toBe(40);
 
     act(() => {
-      result.current.setRearDistribution(50);
+      result.current.setFrontDistribution(50);
     });
 
     expect(result.current.rearDistribution).toBe(50);
@@ -107,10 +107,10 @@ describe("TuningViewModel", () => {
       result.current.setFrontDistribution(60);
     });
 
-    expect(result.current.frontWeight).toBeCloseTo(2400);
-    expect(result.current.rearWeight).toBeCloseTo(1600);
-    expect(result.current.frontCornerWeight).toBeCloseTo(1200);
-    expect(result.current.rearCornerWeight).toBeCloseTo(800);
+    expect(result.current.weights.frontAxle).toBeCloseTo(2400);
+    expect(result.current.weights.rearAxle).toBeCloseTo(1600);
+    expect(result.current.weights.frontCorner).toBeCloseTo(1200);
+    expect(result.current.weights.rearCorner).toBeCloseTo(800);
   });
 
   it("should adjust suspension settings based on layout and drivetrain", () => {

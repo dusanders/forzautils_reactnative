@@ -43,7 +43,8 @@ export const mockLighColors: IThemeElements = {
       primary: 'rgb(255, 255, 255)',
       onPrimary: 'rgb(242,242,242)',
       secondary: 'rgb(34,40,44)',
-      onSecondary: 'rgb(131, 140, 149)'
+      onSecondary: 'rgb(131, 140, 149)',
+      dialogBackdrop: 'rgba(0,0,0,0.33)'
     },
     card: {
       borderColor: 'rgb(223,218,220)'
@@ -82,7 +83,8 @@ export const mockDarkColors: IThemeElements = {
       primary: 'rgb(34, 40, 44)',
       onPrimary: 'rgb(57,61,65)',
       secondary: 'rgb(253, 243, 255)',
-      onSecondary: 'rgba(220, 220, 220,1)'
+      onSecondary: 'rgba(220, 220, 220,1)',
+      dialogBackdrop: 'rgba(255,255,255,0.33)'
     },
     card: {
       borderColor: 'rgb(52,58,62)'
