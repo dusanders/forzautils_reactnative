@@ -1,5 +1,5 @@
 import { ReactElement, useCallback } from "react";
-import { Pressable } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
 import { getTheme } from "../../redux/ThemeStore";
 
@@ -22,7 +22,7 @@ export function AppSettingsButton(props: AppSettingsButtonProps) {
   }, [props.onPress]);
   const theme = useSelector(getTheme);
   return (
-    <Pressable
+    <TouchableOpacity
       testID={props.testID}
       style={{
         width: '100%',
@@ -36,6 +36,6 @@ export function AppSettingsButton(props: AppSettingsButtonProps) {
       onPress={handleClick}
     >
       {props.children}
-    </Pressable>
+    </TouchableOpacity>
   )
 }

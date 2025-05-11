@@ -1,10 +1,10 @@
 import React from "react";
-import { Pressable, PressableProps, StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity, TouchableOpacityProps } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { useSelector } from "react-redux";
 import { getTheme } from "../redux/ThemeStore";
 
-export interface ThemeButtonProps extends PressableProps {
+export interface ThemeButtonProps extends TouchableOpacityProps {
   children?: any;
 }
 
@@ -13,7 +13,7 @@ export function ThemeButton(props: ThemeButtonProps) {
   const styles = themeStyles(theme);
 
   return (
-    <Pressable
+    <TouchableOpacity
       style={{ ...styles.root, ...props.style as any }}
       onPress={(ev) => {
         if (props.onPress) {
@@ -21,7 +21,7 @@ export function ThemeButton(props: ThemeButtonProps) {
         }
       }}>
       {props.children}
-    </Pressable>
+    </TouchableOpacity>
   )
 }
 

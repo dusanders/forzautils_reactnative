@@ -1,5 +1,5 @@
-import React, { ReactElement, useCallback, useState } from "react";
-import { Pressable, PressableProps, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../ThemeText";
 import { ThemeIcon } from "../ThemeIcon";
@@ -62,7 +62,7 @@ export function AppBar(props: AppBarProps) {
         )}
 
         {doShowBackButton && (
-          <Pressable testID={AppBarTestID.backIconView}
+          <TouchableOpacity testID={AppBarTestID.backIconView}
             style={style.backIconView}
             onPress={() => {
               if (props.onBack) {
@@ -71,20 +71,20 @@ export function AppBar(props: AppBarProps) {
             }}>
             <ThemeIcon name={'chevron-left'}
               size={theme.sizes.icon} />
-          </Pressable>
+          </TouchableOpacity>
         )}
 
         <View style={{ flexGrow: 1 }} />
 
         {doShowSettingsButton && (
-          <Pressable testID={AppBarTestID.settingIconView}
+          <TouchableOpacity testID={AppBarTestID.settingIconView}
             style={style.settingIconView}
             onPress={() => {
               setShowSettings(!showSettings)
             }}>
             <ThemeIcon name={'settings'}
               size={theme.sizes.icon} />
-          </Pressable>
+          </TouchableOpacity>
         )}
 
         {showSettings && (

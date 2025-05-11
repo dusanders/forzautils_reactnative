@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
 import { Row } from "../../components/Row";
@@ -11,7 +11,7 @@ import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
 import { useReplay } from "../../context/Replay";
 import { useLogger } from "../../context/Logger";
 import { useNetworkContext } from "../../context/Network";
-import { AppRoutes, StackNavigation } from "../../constants/types";
+import { StackNavigation } from "../../constants/types";
 import { DeleteDialog } from "./DeleteDialog";
 
 export interface ReplayListProps {
@@ -80,7 +80,7 @@ export function ReplayList(props: ReplayListProps) {
               <View style={{ height: 150 }} />
             )}
             renderItem={(info) => (
-              <Pressable
+              <TouchableOpacity
                 style={styles.listItemRoot}
                 onLongPress={() => {
                   setToDelete(info.item);
@@ -106,7 +106,7 @@ export function ReplayList(props: ReplayListProps) {
                     duration: {(((info.item.endTime - info.item.startTime) / 60) / 60).toFixed(1)}
                   </ThemeText>
                 </Row>
-              </Pressable>
+              </TouchableOpacity>
             )} />
         </Row>
       </View>
