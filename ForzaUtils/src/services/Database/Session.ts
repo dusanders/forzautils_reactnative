@@ -4,37 +4,57 @@ import { ISession, ISessionInfo, SESSION_DB_NAME_PREFIX, DB_FILE_EXT, MASTER_DB_
 import { ILogger, Logger } from '../../context/Logger';
 import { FileSystem } from 'react-native-file-access';
 
+/**
+ * Structure of the packet data in the database
+ */
 interface IPacketData {
+  /**
+   * Unique identifier for the packet
+   * Sequentially incremented
+   * @type {number}
+   */
   id: number;
+  /**
+   * JSON string representation of the telemetry data
+   * @type {string}
+   */
   json: string;
 }
 
 export class Session implements ISession {
+  /**
+   * Factory method to create a new session
+   * @param info Session metadata
+   * @returns 
+   */
   static fromInfo(info: ISessionInfo): ISession {
     return (new Session(info).initialize());
   }
+  
   private tag: string;
   private db?: DB;
   private masterDb?: DB;
-  private readCounter = 0;
   private logger: ILogger = Logger();
   info: ISessionInfo;
+  currentReadOffset: number = 0;
 
   constructor(info: ISessionInfo) {
     this.tag = info.name;
     this.info = info;
   }
+
   async delete() {
     if(this.db?.getDbPath()) {
       await FileSystem.unlink(this.db.getDbPath());
     }
   }
+
   async readPacket(offset?: number): Promise<ITelemetryData | null> {
-    let readOffset = offset || this.readCounter;
-    this.readCounter = readOffset;
+    let readOffset = offset || this.currentReadOffset;
+    this.currentReadOffset = readOffset;
     const found = await this.executeQuery(
       `SELECT * FROM packets WHERE id = ?`,
-      [this.readCounter++]
+      [this.currentReadOffset++]
     );
     const casted = (found!.rows[0] as any) as IPacketData;
     if (casted.json.length > 0) {
@@ -42,6 +62,7 @@ export class Session implements ISession {
     }
     return null;
   }
+
   async addPacket(packet: ITelemetryData): Promise<void> {
     if (!this.db) {
       throw new Error(`Failed to add packet - session not initialized`);
@@ -54,6 +75,7 @@ export class Session implements ISession {
       [this.info.length++, JSON.stringify(packet)]
     );
   }
+
   close(): void {
     if (!this.db || !this.masterDb) {
       throw new Error(`Failed to add packet - session not initialized`);
@@ -71,6 +93,11 @@ export class Session implements ISession {
     this.db?.close();
     this.masterDb?.close();
   }
+
+  /**
+   * Initialize the session databases
+   * @returns Session object
+   */
   private initialize(): ISession {
     this.db = SqliteOpen({
       name: `${SESSION_DB_NAME_PREFIX}${this.info.name}.${DB_FILE_EXT}`
@@ -83,6 +110,13 @@ export class Session implements ISession {
     this.logger.log(this.tag, `initialized with ${JSON.stringify(this.info)}`);
     return this;
   }
+
+  /**
+   * Query the database
+   * @param query Sqlite query to execute
+   * @param params Parameters to bind to the query
+   * @returns 
+   */
   private async executeQuery(query: string, params: any[] = []): Promise<QueryResult | undefined> {
     try {
       return await this.db?.execute(query, params);

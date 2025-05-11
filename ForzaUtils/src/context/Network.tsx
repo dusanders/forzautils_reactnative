@@ -9,36 +9,78 @@ import { ISocketCallback, Socket } from '../services/Socket';
 import { useSelector } from 'react-redux';
 import { ISession } from '../services/Database/DatabaseInterfaces';
 
+//#region Definitions
+
 export interface INetworkContext {
+  /**
+   * Current replay session
+   */
   replay?: ISession;
+  /**
+   * Delay in milliseconds between reading and sending replay packets
+   */
+  replayDelay: number;
+  /**
+   * Time to wait between reading and sending replay packets
+   * @param ms Time delay in MS
+   */
+  setReplayDelay(ms: number): void;
+  /**
+   * Start a debug stream of randomly generated telemetry packets
+   */
   DEBUG(): void;
+  /**
+   * Stop the debug stream 
+   */
   STOP_DEBUG(): void;
+  /**
+   * Set the replay session 
+   * @param session Session to use for replay packets
+   */
   setReplaySession(session?: ISession): void;
 }
 
+/**
+ * Network context to provide network state and socket information
+ */
 export const NetworkContext = createContext({} as INetworkContext);
 
+/**
+ * Custom hook to access the network context
+ * @returns Network context
+ */
 export function useNetworkContext() {
   return useContext(NetworkContext);
 }
 
+/**
+ * Network watcher component to monitor network state and socket connections
+ */
 export interface NetworkWatcherProps {
   children?: any;
 }
 
+//#endregion
+
+/**
+ * Network watcher component
+ * @param props Network watcher props
+ * @returns 
+ */
 export function NetworkWatcher(props: NetworkWatcherProps) {
   const tag = "NetworkWatcher.tsx";
   const logger = useLogger();
   const [port, setPort] = useState(0);
   const updateReduxWifiState = useSetWifiState();
   const reduxWifiState = useSelector(getWifiState);
-  const updatePacket = useSetPacket();
+  const setPacket = useSetPacket();
   const [loaded, setLoaded] = useState(false);
   const [wifiInfo, setWifiInfo] = useState<NetInfoState | undefined>(undefined);
   const [isReplay, setIsReplay] = useState(false);
   const replaySession = useRef<ISession | undefined>(undefined);
   const throttledPacket = useRef<ITelemetryData>(undefined);
   const animationFrameId = useRef<number | undefined>(undefined);
+  const replayDelay = useRef<number>(500);
 
   /**
    * Handler for the Socket service instance
@@ -89,12 +131,12 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
    */
   const updatePacketState = async () => {
     if (replaySession.current) {
+      logger.log(tag, `use replay: ${replaySession.current.currentReadOffset} - ${replaySession.current.info.length}`);
       throttledPacket.current = (await replaySession.current.readPacket()) || undefined;
-      logger.log(tag, `use replay: ${throttledPacket.current?.timeStampMS}`);
-      await delay(500);
+      await delay(replayDelay.current);
     }
     if (throttledPacket.current) {
-      updatePacket(throttledPacket.current);
+      setPacket(throttledPacket.current);
     }
     animationFrameId.current = requestAnimationFrame(updatePacketState);
   }
@@ -193,14 +235,21 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
    */
   useEffect(() => {
     logger.log(tag, `setting replay session: ${replaySession.current?.info.name} : ${animationFrameId.current}`);
-    if(isReplay) {
-      updatePacketState();
+    if (isReplay) {
+      // Only start the animation frame if not already started
+      if (!animationFrameId.current) {
+        updatePacketState();
+      }
     }
   }, [isReplay]);
 
   return (
     <NetworkContext.Provider value={{
       replay: replaySession.current,
+      replayDelay: replayDelay.current,
+      setReplayDelay: (ms) => {
+        replayDelay.current = ms;
+      },
       setReplaySession: (session) => {
         replaySession.current = session;
         setIsReplay(Boolean(session));

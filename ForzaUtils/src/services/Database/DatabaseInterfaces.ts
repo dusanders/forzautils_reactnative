@@ -18,8 +18,30 @@ export interface ISessionInfo {
 }
 
 export interface ISession {
+  /**
+   * Session metadata
+   */
   info: ISessionInfo;
+  /**
+   * Current packet read offset
+   */
+  currentReadOffset: number;
+  /**
+   * Add a telemetry packet to the session
+   * @param packet Telemetry packet to add
+   */
   addPacket(packet: ITelemetryData): Promise<void>;
+  /**
+   * Read a telemetry packet from the session
+   * @param offset Optional offset to read from
+   */
   readPacket(offset?: number): Promise<ITelemetryData | null>;
+  /**
+   * Close the session and free resources
+   */
   close(): void;
+  /**
+   * Delete the session and free resources
+   */
+  delete(): Promise<void>;
 }
