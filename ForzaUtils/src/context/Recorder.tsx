@@ -4,26 +4,26 @@ import { useLogger } from "./Logger";
 import { ISessionInfo, ISession } from "../services/Database/DatabaseInterfaces";
 import { ITelemetryData } from "ForzaTelemetryApi";
 
-export interface IReplay {
-  session?: ISession;
+export interface IRecorder {
+  recording?: ISession;
   getAllSessions(): Promise<ISessionInfo[]>;
-  setSession(session: ISession): void;
-  closeSession(): void;
+  setRecording(session: ISession): void;
+  closeRecording(): void;
   submitPacket(packet: ITelemetryData): void;
   getOrCreate(info?: ISessionInfo): Promise<ISession>;
   delete(info: ISessionInfo): Promise<void>;
 }
 
-export interface ReplayProviderProps {
+export interface RecorderProviderProps {
   children?: any;
 }
 
-export const ReplayContext = createContext({} as IReplay);
+export const RecorderContext = createContext({} as IRecorder);
 export function useReplay() {
-  return useContext(ReplayContext);
+  return useContext(RecorderContext);
 }
-export function ReplayProvider(props: ReplayProviderProps) {
-  const tag = 'ReplayProvider.tsx';
+export function RecorderProvider(props: RecorderProviderProps) {
+  const tag = 'RecorderProvider.tsx';
   const logger = useLogger();
   const dbService = useRef(DatabaseService.getInstance());
   const currentFile = useRef<ISession>(undefined);
@@ -57,14 +57,14 @@ export function ReplayProvider(props: ReplayProviderProps) {
   }
 
   return (
-    <ReplayContext.Provider value={{
-      session: currentFile.current,
+    <RecorderContext.Provider value={{
+      recording: currentFile.current,
       getAllSessions: () => getAllInfos(),
       getOrCreate: (info) => doGetOrCreate(info),
       delete: async (info) => {
         await dbService.current.deleteSession(info.name);
       },
-      setSession: (session) => {
+      setRecording: (session) => {
         if (!currentFile.current) {
           currentFile.current = session;
         }
@@ -74,7 +74,7 @@ export function ReplayProvider(props: ReplayProviderProps) {
           currentFile.current.addPacket(packet);
         }
       },
-      closeSession: () => {
+      closeRecording: () => {
         if (currentFile.current) {
           currentFile.current.close();
           currentFile.current = undefined;
@@ -82,6 +82,6 @@ export function ReplayProvider(props: ReplayProviderProps) {
       }
     }}>
       {props.children}
-    </ReplayContext.Provider>
+    </RecorderContext.Provider>
   )
 }

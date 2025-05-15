@@ -30,7 +30,7 @@ export class Session implements ISession {
   static fromInfo(info: ISessionInfo): ISession {
     return (new Session(info).initialize());
   }
-  
+
   private tag: string;
   private db?: DB;
   private masterDb?: DB;
@@ -44,7 +44,7 @@ export class Session implements ISession {
   }
 
   async delete() {
-    if(this.db?.getDbPath()) {
+    if (this.db?.getDbPath()) {
       await FileSystem.unlink(this.db.getDbPath());
     }
   }
@@ -52,6 +52,10 @@ export class Session implements ISession {
   async readPacket(offset?: number): Promise<ITelemetryData | null> {
     let readOffset = offset || this.currentReadOffset;
     this.currentReadOffset = readOffset;
+    if (this.currentReadOffset >= this.info.length) {
+      this.logger.log(this.tag, `No more packets to read`);
+      this.currentReadOffset = 0;
+    }
     const found = await this.executeQuery(
       `SELECT * FROM packets WHERE id = ?`,
       [this.currentReadOffset++]
@@ -122,7 +126,7 @@ export class Session implements ISession {
       return await this.db?.execute(query, params);
     } catch (error) {
       console.error('Database query error:', error);
-      throw error;
+      return undefined;
     }
   }
 }

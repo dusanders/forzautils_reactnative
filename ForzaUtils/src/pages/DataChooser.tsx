@@ -13,7 +13,7 @@ import { AvgTireTemps } from "../components/Graphs/AvgTireTemp";
 import { useLogger } from "../context/Logger";
 import { ThemeText } from "../components/ThemeText";
 import { ThemeSwitch } from "../components/ThemeSwitch";
-import { useReplay } from "../context/Replay";
+import { useReplay } from "../context/Recorder";
 import { getForzaPacket } from "../redux/WifiStore";
 import { useNetworkContext } from "../context/Network";
 
@@ -111,10 +111,10 @@ export function DataChooser(props: DataChooserProps) {
   const setRecording = async () => {
     if (!isRecording) {
       const file = await replay.getOrCreate();
-      replay.setSession(file);
+      replay.setRecording(file);
       setIsRecording(true);
     } else {
-      replay.closeSession();
+      replay.closeRecording();
       setIsRecording(false);
     }
   }
@@ -139,11 +139,12 @@ export function DataChooser(props: DataChooserProps) {
       onBack={() => {
         navigation.goBack();
       }}
-      injectElements={[
-        {
+      injectElements={Boolean(network.replay)
+        ? []
+        : [{
           id: 'record-button',
           onPress: () => {
-
+            // Nothing - this is handled by the switch
           },
           renderItem: () => (
             <>
@@ -159,17 +160,10 @@ export function DataChooser(props: DataChooserProps) {
                 }} />
             </>
           )
-        }
-      ]}>
-      <View style={{
-        height: '100%',
-        alignItems: 'center'
-      }}>
+        }]}>
+      <View style={styles.root}>
         <TrackMap
-          style={{
-            marginBottom: 20,
-            width: '95%'
-          }} />
+          style={styles.trackMapRoot} />
         <FlatList
           style={styles.listRoot}
           data={dataElements}
@@ -181,6 +175,14 @@ export function DataChooser(props: DataChooserProps) {
 
 function themeStyles(theme: IThemeElements) {
   return StyleSheet.create({
+    root: {
+      height: '100%',
+      alignItems: 'center',
+    },
+    trackMapRoot: {
+      marginBottom: 20,
+      width: '95%'
+    },
     listRoot: {
       flexGrow: 0,
       margin: 0,

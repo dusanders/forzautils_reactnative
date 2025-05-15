@@ -11,7 +11,7 @@ export interface ThemeIconProps<T> extends IconProps<T> {
 export function ThemeIcon<T>(props: ThemeIconProps<T>) {
   const theme = useSelector(getTheme);
   return (
-    <Icon name={props.name as any}
+    <Icon name={props.name}
       color={theme.colors.text.primary.onPrimary}
       size={theme.sizes.icon}
       style={{

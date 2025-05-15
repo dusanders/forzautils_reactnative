@@ -8,7 +8,7 @@ import { IThemeElements } from "../../constants/Themes";
 import { useSelector } from "react-redux";
 import { getTheme } from "../../redux/ThemeStore";
 import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
-import { useReplay } from "../../context/Replay";
+import { useReplay } from "../../context/Recorder";
 import { useLogger } from "../../context/Logger";
 import { useNetworkContext } from "../../context/Network";
 import { StackNavigation } from "../../constants/types";

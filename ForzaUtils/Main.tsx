@@ -6,20 +6,20 @@ import { PermissionsWatcher } from "./src/context/Permissions";
 import { NetworkWatcher } from "./src/context/Network";
 import { ViewModelStore_Hoc } from "./src/context/viewModels/ViewModelStore";
 import { CacheProvider } from "./src/context/Cache";
-import { ReplayProvider } from "./src/context/Replay";
+import { RecorderProvider } from "./src/context/Recorder";
 
 function Main() {
   return (
     <CacheProvider>
       <Provider store={AppStore}>
         <PermissionsWatcher>
-          <ReplayProvider>
+          <RecorderProvider>
             <NetworkWatcher>
               <ViewModelStore_Hoc>
                 <App />
               </ViewModelStore_Hoc>
             </NetworkWatcher>
-          </ReplayProvider>
+          </RecorderProvider>
         </PermissionsWatcher>
       </Provider>
     </CacheProvider>

@@ -80,7 +80,7 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   const replaySession = useRef<ISession | undefined>(undefined);
   const throttledPacket = useRef<ITelemetryData>(undefined);
   const animationFrameId = useRef<number | undefined>(undefined);
-  const replayDelay = useRef<number>(500);
+  const replayDelay = useRef<number>(100);
 
   /**
    * Handler for the Socket service instance
@@ -131,7 +131,6 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
    */
   const updatePacketState = async () => {
     if (replaySession.current) {
-      logger.log(tag, `use replay: ${replaySession.current.currentReadOffset} - ${replaySession.current.info.length}`);
       throttledPacket.current = (await replaySession.current.readPacket()) || undefined;
       await delay(replayDelay.current);
     }
