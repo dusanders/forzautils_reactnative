@@ -1,12 +1,12 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
 import { useSelector } from "react-redux";
 import { getTheme } from "../../redux/ThemeStore";
 import { useLogger } from "../../context/Logger";
 import { useReplay } from "../../context/Recorder";
 import { ThemeIcon } from "../ThemeIcon";
-import { useNetworkContext } from "../../context/Network";
+import { ReplayState, useNetworkContext } from "../../context/Network";
 import { ThemeText } from "../ThemeText";
 
 export interface ReplayBarProps {
@@ -21,19 +21,37 @@ export function ReplayBar(props: ReplayBarProps) {
   return (
     <View style={styles.root}>
       <View>
-        <ThemeIcon
-          name={network.replay ? 'play' : 'pause'}
-          size={theme.sizes.icon} />
+        <TouchableOpacity
+          onPress={() => {
+            network.setReplayState(network.replayState === ReplayState.PLAYING
+              ? ReplayState.PAUSED
+              : ReplayState.PLAYING
+            );
+          }}>
+          <ThemeIcon
+            name={network.replayState === ReplayState.PLAYING ? 'pause' : 'play-arrow'}
+            size={theme.sizes.icon} />
+        </TouchableOpacity>
       </View>
-      <View>
+      <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <ThemeText style={{ marginRight: theme.sizes.borderRadius }}>
+          {network.replay?.currentReadOffset} / {network.replay?.info.length}
+        </ThemeText>
         <ThemeText>
           {network.replay ? network.replay.info.name : 'No Replay'}
         </ThemeText>
       </View>
       <View>
-        <ThemeIcon
-          name={'close'}
-          size={theme.sizes.icon} />
+        <TouchableOpacity
+          onPress={() => {
+            network.setReplayState(ReplayState.STOPPED);
+            network.setReplaySession(undefined);
+            logger.log(tag, `Stopped replay`);
+          }}>
+          <ThemeIcon
+            name={'close'}
+            size={theme.sizes.icon} />
+        </TouchableOpacity>
       </View>
     </View>
   )

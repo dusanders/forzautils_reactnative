@@ -11,6 +11,12 @@ import { ISession } from '../services/Database/DatabaseInterfaces';
 
 //#region Definitions
 
+export enum ReplayState {
+  STOPPED = 'STOPPED',
+  PLAYING = 'PLAYING',
+  PAUSED = 'PAUSED'
+}
+
 export interface INetworkContext {
   /**
    * Current replay session
@@ -20,6 +26,15 @@ export interface INetworkContext {
    * Delay in milliseconds between reading and sending replay packets
    */
   replayDelay: number;
+  /**
+   * Current replay state
+   */
+  replayState: ReplayState;
+  /**
+   * Set the replay state
+   * @param state Replay state to set
+   */
+  setReplayState(state: ReplayState): void;
   /**
    * Time to wait between reading and sending replay packets
    * @param ms Time delay in MS
@@ -76,7 +91,8 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   const setPacket = useSetPacket();
   const [loaded, setLoaded] = useState(false);
   const [wifiInfo, setWifiInfo] = useState<NetInfoState | undefined>(undefined);
-  const [isReplay, setIsReplay] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const replayState = useRef<ReplayState>(ReplayState.STOPPED);
   const replaySession = useRef<ISession | undefined>(undefined);
   const throttledPacket = useRef<ITelemetryData>(undefined);
   const animationFrameId = useRef<number | undefined>(undefined);
@@ -130,14 +146,14 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
    * This is called at a regular interval to avoid flooding the UI
    */
   const updatePacketState = async () => {
-    if (replaySession.current) {
+    if (replaySession.current && replayState.current === ReplayState.PLAYING) {
       throttledPacket.current = (await replaySession.current.readPacket()) || undefined;
       await delay(replayDelay.current);
     }
     if (throttledPacket.current) {
       setPacket(throttledPacket.current);
     }
-    animationFrameId.current = requestAnimationFrame(updatePacketState);
+    animationFrameId.current = requestAnimationFrame(() => { updatePacketState() });
   }
 
   /**
@@ -173,7 +189,7 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   useEffect(() => {
     if (reduxWifiState.isUdpListening) {
       logger.debug(tag, `Starting packet flush interval`);
-      animationFrameId.current = requestAnimationFrame(updatePacketState);
+      updatePacketState();
     } else {
       logger.debug(tag, `Stopping packet flush interval`);
       closeAnimationFrame();
@@ -229,29 +245,29 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
     }
   }, [wifiInfo]);
 
-  /**
-   * Update replay state
-   */
-  useEffect(() => {
-    logger.log(tag, `setting replay session: ${replaySession.current?.info.name} : ${animationFrameId.current}`);
-    if (isReplay) {
-      // Only start the animation frame if not already started
-      if (!animationFrameId.current) {
-        updatePacketState();
-      }
-    }
-  }, [isReplay]);
-
   return (
     <NetworkContext.Provider value={{
       replay: replaySession.current,
       replayDelay: replayDelay.current,
+      replayState: replayState.current,
+      setReplayState: (state) => {
+        logger.debug(tag, `Setting replay state: ${replayState.current} -> ${state}`);
+        replayState.current = state;
+        setIsPlaying(state === ReplayState.PLAYING);
+      },
       setReplayDelay: (ms) => {
         replayDelay.current = ms;
       },
       setReplaySession: (session) => {
         replaySession.current = session;
-        setIsReplay(Boolean(session));
+        replaySession.current = session;
+        replayState.current = Boolean(session)
+          ? ReplayState.PLAYING
+          : ReplayState.STOPPED;
+        if (!animationFrameId.current) {
+          updatePacketState();
+        }
+        setIsPlaying(replayState.current === ReplayState.PLAYING);
       },
       DEBUG: () => {
         Socket.getInstance(logger).DEBUG();

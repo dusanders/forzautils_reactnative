@@ -22,6 +22,7 @@ export interface DataChooserProps {
 }
 
 export function DataChooser(props: DataChooserProps) {
+  const tag = 'DataChooser.tsx';
   const theme = useSelector(getTheme);
   const styles = themeStyles(theme);
   const packet = useSelector(getForzaPacket);
@@ -120,7 +121,7 @@ export function DataChooser(props: DataChooserProps) {
   }
 
   useEffect(() => {
-    if (!network.replay) {
+    if (!Boolean(network.replay)) {
       network.DEBUG();
     } else {
       network.STOP_DEBUG();
