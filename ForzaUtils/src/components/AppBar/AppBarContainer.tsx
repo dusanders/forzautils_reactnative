@@ -37,6 +37,7 @@ export function AppBarContainer(props: AppBarContainerProps) {
       <AppBar {...props} />
       <View style={{
         paddingTop: theme.sizes.navBar + theme.sizes.borderRadius,
+        paddingBottom: Boolean(network.replay) ? theme.sizes.navBar : 0,
       }}>
         {props.children}
       </View>
