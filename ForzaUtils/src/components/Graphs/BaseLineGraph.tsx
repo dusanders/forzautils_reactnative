@@ -131,7 +131,6 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
         <Svg
           viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`}
           onLayout={(ev) => {
-            console.log(ev.nativeEvent.layout);
             setRenderedLayout({
               width: ev.nativeEvent.layout.width,
               height: ev.nativeEvent.layout.height

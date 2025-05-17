@@ -141,7 +141,6 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
     if (existing && existing.events?.length) {
       const last = existing.events[existing.events.length];
       if (last && (forza.rpmData.current < last.rpm)) {
-        console.log(`skip decel`)
         return;
       }
     }

@@ -25,7 +25,6 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
   const [loaded, setLoaded] = useState(false);
 
   const ensurePermissions = async () => {
-    console.log(`ensuring permissions...`);
     if(permissionState.isGranted == 'blocked') {
       setLoaded(true);
       return;
@@ -36,7 +35,6 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
         permList = iosPermissionList
     };
     const systemPermissions = await requestMultiple(permList);
-    console.log(`done checking ${JSON.stringify(systemPermissions)}`);
     let allAllowed = false;
     let allBlocked = false;
     let allDenied = false;
@@ -57,7 +55,6 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
   // didMount initial logic
   useEffect(() => {
     const stateHandler = async (state: AppStateStatus) => {
-      console.log(`APP CHANGE: ${state}`);
       if (state === 'active') {
         await ensurePermissions();
       }

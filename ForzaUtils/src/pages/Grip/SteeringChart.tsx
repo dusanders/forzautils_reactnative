@@ -22,8 +22,6 @@ export const SteeringChart = memo((props: SteeringChartProps) => {
   const [steeringViewLayout, setSteeringViewLayout] = useState<LayoutRectangle>(defaultLayout);
   const [indicatorPosition, setIndicatorPosition] = useState(50);
   useEffect(() => {
-    console.log(`layout: ${JSON.stringify(steeringViewLayout)}`);
-    console.log(`angle: ${props.steeringAngle}`);
     if(props.steeringAngle === 0 || steeringViewLayout.width === 0) {
       setIndicatorPosition(steeringViewLayout.width / 2);
       return;
