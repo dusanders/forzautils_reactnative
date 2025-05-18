@@ -91,7 +91,7 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   const setPacket = useSetPacket();
   const [loaded, setLoaded] = useState(false);
   const [wifiInfo, setWifiInfo] = useState<NetInfoState | undefined>(undefined);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [renderHack, setRenderHack] = useState(false);
   const replayState = useRef<ReplayState>(ReplayState.STOPPED);
   const replaySession = useRef<ISession | undefined>(undefined);
   const throttledPacket = useRef<ITelemetryData>(undefined);
@@ -253,21 +253,20 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
       setReplayState: (state) => {
         logger.debug(tag, `Setting replay state: ${replayState.current} -> ${state}`);
         replayState.current = state;
-        setIsPlaying(state === ReplayState.PLAYING);
+        setRenderHack(!renderHack);
       },
       setReplayDelay: (ms) => {
         replayDelay.current = ms;
       },
       setReplaySession: (session) => {
         replaySession.current = session;
-        replaySession.current = session;
         replayState.current = Boolean(session)
-          ? ReplayState.PLAYING
+          ? ReplayState.PAUSED
           : ReplayState.STOPPED;
         if (!animationFrameId.current) {
           updatePacketState();
         }
-        setIsPlaying(replayState.current === ReplayState.PLAYING);
+        setRenderHack(!renderHack);
       },
       DEBUG: () => {
         Socket.getInstance(logger).DEBUG();
