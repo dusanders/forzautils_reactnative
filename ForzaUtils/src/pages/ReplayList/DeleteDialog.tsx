@@ -1,11 +1,10 @@
 import React from "react";
 import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
 import { StyleSheet, View } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
 import { TextCard } from "../../components/TextCard";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface DeleteDialogProps {
   session: ISessionInfo;
@@ -14,7 +13,7 @@ export interface DeleteDialogProps {
 }
 
 export function DeleteDialog(props: DeleteDialogProps) {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
   return (
     <View style={styles.root}>

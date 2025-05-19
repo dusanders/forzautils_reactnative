@@ -1,11 +1,9 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { TextCard } from "../../components/TextCard";
 import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
 import { CardContainer } from "../../components/CardContainer";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface TireInfoProps {
   temp: number;
@@ -13,7 +11,7 @@ export interface TireInfoProps {
 }
 
 export function TireInfo(props: TireInfoProps) {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const style = themeStyles(theme);
 
   const colorForTemp = (temp: number) => {

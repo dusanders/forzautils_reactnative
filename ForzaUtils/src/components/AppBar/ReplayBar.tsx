@@ -1,13 +1,11 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
 import { useLogger } from "../../context/Logger";
-import { useReplay } from "../../context/Recorder";
 import { ThemeIcon } from "../ThemeIcon";
 import { ReplayState, useNetworkContext } from "../../context/Network";
 import { ThemeText } from "../ThemeText";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface ReplayBarProps {
 }
@@ -15,7 +13,7 @@ export function ReplayBar(props: ReplayBarProps) {
   const tag = `ReplayBar.tsx`;
   const logger = useLogger();
   const network = useNetworkContext();
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
 
   return (

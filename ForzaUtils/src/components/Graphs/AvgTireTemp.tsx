@@ -1,16 +1,15 @@
 import React from "react";
 import { CardContainer } from "../CardContainer";
 import { BaseLineGraph } from "./BaseLineGraph";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
 import { StyleSheet } from "react-native";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface AvgTireTempProps {
 }
 
 export function AvgTireTemps(props: AvgTireTempProps) {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
   const viewModel = useViewModelStore().tireTemps;
 

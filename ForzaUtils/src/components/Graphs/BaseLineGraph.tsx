@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Paper } from "../Paper";
 import { StyleSheet, View } from "react-native";
-import { useSelector } from "react-redux";
 import { IThemeElements } from "../../constants/Themes";
-import { getTheme } from "../../redux/ThemeStore";
 import Svg, { Path, Text } from "react-native-svg";
 import { ThemeText } from "../ThemeText";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface IGraphData {
   color: string;
@@ -30,7 +29,7 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   const widthScalar = props.dataLength;
   const [renderedLayout, setRenderedLayout] = useState({ width: 1, height: 1 });
   const [viewBox, setViewBox] = useState({ minX: -1, minY: 1, width: 1, height: 1 });
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
   const [paths, setPaths] = useState<string[]>([]);
   const [yLimits, setYLimits] = useState<YValueLimits>({

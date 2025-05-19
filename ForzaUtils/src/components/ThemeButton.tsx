@@ -1,15 +1,14 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, TouchableOpacityProps } from "react-native";
 import { IThemeElements } from "../constants/Themes";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
+import { useCurrentTheme } from "../hooks/ThemeState";
 
 export interface ThemeButtonProps extends TouchableOpacityProps {
   children?: any;
 }
 
 export function ThemeButton(props: ThemeButtonProps) {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
 
   return (

@@ -2,8 +2,7 @@ import React, { memo, useEffect, useState } from "react";
 import { LayoutRectangle, StyleSheet, View } from "react-native";
 import { ThemeText } from "../../components/ThemeText";
 import { IThemeElements } from "../../constants/Themes";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface SteeringChartProps {
   steeringAngle: number;
@@ -17,7 +16,7 @@ const defaultLayout: LayoutRectangle = {
 }
 
 export const SteeringChart = memo((props: SteeringChartProps) => {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const style = themeStyles(theme);
   const [steeringViewLayout, setSteeringViewLayout] = useState<LayoutRectangle>(defaultLayout);
   const [indicatorPosition, setIndicatorPosition] = useState(50);

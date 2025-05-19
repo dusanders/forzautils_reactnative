@@ -2,12 +2,10 @@ import React, { useEffect } from "react";
 import { Container, ContainerProps } from "../Container";
 import { AppBar, AppBarProps } from "./AppBar";
 import { View } from "react-native";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
-import { useReplay } from "../../context/Recorder";
 import { useLogger } from "../../context/Logger";
 import { ReplayBar } from "./ReplayBar";
 import { useNetworkContext } from "../../context/Network";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface AppBarContainerProps extends ContainerProps, AppBarProps {
 
@@ -15,7 +13,7 @@ export interface AppBarContainerProps extends ContainerProps, AppBarProps {
 
 export function AppBarContainer(props: AppBarContainerProps) {
   const tag = `AppBarContainer.tsx`;
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const logger = useLogger();
   const network = useNetworkContext();
 

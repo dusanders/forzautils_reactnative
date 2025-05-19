@@ -6,16 +6,16 @@ import { TextCard } from "../components/TextCard";
 import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
 import { TrackMap } from "../components/TrackMap";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
 import { AvgSuspensionTravel } from "../components/Graphs/AvgSuspensionTravel";
 import { AvgTireTemps } from "../components/Graphs/AvgTireTemp";
 import { useLogger } from "../context/Logger";
 import { ThemeText } from "../components/ThemeText";
 import { ThemeSwitch } from "../components/ThemeSwitch";
 import { useReplay } from "../context/Recorder";
-import { getForzaPacket } from "../redux/WifiStore";
 import { useNetworkContext } from "../context/Network";
+import { useAtomValue } from "jotai";
+import { packetAtom } from "../hooks/PacketState";
+import { useCurrentTheme } from "../hooks/ThemeState";
 
 export interface DataChooserProps {
 
@@ -23,9 +23,9 @@ export interface DataChooserProps {
 
 export function DataChooser(props: DataChooserProps) {
   const tag = 'DataChooser.tsx';
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
-  const packet = useSelector(getForzaPacket);
+  const packet = useAtomValue(packetAtom);
   const network = useNetworkContext();
   const logger = useLogger();
   const navigation = useNavigation<StackNavigation>();

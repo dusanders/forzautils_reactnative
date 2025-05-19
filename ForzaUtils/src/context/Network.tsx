@@ -1,13 +1,14 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLogger } from './Logger';
 import { addEventListener, NetInfoState, NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
-import { getWifiState, useSetPacket, useSetWifiState } from '../redux/WifiStore';
 import { Splash } from '../pages/Splash';
 import { delay, LISTEN_PORT } from '../constants/types';
 import { ITelemetryData } from 'ForzaTelemetryApi';
 import { ISocketCallback, Socket } from '../services/Socket';
-import { useSelector } from 'react-redux';
 import { ISession } from '../services/Database/DatabaseInterfaces';
+import { useAtom } from 'jotai';
+import { initialState, wifiState } from '../hooks/WifiState';
+import { packetState } from '../hooks/PacketState';
 
 //#region Definitions
 
@@ -85,12 +86,9 @@ export interface NetworkWatcherProps {
 export function NetworkWatcher(props: NetworkWatcherProps) {
   const tag = "NetworkWatcher.tsx";
   const logger = useLogger();
-  const [port, setPort] = useState(0);
-  const updateReduxWifiState = useSetWifiState();
-  const reduxWifiState = useSelector(getWifiState);
-  const setPacket = useSetPacket();
+  const [currentWifiState, setNewWifiState] = useAtom(wifiState);
+  const [currentPacket, setCurrentPacket] = useAtom(packetState);
   const [loaded, setLoaded] = useState(false);
-  const [wifiInfo, setWifiInfo] = useState<NetInfoState | undefined>(undefined);
   const [renderHack, setRenderHack] = useState(false);
   const replayState = useRef<ReplayState>(ReplayState.STOPPED);
   const replaySession = useRef<ISession | undefined>(undefined);
@@ -104,11 +102,17 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   const socketCallbacks = useMemo<ISocketCallback>(() => ({
     onClose: (ev) => {
       logger.debug(tag, `socket did close ${(ev as Error)?.message}`);
-      setPort(0);
+      setNewWifiState({
+        ...currentWifiState,
+        port: 0
+      });
     },
     onError: (ev) => {
       logger.error(tag, `Socket error: ${ev?.message}`);
-      setPort(0);
+      setNewWifiState({
+        ...currentWifiState,
+        port: 0
+      });
     },
     onPacket: (packet) => {
       if (!replaySession.current) {
@@ -116,19 +120,6 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
       }
     }
   }), []);
-
-  /**
-   * Handler attached to the network state listener
-   */
-  const netInfoCallback = useCallback((state: NetInfoState) => {
-    setWifiInfo((prevWifiInfo) => {
-      if (state.type !== prevWifiInfo?.type || state.isConnected !== prevWifiInfo?.isConnected) {
-        return state; // Update the state only if it has changed
-      }
-      return prevWifiInfo; // Keep the previous state if nothing has changed
-    });
-    setLoaded(true);
-  }, []);
 
   /**
    * Close the animation frame request
@@ -151,34 +142,34 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
       await delay(replayDelay.current);
     }
     if (throttledPacket.current) {
-      setPacket(throttledPacket.current);
+      setCurrentPacket({ packet: throttledPacket.current });
     }
     animationFrameId.current = requestAnimationFrame(() => { updatePacketState() });
-  }
-
-  /**
-   * Determine if the device is connected to a Wifi network
-   * @param netInfo Network state object
-   * @returns 
-   */
-  const isWifiConnected = (netInfo: NetInfoState | undefined) => {
-    if (!netInfo) {
-      logger.error(tag, `Failed to get NetInfo! ${JSON.stringify(netInfo)}`);
-      return false
-    };
-    return netInfo.type === NetInfoStateType.wifi
-      && netInfo.isConnected;
   }
 
   /**
    * Gather and update the Wifi state
    */
   useEffect(() => {
-    let netInfoSub: NetInfoSubscription = addEventListener(netInfoCallback);
+    let netInfoSub: NetInfoSubscription = addEventListener((state: NetInfoState) => {
+      if (!state || state.type !== NetInfoStateType.wifi) {
+        setNewWifiState(initialState);
+      } else if (state.type === NetInfoStateType.wifi && state.isConnected) {
+        setNewWifiState((prev) => {
+          return {
+            isConnected: true,
+            isUdpListening: prev.isUdpListening,
+            port: prev.port,
+            ip: state.details?.ipAddress || ""
+          }
+        });
+      }
+    });
     return () => {
       if (netInfoSub) {
         netInfoSub();
       }
+      Socket.getInstance(logger).close();
       closeAnimationFrame();
     }
   }, []);
@@ -187,18 +178,14 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
    * Throttle the packet data to avoid flooding the UI
    */
   useEffect(() => {
-    if (reduxWifiState.isUdpListening) {
+    if (currentWifiState.isUdpListening) {
       logger.debug(tag, `Starting packet flush interval`);
       updatePacketState();
     } else {
       logger.debug(tag, `Stopping packet flush interval`);
       closeAnimationFrame();
     }
-    return () => {
-      logger.log(tag, `effect return on UDP listener!!!`);
-      closeAnimationFrame();
-    }
-  }, [reduxWifiState.isUdpListening]);
+  }, [currentWifiState.isUdpListening]);
 
   /**
    * Handle Wifi connection state changes
@@ -208,42 +195,23 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
     const tryConnect = async () => {
       socket = Socket.getInstance(logger);
       let listeningPort = await socket.bind(LISTEN_PORT, socketCallbacks);
-      updateReduxWifiState({
-        ip: (wifiInfo?.details as any).ipAddress,
+      setNewWifiState({
+        isConnected: currentWifiState.isConnected,
+        isUdpListening: listeningPort > 0,
         port: listeningPort,
-        isConnected: isWifiConnected(wifiInfo),
-        isUdpListening: listeningPort > 0
-      })
+        ip: currentWifiState.ip
+      });
+      setLoaded(true);
     }
-    if (wifiInfo?.isConnected) {
+    if (currentWifiState.isConnected) {
+      logger.debug(tag, `Wifi connected!`);
       tryConnect();
     } else {
       logger.debug(tag, `Wifi disconnected!`);
+      setNewWifiState(initialState);
       socket?.close()
     }
-    setLoaded(true);
-    return () => {
-      logger.log(tag, `useEffect returns isConnected!!!`);
-      if (socket) {
-        socket.close();
-      }
-      closeAnimationFrame();
-    }
-  }, [wifiInfo?.isConnected]);
-
-  /**
-   * Update wifi state when the network state changes
-   */
-  useEffect(() => {
-    if (wifiInfo && wifiInfo.isConnected) {
-      updateReduxWifiState({
-        ip: (wifiInfo.details as any).ipAddress,
-        port: port,
-        isConnected: isWifiConnected(wifiInfo),
-        isUdpListening: port > 0
-      });
-    }
-  }, [wifiInfo]);
+  }, [currentWifiState.isConnected]);
 
   return (
     <NetworkContext.Provider value={{

@@ -5,14 +5,13 @@ import { useNavigation } from "@react-navigation/native";
 import { Row } from "../../components/Row";
 import { ThemeText } from "../../components/ThemeText";
 import { IThemeElements } from "../../constants/Themes";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
 import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
 import { useReplay } from "../../context/Recorder";
 import { useLogger } from "../../context/Logger";
 import { useNetworkContext } from "../../context/Network";
 import { StackNavigation } from "../../constants/types";
 import { DeleteDialog } from "./DeleteDialog";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface ReplayListProps {
 
@@ -24,7 +23,7 @@ export function ReplayList(props: ReplayListProps) {
   const navigation = useNavigation<StackNavigation>();
   const replay = useReplay();
   const network = useNetworkContext();
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
   const [sessions, setSessions] = useState<ISessionInfo[]>([]);
   const [toDelete, setToDelete] = useState<ISessionInfo | undefined>(undefined);

@@ -11,8 +11,7 @@ import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface HpTqGraphProps {
   // Nothing
@@ -20,7 +19,7 @@ export interface HpTqGraphProps {
 
 export function HptqGraph(props: HpTqGraphProps) {
   const navigation = useNavigation<StackNavigation>();
-  const theme = useSelector(getTheme);
+    const theme = useCurrentTheme();
   const styles = themeStyles(theme);
   const store = useViewModelStore().hpTqGraph;
   const windowMeasure = withScaledWindow(0.9, 1);

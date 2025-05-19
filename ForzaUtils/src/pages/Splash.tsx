@@ -1,15 +1,14 @@
 import React, {  } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { IThemeElements } from "../constants/Themes";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
+import { useCurrentTheme } from "../hooks/ThemeState";
 
 export interface SplashProps {
 
 }
 
 export function Splash(props: SplashProps) {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const style = withStyles(theme);
   return (
     <View style={style.root}>

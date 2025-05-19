@@ -7,9 +7,8 @@ import { AppRoutes, StackNavigation } from "../constants/types";
 import { Row } from "../components/Row";
 import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "../components/ThemeText";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
 import { useLogger } from "../context/Logger";
+import { useCurrentTheme } from "../hooks/ThemeState";
 
 export interface SourceChooserProps {
   // None
@@ -19,7 +18,7 @@ export function SourceChooser(props: SourceChooserProps) {
   const tag = 'SourceChooser.tsx';
   const navigation = useNavigation<StackNavigation>();
   const logger = useLogger();
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
 
   return (

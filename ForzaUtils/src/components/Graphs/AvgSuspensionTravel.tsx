@@ -1,17 +1,16 @@
 import React, {  } from "react";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { StyleSheet } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
 import { BaseLineGraph } from "./BaseLineGraph";
 import { CardContainer } from "../CardContainer";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface IAvgSuspensionTravelProps {
 }
 
 export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
   const viewModel = useViewModelStore().suspensionGraph;
 

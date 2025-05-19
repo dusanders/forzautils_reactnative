@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useDataWindow } from "../../constants/types";
-import { useSelector } from "react-redux";
-import { getForzaPacket } from "../../redux/WifiStore";
+import { useAtomValue } from "jotai";
+import { packetAtom } from "../../hooks/PacketState";
 
 export interface AverageTempData {
   front: number;
@@ -42,7 +42,7 @@ const debugData: AverageTempData[] = [
 export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 50;
-  const forza = useSelector(getForzaPacket);
+  const forza = useAtomValue(packetAtom);
   const avgTempWindow = useDataWindow<AverageTempData>(windowSize);
 
   useEffect(() => {

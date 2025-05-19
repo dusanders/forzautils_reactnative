@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { StyleSheet } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
-import { Picker, PickerIOS } from "@react-native-picker/picker";
+import { Picker } from "@react-native-picker/picker";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface IDropdownOption {
   label: string;
@@ -17,7 +16,7 @@ export interface DropdownProps {
 }
 
 export function Dropdown(props: DropdownProps) {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
   const [value, setValue] = useState(props.value);
 

@@ -1,8 +1,8 @@
 import { DirectionalData } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { getForzaPacket } from "../../redux/WifiStore";
 import { useLogger } from "../Logger";
+import { useAtomValue } from "jotai";
+import { packetAtom } from "../../hooks/PacketState";
 
 export interface PlayerPosition {
   x: number;
@@ -49,7 +49,7 @@ const initialViewBox: SvgViewBoxMeasures = {
 export function useMapViewModel(): IMapViewModel {
   const tag = 'MapViewModel';
   const logger = useLogger();
-  const forza = useSelector(getForzaPacket);
+  const forza = useAtomValue(packetAtom);
   const [trackId, setTrackId] = useState(0);
   const [svg, setSvg] = useState('');
   const [viewBox, setViewBox] = useState<SvgViewBoxMeasures>(initialViewBox);

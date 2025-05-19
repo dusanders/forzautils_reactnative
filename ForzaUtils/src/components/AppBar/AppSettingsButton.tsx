@@ -1,7 +1,5 @@
 import { ReactElement, useCallback } from "react";
 import { TouchableOpacity } from "react-native";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
 
 
 export interface AppBarSettingsButtonParams {
@@ -20,7 +18,7 @@ export function AppSettingsButton(props: AppSettingsButtonProps) {
   const handleClick = useCallback(() => {
     props.onPress()
   }, [props.onPress]);
-  const theme = useSelector(getTheme);
+  
   return (
     <TouchableOpacity
       testID={props.testID}

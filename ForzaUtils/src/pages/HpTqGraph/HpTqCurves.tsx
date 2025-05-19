@@ -3,8 +3,7 @@ import LineChart, { LineChartData } from "react-native-chart-kit/dist/line-chart
 import { Paper } from "../../components/Paper";
 import { ThemeText } from "../../components/ThemeText";
 import { DataEvent } from "../../context/viewModels/HpTqGraphViewModel";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 
 export interface HpTqCurvesProps {
@@ -14,7 +13,7 @@ export interface HpTqCurvesProps {
 }
 
 export const HpTqCurves = memo((props: HpTqCurvesProps) => {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const sorted = props.data.sort((a, b) => a.rpm - b.rpm);
 
   const lineData: LineChartData = {

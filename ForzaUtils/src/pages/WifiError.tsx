@@ -3,15 +3,14 @@ import { StyleSheet } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "../components/ThemeText";
 import { Container } from "../components/Container";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
+import { useCurrentTheme } from "../hooks/ThemeState";
 
 export interface WifiErrorProps {
 
 }
 
 export function WifiError(props: WifiErrorProps) {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
 
   return (

@@ -8,13 +8,12 @@ import { Row } from "../../components/Row";
 import { CardContainer } from "../../components/CardContainer";
 import { ThemeSwitch } from "../../components/ThemeSwitch";
 import { LabelText } from "../../components/ThemeText";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
 import { Drivetrain } from "ForzaTelemetryApi";
 import { TextCard } from "../../components/TextCard";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { EngineLayout } from "../../context/viewModels/TuningViewModel";
 import { Dropdown } from "./Dropdown";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface TuningPageProps {
   // Nothing
@@ -24,7 +23,7 @@ export function TuningPage(props: TuningPageProps) {
   const tag = 'TuningPage.tsx';
   const viewModel = useViewModelStore().tuning;
   const navigation = useNavigation();
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const styles = themeStyles(theme);
   const [weightInput, setWeightInput] = useState(viewModel.totalVehicleWeight.toString());
   const [frontDistInput, setFrontDistInput] = useState(viewModel.frontDistribution.toLocaleString());

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Dimensions, FlatList, ScrollView, StyleSheet, View } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
@@ -9,10 +9,10 @@ import { ThemeIcon } from "../components/ThemeIcon";
 import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { Row } from "../components/Row";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
 import { CircleCheckIcon } from "../components/CircleCheckIcon";
-import { getWifiState } from "../redux/WifiStore";
+import { useAtomValue } from "jotai";
+import { wifiState } from "../hooks/WifiState";
+import { useCurrentTheme } from "../hooks/ThemeState";
 
 export interface WifiInfoProps {
   // None
@@ -20,8 +20,8 @@ export interface WifiInfoProps {
 
 export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps> {
   const tag = "WifiInfo.tsx";
-  const theme = useSelector(getTheme);
-  const wifiInfo = useSelector(getWifiState);
+  const theme = useCurrentTheme();
+  const wifiInfo = useAtomValue(wifiState);
   const styles = themeStyles(theme);
   const navigation = useNavigation<StackNavigation>();
 

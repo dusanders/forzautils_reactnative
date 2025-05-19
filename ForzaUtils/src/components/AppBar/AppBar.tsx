@@ -6,8 +6,8 @@ import { ThemeIcon } from "../ThemeIcon";
 import { Container } from "../Container";
 import { ThemeSwitch } from "../ThemeSwitch";
 import { AppBarSettingsButtonParams, AppSettingsButton } from "./AppSettingsButton";
-import { useSelector } from "react-redux";
-import { getTheme, getThemeType, useSetTheme } from "../../redux/ThemeStore";
+import { setThemeAtom, themeAtom, themeTypeAtom } from "../../hooks/ThemeState";
+import { useAtomValue, useSetAtom } from "jotai";
 
 export const AppBarTestID = {
   root: 'app-bar-root',
@@ -29,9 +29,9 @@ export interface AppBarProps {
 
 export function AppBar(props: AppBarProps) {
   const [showSettings, setShowSettings] = useState(false);
-  const theme = useSelector(getTheme);
-  const themeType = useSelector(getThemeType);
-  const setTheme = useSetTheme();
+  const theme = useAtomValue(themeAtom);
+  const themeType = useAtomValue(themeTypeAtom);
+  const test = useSetAtom(setThemeAtom);
   const style = themeStyles(theme);
   let doShowSettingsButton = true;
   if (props.hideSettings != undefined) {
@@ -104,7 +104,7 @@ export function AppBar(props: AppBarProps) {
                 <ThemeSwitch
                   onPalette={'secondary'}
                   onValueChange={(val) => {
-                    setTheme(val ? 'dark' : 'light');
+                    test(val ? 'dark' : 'light');
                   }}
                   value={themeType === 'dark'} />
               </View>

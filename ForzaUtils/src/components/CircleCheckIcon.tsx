@@ -1,7 +1,6 @@
 import { View } from "react-native";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
 import { ThemeIcon } from "./ThemeIcon";
+import { useCurrentTheme } from "../hooks/ThemeState";
 
 
 export interface CircleCheckIconProps {
@@ -9,7 +8,7 @@ export interface CircleCheckIconProps {
 }
 
 export function CircleCheckIcon(props: CircleCheckIconProps) {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   return (
     <View style={{
       height: 50,

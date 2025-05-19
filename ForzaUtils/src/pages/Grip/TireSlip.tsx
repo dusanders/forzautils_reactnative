@@ -4,8 +4,7 @@ import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
 import { Row } from "../../components/Row";
 import { TextCard } from "../../components/TextCard";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface TireSlipProps {
   leftFront: number;
@@ -15,7 +14,7 @@ export interface TireSlipProps {
 }
 
 export function TireSlip(props: TireSlipProps) {
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const style = themeStyles(theme);
 
   return (

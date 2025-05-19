@@ -9,8 +9,7 @@ import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { useCurrentTheme } from "../../hooks/ThemeState";
 
 export interface SuspensionTravelProps {
   // Nothing
@@ -39,7 +38,7 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   const store = useViewModelStore();
   const viewModel = store.suspensionGraph;
   const navigation = useNavigation<StackNavigation>();
-  const theme = useSelector(getTheme);
+  const theme = useCurrentTheme();
   const dimensions = withScaledWindow(0.9, 0.3);
   const style = themeStyles(theme);
 
