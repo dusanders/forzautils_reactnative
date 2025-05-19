@@ -31,7 +31,7 @@ export function AppBar(props: AppBarProps) {
   const [showSettings, setShowSettings] = useState(false);
   const theme = useAtomValue(themeAtom);
   const themeType = useAtomValue(themeTypeAtom);
-  const test = useSetAtom(setThemeAtom);
+  const setNewTheme = useSetAtom(setThemeAtom);
   const style = themeStyles(theme);
   let doShowSettingsButton = true;
   if (props.hideSettings != undefined) {
@@ -104,7 +104,7 @@ export function AppBar(props: AppBarProps) {
                 <ThemeSwitch
                   onPalette={'secondary'}
                   onValueChange={(val) => {
-                    test(val ? 'dark' : 'light');
+                    setNewTheme(val ? 'dark' : 'light');
                   }}
                   value={themeType === 'dark'} />
               </View>

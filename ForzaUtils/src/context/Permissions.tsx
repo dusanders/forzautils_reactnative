@@ -3,9 +3,9 @@ import { Permission, PERMISSIONS, requestMultiple } from "react-native-permissio
 import { useSelector } from "react-redux";
 import { PermissionError } from "../pages/PermissionError";
 import { AppState, AppStateStatus, Platform } from "react-native";
-import { setPermissionState } from "../redux/PermissionStore";
 import { Splash } from "../pages/Splash";
-import { AppStoreState } from "../redux/AppStore";
+import { useAtom, useSetAtom } from "jotai";
+import { setPermissionAtom, useCurrentPermission } from "../hooks/PermissionState";
 
 export interface PermissionsWatchProps {
   children?: any;
@@ -21,11 +21,12 @@ const iosPermissionList: Permission[] = [
 
 export function PermissionsWatcher(props: PermissionsWatchProps) {
   const tag = "PermissionsWatch.tsx";
-  const permissionState = useSelector((state: AppStoreState) => state.permissions);
+  const permissionState = useCurrentPermission();
+  const setPermissions = useSetAtom(setPermissionAtom);
   const [loaded, setLoaded] = useState(false);
 
   const ensurePermissions = async () => {
-    if(permissionState.isGranted == 'blocked') {
+    if (permissionState == 'blocked') {
       setLoaded(true);
       return;
     }
@@ -45,10 +46,10 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
     });
     if (allAllowed) {
       setLoaded(true);
-      setPermissionState({ isGranted: 'granted' });
+      setPermissions({ isGranted: 'granted' });
     } else {
       setLoaded(true);
-      setPermissionState({ isGranted: 'blocked' });
+      setPermissions({ isGranted: 'blocked' });
     }
   }
 
@@ -69,12 +70,12 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
   }, []);
 
   if (!loaded) return (<Splash />);
-  if (permissionState.isGranted != undefined) return props.children;
+  if (permissionState != undefined) return props.children;
   return (
     <PermissionError
       onIgnore={() => {
         setLoaded(true);
-        setPermissionState({ isGranted: 'granted' });
+        setPermissions({ isGranted: 'granted' });
       }}
       onOpenSettings={async () => {
         await ensurePermissions();
