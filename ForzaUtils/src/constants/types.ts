@@ -2,6 +2,17 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
 
 /**
+ * Add type for generic axle data
+ * @template T Type of data for the axle
+ * @property front Data for the front axle
+ * @property rear Data for the rear axle
+ */
+export interface AxleData<T> {
+  front: T;
+  rear: T;
+}
+
+/**
  * Add Type for react-native-udp 'rinfo' object
  */
 export interface Upd_rinfo {

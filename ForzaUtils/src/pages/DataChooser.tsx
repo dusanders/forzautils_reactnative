@@ -16,6 +16,7 @@ import { useNetworkContext } from "../context/Network";
 import { useAtomValue } from "jotai";
 import { packetAtom } from "../hooks/PacketState";
 import { useCurrentTheme } from "../hooks/ThemeState";
+import { SlipAngle } from "../components/Graphs/SlipAngle";
 
 export interface DataChooserProps {
 
@@ -35,6 +36,7 @@ export function DataChooser(props: DataChooserProps) {
   const dataElements = [
     (<AvgSuspensionTravel />),
     (<AvgTireTemps />),
+    (<SlipAngle />),
     (
       <View style={{ display: 'flex', flexDirection: 'row' }}>
         <TextCard

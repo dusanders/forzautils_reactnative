@@ -1,21 +1,17 @@
 import { useEffect, useMemo } from "react";
-import { useDataWindow } from "../../constants/types";
+import { AxleData, useDataWindow } from "../../constants/types";
 import { useAtomValue } from "jotai";
 import { packetAtom } from "../../hooks/PacketState";
 
-export interface AverageTempData {
-  front: number;
-  rear: number;
-}
 export interface ITireTempViewModel {
   leftFront: number;
   rightFront: number;
   leftRear: number;
   rightRear: number;
   avgTempWindowSize: number;
-  avgTemps: AverageTempData[];
+  avgTemps: AxleData<number>[];
 }
-const debugData: AverageTempData[] = [
+const debugData: AxleData<number>[] = [
   { front: 180, rear: 180 },
   { front: 180, rear: 180 },
   { front: 180, rear: 180 },
@@ -43,7 +39,7 @@ export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 50;
   const forza = useAtomValue(packetAtom);
-  const avgTempWindow = useDataWindow<AverageTempData>(windowSize);
+  const avgTempWindow = useDataWindow<AxleData<number>>(windowSize);
 
   useEffect(() => {
     if (forza?.tireTemp) {
