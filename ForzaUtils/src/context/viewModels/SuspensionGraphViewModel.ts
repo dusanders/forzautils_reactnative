@@ -1,19 +1,15 @@
 import { useEffect, useMemo } from "react";
-import { useDataWindow } from "../../constants/types";
+import { AxleData, useDataWindow } from "../../constants/types";
 import { useAtomValue } from "jotai";
 import { packetAtom } from "../../hooks/PacketState";
 
-interface AvgTravel {
-  front: number;
-  rear: number;
-}
 export interface ISuspensionGraphViewModel {
   leftFront: number;
   leftRear: number;
   rightFront: number;
   rightRear: number;
   windowSize: number;
-  avgTravel: AvgTravel[];
+  avgTravel: AxleData<number>[];
 }
 const debugData = [
   {
@@ -101,7 +97,7 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
   const windowSize = 50;
   const forza = useAtomValue(packetAtom);
-  const avgTravelWindow = useDataWindow<AvgTravel>(windowSize);
+  const avgTravelWindow = useDataWindow<AxleData<number>>(windowSize);
 
   useEffect(() => {
     if (forza?.normalizedSuspensionTravel) {
