@@ -141,13 +141,13 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
                 fontSize={fontSize}
                 y={0 + (fontSize / 1.4)}
                 fill={theme.colors.text.primary.onPrimary}>
-                {yLimits.maxY.toFixed(2)}
+                {yLimits.maxY === Number.MIN_SAFE_INTEGER ? 0 : yLimits.maxY.toFixed(2)}
               </Text>
               <Text
                 fontSize={fontSize}
                 y={viewBox.height - (fontSize / 1.4)}
                 fill={theme.colors.text.primary.onPrimary}>
-                {yLimits.minY.toFixed(2)}
+                {yLimits.minY === Number.MAX_SAFE_INTEGER ? 0 : yLimits.minY.toFixed(2)}
               </Text>
             </>
           )}
