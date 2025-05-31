@@ -45,6 +45,9 @@ export function useGripViewModel(): IGripViewModel {
   }, [forza?.tireSlipRatio]);
 
   useEffect(() => {
+    if(!forza || !forza.isRaceOn) {
+      return;
+    }
     const data: TireData = {
       leftFront: Number(forza?.tireSlipAngle?.leftFront.toFixed(2)) || 0,
       rightFront: Number(forza?.tireSlipAngle?.rightFront.toFixed(2)) || 0,

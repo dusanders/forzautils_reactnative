@@ -42,6 +42,9 @@ export function useTireTempsViewModel(): ITireTempViewModel {
   const avgTempWindow = useDataWindow<AxleData<number>>(windowSize);
 
   useEffect(() => {
+    if(!forza || !forza.isRaceOn) {
+      return
+    }
     if (forza?.tireTemp) {
       const leftFront = Number(forza.tireTemp.leftFront?.toFixed(2)) || 0;
       const rightFront = Number(forza.tireTemp.rightFront?.toFixed(2)) || 0;

@@ -100,6 +100,9 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const avgTravelWindow = useDataWindow<AxleData<number>>(windowSize);
 
   useEffect(() => {
+    if (!forza || !forza.isRaceOn) {
+      return;
+    }
     if (forza?.normalizedSuspensionTravel) {
       avgTravelWindow.add({
         front: (forza.normalizedSuspensionTravel.leftFront + forza.normalizedSuspensionTravel.rightFront) / 2,
