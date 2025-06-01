@@ -106,7 +106,7 @@ export class GrokCalculator implements ITuningCalculator {
   }
 
   private calculateSpringRate(axleWeight: number, height: number, aero: number = 0): number {
-    const rate = this.calculateHzFromRideHeight(height) * ((axleWeight + aero) / (2 * height));
+    const rate = this.calculateHzFromRideHeight(height) * ((axleWeight + aero) / (1.5 * height));
     const result = Number(rate.toFixed(2));
     return result;
   }
