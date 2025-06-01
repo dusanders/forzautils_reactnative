@@ -11,9 +11,9 @@ import { LabelText } from "../../components/ThemeText";
 import { Drivetrain } from "ForzaTelemetryApi";
 import { TextCard } from "../../components/TextCard";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
-import { EngineLayout } from "../../context/viewModels/TuningViewModel";
 import { Dropdown } from "./Dropdown";
 import { useCurrentTheme } from "../../hooks/ThemeState";
+import { EngineLayout } from "../../context/viewModels/Tuning/Calculators";
 
 export interface TuningPageProps {
   // Nothing
@@ -25,14 +25,14 @@ export function TuningPage(props: TuningPageProps) {
   const navigation = useNavigation();
   const theme = useCurrentTheme();
   const styles = themeStyles(theme);
-  const [weightInput, setWeightInput] = useState(viewModel.totalVehicleWeight.toString());
-  const [frontDistInput, setFrontDistInput] = useState(viewModel.frontDistribution.toLocaleString());
-  const [frontHeightInput, setFrontHeightInput] = useState(viewModel.frontHeight.toLocaleString());
-  const [rearHeightInput, setRearHeightInput] = useState(viewModel.rearHeight.toLocaleString());
-  const [frontHzInput, setFrontHzInput] = useState(viewModel.frontHz.toLocaleString());
-  const [rearHzInput, setRearHzInput] = useState(viewModel.rearHz.toLocaleString());
-  const [selectedDrivetrain, setDrivetrain] = useState(viewModel.drivetrain);
-  const [selectedLayout, setLayout] = useState(viewModel.engineLayout);
+  const [weightInput, setWeightInput] = useState(viewModel.input.totalWeight.toString());
+  const [frontDistInput, setFrontDistInput] = useState(viewModel.input.frontWeightDistribution.toLocaleString());
+  const [frontHeightInput, setFrontHeightInput] = useState(viewModel.input.rideHeight.front.toLocaleString());
+  const [rearHeightInput, setRearHeightInput] = useState(viewModel.input.rideHeight.rear.toLocaleString());
+  const [frontHzInput, setFrontHzInput] = useState(viewModel.input.suspensionHz.front.toLocaleString());
+  const [rearHzInput, setRearHzInput] = useState(viewModel.input.suspensionHz.rear.toLocaleString());
+  const [selectedDrivetrain, setDrivetrain] = useState(viewModel.input.drivetrain);
+  const [selectedLayout, setLayout] = useState(viewModel.input.engineLayout);
 
   const labelForDrivetrain = (type: Drivetrain) => {
     switch (type) {
@@ -66,8 +66,8 @@ export function TuningPage(props: TuningPageProps) {
   //#region Effects
 
   useEffect(() => {
-    setDrivetrain(viewModel.drivetrain)
-  }, [viewModel.drivetrain]);
+    setDrivetrain(viewModel.input.drivetrain)
+  }, [viewModel.input.drivetrain]);
 
   useEffect(() => {
     if (frontHzInput.endsWith('.')) {
@@ -75,7 +75,13 @@ export function TuningPage(props: TuningPageProps) {
     }
     let parsed = parseFloat(frontHzInput);
     if (parsed > 0) {
-      viewModel.setFrontHz(parsed);;
+      viewModel.setInput({
+        ...viewModel.input,
+        suspensionHz: {
+          ...viewModel.input.suspensionHz,
+          front: parsed
+        }
+      });
     }
   }, [frontHzInput]);
 
@@ -85,7 +91,13 @@ export function TuningPage(props: TuningPageProps) {
     }
     let parsed = parseFloat(rearHzInput);
     if (parsed > 0) {
-      viewModel.setRearHz(parsed);
+      viewModel.setInput({
+        ...viewModel.input,
+        suspensionHz: {
+          ...viewModel.input.suspensionHz,
+          rear: parsed
+        }
+      });
     }
   }, [rearHzInput])
 
@@ -95,7 +107,13 @@ export function TuningPage(props: TuningPageProps) {
     }
     let parsed = parseFloat(frontHeightInput);
     if (parsed > 0) {
-      viewModel.setFrontHeight(parsed);
+      viewModel.setInput({
+        ...viewModel.input,
+        rideHeight: {
+          ...viewModel.input.rideHeight,
+          front: parsed
+        }
+      });
     }
   }, [frontHeightInput]);
 
@@ -105,7 +123,13 @@ export function TuningPage(props: TuningPageProps) {
     }
     let parsed = parseFloat(rearHeightInput);
     if (parsed > 0) {
-      viewModel.setRearHeight(parsed);
+      viewModel.setInput({
+        ...viewModel.input,
+        rideHeight: {
+          ...viewModel.input.rideHeight,
+          rear: parsed
+        }
+      });
     }
   }, [rearHeightInput]);
 
@@ -115,7 +139,10 @@ export function TuningPage(props: TuningPageProps) {
     }
     let parsed = parseFloat(weightInput);
     if (parsed > 0) {
-      viewModel.setTotalVehicleWeight(parsed);
+      viewModel.setInput({
+        ...viewModel.input,
+        totalWeight: parsed
+      });
     }
   }, [weightInput]);
 
@@ -124,14 +151,17 @@ export function TuningPage(props: TuningPageProps) {
       return;
     }
     let parsed = parseFloat(frontDistInput);
-    if (parsed > 0 && parsed !== viewModel.frontDistribution) {
-      viewModel.setFrontDistribution(parsed);
+    if (parsed > 0 && parsed !== viewModel.input.frontWeightDistribution) {
+      viewModel.setInput({
+        ...viewModel.input,
+        frontWeightDistribution: parsed
+      });
     }
   }, [frontDistInput]);
 
   useEffect(() => {
-    setFrontDistInput(viewModel.frontDistribution.toLocaleString());
-  }, [viewModel.frontDistribution]);
+    setFrontDistInput(viewModel.input.frontWeightDistribution.toLocaleString());
+  }, [viewModel.input.frontWeightDistribution]);
 
   //#endregion
 
@@ -153,8 +183,13 @@ export function TuningPage(props: TuningPageProps) {
             style={styles.baseCard}
             centerContent>
             <ThemeSwitch
-              value={viewModel.hasRollCage}
-              onValueChange={(ev) => viewModel.setHasRollCage(ev)} />
+              value={viewModel.input.hasRollCage}
+              onValueChange={(ev) => {
+                viewModel.setInput({
+                  ...viewModel.input,
+                  hasRollCage: ev
+                });
+              }} />
             <LabelText>
               Roll Cage
             </LabelText>
@@ -172,7 +207,7 @@ export function TuningPage(props: TuningPageProps) {
           <TextCard
             style={styles.baseCard}
             body={'Rear Distribution'}
-            title={viewModel.rearDistribution.toFixed(0)} />
+            title={Number(100 - viewModel.input.frontWeightDistribution).toFixed(0)} />
         </Row>
         <Row>
           <CardInput
@@ -222,7 +257,10 @@ export function TuningPage(props: TuningPageProps) {
                   { value: EngineLayout.REAR, label: labelForLayout(EngineLayout.REAR) }
                 ]}
                 onValueChanged={(option) => {
-                  viewModel.setEngineLayout(option.value)
+                  viewModel.setInput({
+                    ...viewModel.input,
+                    engineLayout: option.value
+                  })
                 }} />
               <LabelText style={{ textAlign: 'center' }}>
                 Engine Layout
@@ -240,7 +278,10 @@ export function TuningPage(props: TuningPageProps) {
                   { value: Drivetrain.AWD, label: labelForDrivetrain(Drivetrain.AWD) }
                 ]}
                 onValueChanged={(option) => {
-                  viewModel.setDrivetrain(option.value)
+                  viewModel.setInput({
+                    ...viewModel.input,
+                    drivetrain: option.value
+                  });
                 }} />
               <LabelText style={{ textAlign: 'center' }}>
                 Drivetrain
@@ -252,80 +293,80 @@ export function TuningPage(props: TuningPageProps) {
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.weights.frontCorner.toFixed(2)}
+            title={viewModel.settings.cornerWeights.front.toFixed(2)}
             body={'LF Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.weights.frontAxle.toFixed(2)}
+            title={viewModel.settings.axleWeights.front.toFixed(2)}
             body={'Front Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.weights.frontCorner.toFixed(2)}
+            title={viewModel.settings.cornerWeights.front.toFixed(2)}
             body={'RF Weight'} />
         </Row>
         <Row>
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.weights.rearCorner.toFixed(2)}
+            title={viewModel.settings.cornerWeights.rear.toFixed(2)}
             body={'LR Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.weights.rearAxle.toFixed(2)}
+            title={viewModel.settings.axleWeights.rear.toFixed(2)}
             body={'Rear Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.weights.rearCorner.toFixed(2)}
+            title={viewModel.settings.cornerWeights.rear.toFixed(2)}
             body={'RR Weight'} />
         </Row>
         <Row>
           <TextCard
             style={styles.springCard}
             centerContent
-            title={viewModel.frontSettings.springRate.toFixed(2)}
+            title={viewModel.settings.springRates.front.toFixed(2)}
             body="Front Spring" />
           <TextCard
             style={styles.springCard}
             centerContent
-            title={viewModel.rearSettings.springRate.toFixed(2)}
+            title={viewModel.settings.springRates.rear.toFixed(2)}
             body="Rear Spring" />
         </Row>
         <Row>
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.frontSettings.bound.toFixed(2)}
+            title={viewModel.settings.damperBound.front.toFixed(2)}
             body="Front Bump" />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.frontSettings.rebound.toFixed(2)}
+            title={viewModel.settings.damperRebound.front.toFixed(2)}
             body="Front Rebound" />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.frontSettings.ARB.toFixed(2)}
+            title={viewModel.settings.antiRollBar.front.toFixed(2)}
             body="Front ARB" />
         </Row>
         <Row>
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.rearSettings.bound.toFixed(2)}
+            title={viewModel.settings.damperBound.rear.toFixed(2)}
             body="Rear Bump" />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.rearSettings.rebound.toFixed(2)}
+            title={viewModel.settings.damperRebound.rear.toFixed(2)}
             body="Rear Rebound" />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.rearSettings.ARB.toFixed(2)}
+            title={viewModel.settings.antiRollBar.rear.toFixed(2)}
             body="Rear ARB" />
         </Row>
       </ScrollView>
