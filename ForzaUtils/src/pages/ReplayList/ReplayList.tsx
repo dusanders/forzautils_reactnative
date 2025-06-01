@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Row } from "../../components/Row";
 import { ThemeText } from "../../components/ThemeText";
 import { IThemeElements } from "../../constants/Themes";
@@ -9,16 +9,18 @@ import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
 import { useReplay } from "../../context/Recorder";
 import { useLogger } from "../../context/Logger";
 import { useNetworkContext } from "../../context/Network";
-import { StackNavigation } from "../../constants/types";
+import { type ReplayNavigationProps, StackNavigation } from "../../constants/types";
 import { DeleteDialog } from "./DeleteDialog";
 import { useCurrentTheme } from "../../hooks/ThemeState";
 
-export interface ReplayListProps {
-
+export interface ReplayRouteParams  {
+  listId: string; // Optional listId for filtering sessions
 }
 
-export function ReplayList(props: ReplayListProps) {
+export function ReplayList() {
   const tag = 'ReplayList';
+  const route = useRoute<ReplayNavigationProps>();
+  console.log(`${tag} - props:`, route.params.listId);
   const logger = useLogger();
   const navigation = useNavigation<StackNavigation>();
   const replay = useReplay();

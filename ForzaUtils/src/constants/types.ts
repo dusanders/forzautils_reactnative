@@ -1,5 +1,7 @@
+import { RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
+import { ReplayRouteParams  } from "../pages/ReplayList/ReplayList";
 
 /**
  * Add type for generic axle data
@@ -44,8 +46,10 @@ export type RootStackParamList = {
   [AppRoutes.GRIP]: undefined;
   [AppRoutes.SOURCE_CHOOSER]: undefined;
   [AppRoutes.TUNING_CALCULATOR]: undefined;
-  [AppRoutes.REPLAY_LIST]: undefined;
+  [AppRoutes.REPLAY_LIST]: ReplayRouteParams;
 }
+
+export type ReplayNavigationProps = RouteProp<RootStackParamList, AppRoutes.REPLAY_LIST>;
 
 /**
  * Define the navigation type for the app

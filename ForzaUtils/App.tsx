@@ -69,7 +69,8 @@ function App(): React.JSX.Element {
               component={TuningPage} />
             <Stack.Screen
               name={AppRoutes.REPLAY_LIST}
-              component={ReplayList} />
+              component={ReplayList}
+              initialParams={{listId: 'none'}} />
           </Stack.Navigator>
         </SafeStack>
       </NavigationContainer>

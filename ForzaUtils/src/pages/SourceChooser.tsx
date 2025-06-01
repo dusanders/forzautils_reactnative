@@ -77,7 +77,7 @@ export function SourceChooser(props: SourceChooserProps) {
             title={'Replay'}
             body="View a previously recorded session"
             onPress={() => {
-              navigation.navigate(AppRoutes.REPLAY_LIST);
+              navigation.push(AppRoutes.REPLAY_LIST, { listId: 'default' });
             }} />
         </Row>
       </View>
