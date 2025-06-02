@@ -19,8 +19,9 @@ export interface WeightsState {
 
 export interface ITuningViewModel {
   input: CalculatorParams;
-  setInput(params: CalculatorParams): void;
   settings: CalculatorResult;
+  setInput(params: CalculatorParams): void;
+  
 }
 
 function isTuningViewModel(obj: any): obj is ITuningViewModel {

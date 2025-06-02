@@ -227,7 +227,7 @@ export function TuningPage(props: TuningPageProps) {
               setRearHeightInput(value);
             }} />
         </Row>
-        {/* <Row>
+        <Row>
           <CardInput
             style={styles.baseCard}
             label="Front Hz"
@@ -244,7 +244,7 @@ export function TuningPage(props: TuningPageProps) {
             onChange={(value) => {
               setRearHzInput(value);
             }} />
-        </Row> */}
+        </Row>
         <Row>
           <CardContainer
             style={styles.pickerContainer}>

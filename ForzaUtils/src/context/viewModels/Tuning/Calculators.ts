@@ -77,11 +77,13 @@ export class GrokCalculator implements ITuningCalculator {
     result.springRates.front = this.calculateSpringRate(
       weights.axle.front,
       params.rideHeight.front,
+      params.suspensionHz.front,
       params.frontAeroForce
     );
     result.springRates.rear = this.calculateSpringRate(
       weights.axle.rear,
       params.rideHeight.rear,
+      params.suspensionHz.rear,
       params.rearAeroForce
     );
     result.antiRollBar = this.calculateAntiRollBar(
@@ -94,19 +96,19 @@ export class GrokCalculator implements ITuningCalculator {
     const dampers = this.calculateDampers(result.springRates);
     result.damperBound = dampers.bound;
     result.damperRebound = dampers.rebound;
-    return result;
+    return this.adjustForLayout(result, params);
   }
 
   calculateHzFromRideHeight(height: number): number {
-    if (height <= 2) return hzLowHeight;
+    if (height <= 4.5) return hzLowHeight;
     if (height >= 6) return hzHighHeight;
     const rideHeightAdjust = (height - 2) * 0.1;
     const freq = hzBase - rideHeightAdjust;
     return freq;
   }
 
-  private calculateSpringRate(axleWeight: number, height: number, aero: number = 0): number {
-    const rate = this.calculateHzFromRideHeight(height) * ((axleWeight + aero) / (1.5 * height));
+  private calculateSpringRate(axleWeight: number, height: number, hz: number, aero: number = 0): number {
+    const rate = hz * ((axleWeight + aero) / (1.5 * height));
     const result = Number(rate.toFixed(2));
     return result;
   }
@@ -138,7 +140,7 @@ export class GrokCalculator implements ITuningCalculator {
     const result = {
       bound: {
         front: 0,
-        rear: 0, 
+        rear: 0,
       },
       rebound: {
         front: 0,
@@ -169,5 +171,92 @@ export class GrokCalculator implements ITuningCalculator {
       }
     };
     return result;
+  }
+
+  private adjustForLayout(settings: CalculatorResult, input: CalculatorParams): CalculatorResult {
+    switch (input.engineLayout) {
+      case EngineLayout.FRONT:
+        switch (input.drivetrain) {
+          case Drivetrain.RWD:
+            // Adjust for RWD front engine
+            settings.springRates.rear *= 0.95; // Slightly softer rear springs
+            settings.damperBound.rear *= 0.95; // Slightly softer rear bound dampers
+            settings.damperRebound.rear *= 0.95; // Slightly softer rear rebound dampers
+            settings.antiRollBar.rear *= 0.85; // Slightly softer rear ARB
+            settings.antiRollBar.front *= 1.35; // Slightly stiffer front ARB
+            return settings;
+          case Drivetrain.AWD:
+            // Adjust for AWD front engine
+            settings.springRates.rear *= 0.9; // Slightly softer rear springs
+            settings.damperBound.rear *= 0.9; // Slightly softer rear bound dampers
+            settings.damperRebound.rear *= 0.9; // Slightly softer rear rebound dampers
+            return settings;
+          case Drivetrain.FWD:
+            // no adjustment needed for FWD front engine
+            return settings;
+          default:
+            return settings;
+        }
+      case EngineLayout.REAR:
+        switch (input.drivetrain) {
+          case Drivetrain.RWD:
+            // Adjust for RWD rear engine
+            settings.springRates.front *= 0.9; // Slightly softer front springs
+            settings.damperBound.front *= 0.9; // Slightly softer front bound dampers
+            settings.damperRebound.front *= 0.9; // Slightly softer front rebound dampers
+            settings.antiRollBar.rear *= 0.75; // Slightly softer rear ARB
+            settings.antiRollBar.front *= 1.45; // Slightly stiffer front ARB
+            return settings;
+          case Drivetrain.AWD:
+            // Adjust for AWD rear engine
+            settings.springRates.front *= 0.8; // Softer front springs
+            settings.damperBound.front *= 0.8; // Softer front bound dampers
+            settings.damperRebound.front *= 0.8; // Softer front rebound dampers
+            return settings;
+          case Drivetrain.FWD:
+            // Adjust for FWD rear engine
+            settings.springRates.front *= 0.7; // Much softer front springs
+            settings.damperBound.front *= 0.7; // Much softer front bound dampers
+            settings.damperRebound.front *= 0.7; // Much softer front rebound dampers
+            return settings;
+          default:
+            return settings;
+        }
+      case EngineLayout.MID:
+        switch (input.drivetrain) {
+          case Drivetrain.RWD:
+            // Adjust for RWD mid engine  
+            settings.springRates.front *= 0.95; // Slightly softer front springs
+            settings.damperBound.front *= 0.95; // Slightly softer front bound dampers
+            settings.damperRebound.front *= 0.95; // Slightly softer front rebound dampers
+            settings.springRates.rear *= 0.95; // Slightly softer rear springs
+            settings.damperBound.rear *= 0.95; // Slightly softer rear bound dampers
+            settings.damperRebound.rear *= 0.95; // Slightly softer rear rebound dampers
+            settings.antiRollBar.rear *= 0.85; // Slightly softer rear ARB
+            settings.antiRollBar.front *= 1.35; // Slightly stiffer front ARB
+            return settings;
+          case Drivetrain.AWD:
+            // Adjust for AWD mid engine
+            settings.springRates.front *= 0.9; // Softer front springs
+            settings.damperBound.front *= 0.9; // Softer front bound dampers
+            settings.damperRebound.front *= 0.9; // Softer front rebound dampers
+            settings.springRates.rear *= 0.9; // Softer rear springs
+            settings.damperBound.rear *= 0.9; // Softer rear bound dampers
+            settings.damperRebound.rear *= 0.9; // Softer rear rebound dampers
+            return settings;
+          case Drivetrain.FWD:
+            // Adjust for FWD mid engine
+            settings.springRates.front *= 0.85; // Softer front springs
+            settings.damperBound.front *= 0.85; // Softer front bound dampers
+            settings.damperRebound.front *= 0.85; // Softer front rebound dampers
+            settings.springRates.rear *= 0.85; // Softer rear springs
+            settings.damperBound.rear *= 0.85; // Softer rear bound dampers
+            settings.damperRebound.rear *= 0.85; // Softer rear rebound dampers
+            return settings;
+          default:
+            return settings;
+        }
+      default: return settings;
+    }
   }
 }
