@@ -166,19 +166,21 @@ export function TuningPage(props: TuningPageProps) {
   //#endregion
 
   return (
-    <AppBarContainer onBack={() => {
+    <AppBarContainer 
+    title="All Units Imperial"
+    onBack={() => {
       navigation.goBack();
     }}>
       <ScrollView>
         <Row>
           <CardInput
             style={styles.baseCard}
-            label="Vehicle Weight"
+            label="Vehicle Weight (lbs)"
             value={weightInput} // This will be bound to state in a real application
             onChange={(value: string) => {
               setWeightInput(value);
             }}
-            placeholder="Vehicle Weight" />
+            placeholder="Vehicle Weight (lbs)" />
           <CardContainer
             style={styles.baseCard}
             centerContent>
@@ -212,16 +214,16 @@ export function TuningPage(props: TuningPageProps) {
         <Row>
           <CardInput
             style={styles.baseCard}
-            label="Front Height"
-            placeholder="Front Height"
+            label="Front Height (in)"
+            placeholder="Front Height (in)"
             value={frontHeightInput}
             onChange={(value) => {
               setFrontHeightInput(value);
             }} />
           <CardInput
             style={styles.baseCard}
-            label={'Rear Height'}
-            placeholder={'Rear Height'}
+            label={'Rear Height (in)'}
+            placeholder={'Rear Height (in)'}
             value={rearHeightInput}
             onChange={(value) => {
               setRearHeightInput(value);

@@ -1,9 +1,9 @@
 import { Drivetrain } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
-import { ICache, useCache } from "../../Cache";
+import { useCache } from "../../Cache";
 import { useLogger } from "../../Logger";
 import { CalculatorParams, CalculatorResult, EngineLayout, GrokCalculator, hzBase } from "./Calculators";
-import { AxleData } from "../../../constants/types";
+import { AxleData, ICache } from "../../../constants/types";
 
 export interface SuspensionSettings {
   springRate: number;

@@ -1,11 +1,6 @@
 import { createContext, useContext } from "react";
-import AsyncStorage, { AsyncStorageStatic } from '@react-native-async-storage/async-storage';
-
-type NonFunctionProperties<T> = {
-  [K in keyof T]: T[K] extends Function ? never : K;
-}[keyof T];
-
-export type ICache<T> = Pick<T, NonFunctionProperties<T>>;
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ICache } from "../constants/types";
 
 export interface ICacheStore {
   getItem<T extends ICache<T>>(key: string): Promise<T | null>;

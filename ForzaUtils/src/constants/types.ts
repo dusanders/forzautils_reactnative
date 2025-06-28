@@ -138,3 +138,10 @@ export function useDataWindow<T>(size: number, initialValues?: T[]): DataWindow<
     clear,
   }
 }
+
+
+type NonFunctionProperties<T> = {
+  [K in keyof T]: T[K] extends Function ? never : K;
+}[keyof T];
+
+export type ICache<T> = Pick<T, NonFunctionProperties<T>>;

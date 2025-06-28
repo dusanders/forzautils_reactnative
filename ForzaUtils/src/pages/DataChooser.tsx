@@ -124,7 +124,7 @@ export function DataChooser(props: DataChooserProps) {
 
   useEffect(() => {
     if (!Boolean(network.replay)) {
-      network.DEBUG();
+      // network.DEBUG();
     } else {
       network.STOP_DEBUG();
     }
