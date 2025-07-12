@@ -10,10 +10,10 @@ import { ThemeSwitch } from "../../components/ThemeSwitch";
 import { LabelText } from "../../components/ThemeText";
 import { Drivetrain } from "ForzaTelemetryApi";
 import { TextCard } from "../../components/TextCard";
-import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { Dropdown } from "./Dropdown";
 import { useCurrentTheme } from "../../hooks/ThemeState";
 import { EngineLayout } from "../../context/viewModels/Tuning/Calculators";
+import { useTuningViewModel } from "../../context/viewModels/Tuning/TuningViewModel";
 
 export interface TuningPageProps {
   // Nothing
@@ -21,18 +21,18 @@ export interface TuningPageProps {
 
 export function TuningPage(props: TuningPageProps) {
   const tag = 'TuningPage.tsx';
-  const viewModel = useViewModelStore().tuning;
+  const tuningVM = useTuningViewModel();
   const navigation = useNavigation();
   const theme = useCurrentTheme();
   const styles = themeStyles(theme);
-  const [weightInput, setWeightInput] = useState(viewModel.input.totalWeight.toString());
-  const [frontDistInput, setFrontDistInput] = useState(viewModel.input.frontWeightDistribution.toLocaleString());
-  const [frontHeightInput, setFrontHeightInput] = useState(viewModel.input.rideHeight.front.toLocaleString());
-  const [rearHeightInput, setRearHeightInput] = useState(viewModel.input.rideHeight.rear.toLocaleString());
-  const [frontHzInput, setFrontHzInput] = useState(viewModel.input.suspensionHz.front.toLocaleString());
-  const [rearHzInput, setRearHzInput] = useState(viewModel.input.suspensionHz.rear.toLocaleString());
-  const [selectedDrivetrain, setDrivetrain] = useState(viewModel.input.drivetrain);
-  const [selectedLayout, setLayout] = useState(viewModel.input.engineLayout);
+  const [weightInput, setWeightInput] = useState(tuningVM.input.totalWeight.toString());
+  const [frontDistInput, setFrontDistInput] = useState(tuningVM.input.frontWeightDistribution.toLocaleString());
+  const [frontHeightInput, setFrontHeightInput] = useState(tuningVM.input.rideHeight.front.toLocaleString());
+  const [rearHeightInput, setRearHeightInput] = useState(tuningVM.input.rideHeight.rear.toLocaleString());
+  const [frontHzInput, setFrontHzInput] = useState(tuningVM.input.suspensionHz.front.toLocaleString());
+  const [rearHzInput, setRearHzInput] = useState(tuningVM.input.suspensionHz.rear.toLocaleString());
+  const [selectedDrivetrain, setDrivetrain] = useState(tuningVM.input.drivetrain);
+  const [selectedLayout, setLayout] = useState(tuningVM.input.engineLayout);
 
   const labelForDrivetrain = (type: Drivetrain) => {
     switch (type) {
@@ -66,8 +66,8 @@ export function TuningPage(props: TuningPageProps) {
   //#region Effects
 
   useEffect(() => {
-    setDrivetrain(viewModel.input.drivetrain)
-  }, [viewModel.input.drivetrain]);
+    setDrivetrain(tuningVM.input.drivetrain)
+  }, [tuningVM.input.drivetrain]);
 
   useEffect(() => {
     if (frontHzInput.endsWith('.')) {
@@ -75,10 +75,10 @@ export function TuningPage(props: TuningPageProps) {
     }
     let parsed = parseFloat(frontHzInput);
     if (parsed > 0) {
-      viewModel.setInput({
-        ...viewModel.input,
+      tuningVM.setInput({
+        ...tuningVM.input,
         suspensionHz: {
-          ...viewModel.input.suspensionHz,
+          ...tuningVM.input.suspensionHz,
           front: parsed
         }
       });
@@ -91,10 +91,10 @@ export function TuningPage(props: TuningPageProps) {
     }
     let parsed = parseFloat(rearHzInput);
     if (parsed > 0) {
-      viewModel.setInput({
-        ...viewModel.input,
+      tuningVM.setInput({
+        ...tuningVM.input,
         suspensionHz: {
-          ...viewModel.input.suspensionHz,
+          ...tuningVM.input.suspensionHz,
           rear: parsed
         }
       });
@@ -107,10 +107,10 @@ export function TuningPage(props: TuningPageProps) {
     }
     let parsed = parseFloat(frontHeightInput);
     if (parsed > 0) {
-      viewModel.setInput({
-        ...viewModel.input,
+      tuningVM.setInput({
+        ...tuningVM.input,
         rideHeight: {
-          ...viewModel.input.rideHeight,
+          ...tuningVM.input.rideHeight,
           front: parsed
         }
       });
@@ -123,10 +123,10 @@ export function TuningPage(props: TuningPageProps) {
     }
     let parsed = parseFloat(rearHeightInput);
     if (parsed > 0) {
-      viewModel.setInput({
-        ...viewModel.input,
+      tuningVM.setInput({
+        ...tuningVM.input,
         rideHeight: {
-          ...viewModel.input.rideHeight,
+          ...tuningVM.input.rideHeight,
           rear: parsed
         }
       });
@@ -139,8 +139,8 @@ export function TuningPage(props: TuningPageProps) {
     }
     let parsed = parseFloat(weightInput);
     if (parsed > 0) {
-      viewModel.setInput({
-        ...viewModel.input,
+      tuningVM.setInput({
+        ...tuningVM.input,
         totalWeight: parsed
       });
     }
@@ -151,17 +151,17 @@ export function TuningPage(props: TuningPageProps) {
       return;
     }
     let parsed = parseFloat(frontDistInput);
-    if (parsed > 0 && parsed !== viewModel.input.frontWeightDistribution) {
-      viewModel.setInput({
-        ...viewModel.input,
+    if (parsed > 0 && parsed !== tuningVM.input.frontWeightDistribution) {
+      tuningVM.setInput({
+        ...tuningVM.input,
         frontWeightDistribution: parsed
       });
     }
   }, [frontDistInput]);
 
   useEffect(() => {
-    setFrontDistInput(viewModel.input.frontWeightDistribution.toLocaleString());
-  }, [viewModel.input.frontWeightDistribution]);
+    setFrontDistInput(tuningVM.input.frontWeightDistribution.toLocaleString());
+  }, [tuningVM.input.frontWeightDistribution]);
 
   //#endregion
 
@@ -185,10 +185,10 @@ export function TuningPage(props: TuningPageProps) {
             style={styles.baseCard}
             centerContent>
             <ThemeSwitch
-              value={viewModel.input.hasRollCage}
+              value={tuningVM.input.hasRollCage}
               onValueChange={(ev) => {
-                viewModel.setInput({
-                  ...viewModel.input,
+                tuningVM.setInput({
+                  ...tuningVM.input,
                   hasRollCage: ev
                 });
               }} />
@@ -209,7 +209,7 @@ export function TuningPage(props: TuningPageProps) {
           <TextCard
             style={styles.baseCard}
             body={'Rear Distribution'}
-            title={Number(100 - viewModel.input.frontWeightDistribution).toFixed(0)} />
+            title={Number(100 - tuningVM.input.frontWeightDistribution).toFixed(0)} />
         </Row>
         <Row>
           <CardInput
@@ -259,8 +259,8 @@ export function TuningPage(props: TuningPageProps) {
                   { value: EngineLayout.REAR, label: labelForLayout(EngineLayout.REAR) }
                 ]}
                 onValueChanged={(option) => {
-                  viewModel.setInput({
-                    ...viewModel.input,
+                  tuningVM.setInput({
+                    ...tuningVM.input,
                     engineLayout: option.value
                   })
                 }} />
@@ -280,8 +280,8 @@ export function TuningPage(props: TuningPageProps) {
                   { value: Drivetrain.AWD, label: labelForDrivetrain(Drivetrain.AWD) }
                 ]}
                 onValueChanged={(option) => {
-                  viewModel.setInput({
-                    ...viewModel.input,
+                  tuningVM.setInput({
+                    ...tuningVM.input,
                     drivetrain: option.value
                   });
                 }} />
@@ -295,80 +295,80 @@ export function TuningPage(props: TuningPageProps) {
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.cornerWeights.front.toFixed(2)}
+            title={tuningVM.settings.cornerWeights.front.toFixed(2)}
             body={'LF Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.axleWeights.front.toFixed(2)}
+            title={tuningVM.settings.axleWeights.front.toFixed(2)}
             body={'Front Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.cornerWeights.front.toFixed(2)}
+            title={tuningVM.settings.cornerWeights.front.toFixed(2)}
             body={'RF Weight'} />
         </Row>
         <Row>
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.cornerWeights.rear.toFixed(2)}
+            title={tuningVM.settings.cornerWeights.rear.toFixed(2)}
             body={'LR Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.axleWeights.rear.toFixed(2)}
+            title={tuningVM.settings.axleWeights.rear.toFixed(2)}
             body={'Rear Weight'} />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.cornerWeights.rear.toFixed(2)}
+            title={tuningVM.settings.cornerWeights.rear.toFixed(2)}
             body={'RR Weight'} />
         </Row>
         <Row>
           <TextCard
             style={styles.springCard}
             centerContent
-            title={viewModel.settings.springRates.front.toFixed(2)}
+            title={tuningVM.settings.springRates.front.toFixed(2)}
             body="Front Spring" />
           <TextCard
             style={styles.springCard}
             centerContent
-            title={viewModel.settings.springRates.rear.toFixed(2)}
+            title={tuningVM.settings.springRates.rear.toFixed(2)}
             body="Rear Spring" />
         </Row>
         <Row>
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.damperBound.front.toFixed(2)}
+            title={tuningVM.settings.damperBound.front.toFixed(2)}
             body="Front Bump" />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.damperRebound.front.toFixed(2)}
+            title={tuningVM.settings.damperRebound.front.toFixed(2)}
             body="Front Rebound" />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.antiRollBar.front.toFixed(2)}
+            title={tuningVM.settings.antiRollBar.front.toFixed(2)}
             body="Front ARB" />
         </Row>
         <Row>
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.damperBound.rear.toFixed(2)}
+            title={tuningVM.settings.damperBound.rear.toFixed(2)}
             body="Rear Bump" />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.damperRebound.rear.toFixed(2)}
+            title={tuningVM.settings.damperRebound.rear.toFixed(2)}
             body="Rear Rebound" />
           <TextCard
             style={styles.weightCard}
             centerContent
-            title={viewModel.settings.antiRollBar.rear.toFixed(2)}
+            title={tuningVM.settings.antiRollBar.rear.toFixed(2)}
             body="Rear ARB" />
         </Row>
       </ScrollView>
