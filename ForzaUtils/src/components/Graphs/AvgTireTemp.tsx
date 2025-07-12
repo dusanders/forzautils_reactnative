@@ -2,8 +2,8 @@ import React from "react";
 import { CardContainer } from "../CardContainer";
 import { BaseLineGraph } from "./BaseLineGraph";
 import { StyleSheet } from "react-native";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useCurrentTheme } from "../../hooks/ThemeState";
-import { useTireTempsViewModel } from "../../context/viewModels/TireTempViewModel";
 
 export interface AvgTireTempProps {
 }
@@ -11,7 +11,7 @@ export interface AvgTireTempProps {
 export function AvgTireTemps(props: AvgTireTempProps) {
   const theme = useCurrentTheme();
   const styles = themeStyles(theme);
-  const tireVM = useTireTempsViewModel();
+  const viewModel = useViewModelStore().tireTemps;
 
   return (
     <CardContainer
@@ -19,15 +19,15 @@ export function AvgTireTemps(props: AvgTireTempProps) {
     style={styles.card}>
       <BaseLineGraph
       title="Average Tire Temps"
-      dataLength={tireVM.avgTempWindowSize}
+      dataLength={viewModel.avgTempWindowSize}
       data={[
         {
-          data: tireVM.avgTemps.map((point) => point.front),
+          data: viewModel.avgTemps.map((point) => point.front),
           label: 'Front Avg Temp',
           color: theme.colors.text.primary.onPrimary
         }, 
         {
-          data: tireVM.avgTemps.map((point) => point.rear),
+          data: viewModel.avgTemps.map((point) => point.rear),
           label: 'Rear Avg Temp',
           color: theme.colors.text.secondary.onPrimary
         }

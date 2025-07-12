@@ -2,12 +2,12 @@ import React, { useMemo } from "react";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { BrakeThrottleChart, BrakeThrottleChartProps } from "./BrakeThrottleChart";
 import { SteeringChart } from "./SteeringChart";
 import { TireSlip } from "./TireSlip";
 import { ScrollView } from "react-native";
 import { TireData } from "ForzaTelemetryApi";
-import { useGripViewModel } from "../../context/viewModels/GripViewModel";
 
 export interface GripProps {
   // Nothing
@@ -15,21 +15,21 @@ export interface GripProps {
 
 export function Grip(props: GripProps) {
   const navigation = useNavigation<StackNavigation>();
-  const gripVM = useGripViewModel();
+  const viewModel = useViewModelStore().grip;
   const brakeThrottle = useMemo<BrakeThrottleChartProps>(() => {
     return {
-      brake: gripVM.brake,
-      throttle: gripVM.throttle
+      brake: viewModel.brake,
+      throttle: viewModel.throttle
     }
-  }, [gripVM.brake, gripVM.throttle]);
+  }, [viewModel.brake, viewModel.throttle]);
 
   const steering = useMemo<number>(() => {
-    return gripVM.steering;
-  }, [gripVM.steering]);
+    return viewModel.steering;
+  }, [viewModel.steering]);
 
   const tireSlipData = useMemo<TireData>(() => {
-    return gripVM.slipRatio
-  }, [gripVM.slipRatio])
+    return viewModel.slipRatio
+  }, [viewModel.slipRatio])
 
   return (
     <AppBarContainer

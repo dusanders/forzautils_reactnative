@@ -5,11 +5,11 @@ import { IThemeElements } from "../../constants/Themes";
 import { BarChart } from "react-native-chart-kit";
 import { ChartData, Dataset } from "react-native-chart-kit/dist/HelperTypes";
 import { Paper } from "../../components/Paper";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
 import { useCurrentTheme } from "../../hooks/ThemeState";
-import { useSuspensionGraphViewModel } from "../../context/viewModels/SuspensionGraphViewModel";
 
 export interface SuspensionTravelProps {
   // Nothing
@@ -35,7 +35,8 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
     'Left Rear',
     'Right Rear'
   ]
-  const suspensionVM = useSuspensionGraphViewModel();
+  const store = useViewModelStore();
+  const viewModel = store.suspensionGraph;
   const navigation = useNavigation<StackNavigation>();
   const theme = useCurrentTheme();
   const dimensions = withScaledWindow(0.9, 0.3);
@@ -44,16 +45,16 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   const frontChartData = useMemo<ChartData>(() => {
     return {
       labels: frontLabels,
-      datasets: getDataSets([suspensionVM.leftFront, suspensionVM.rightFront])
+      datasets: getDataSets([viewModel.leftFront, viewModel.rightFront])
     }
-  }, [suspensionVM.leftFront, suspensionVM.rightFront]);
+  }, [viewModel.leftFront, viewModel.rightFront]);
 
   const rearChartData = useMemo<ChartData>(() => {
     return {
       labels: rearLabels,
-      datasets: getDataSets([suspensionVM.leftRear, suspensionVM.rightRear])
+      datasets: getDataSets([viewModel.leftRear, viewModel.rightRear])
     }
-  }, [suspensionVM.leftRear, suspensionVM.rightRear]);
+  }, [viewModel.leftRear, viewModel.rightRear]);
 
   return (
     <AppBarContainer

@@ -4,10 +4,10 @@ import { IThemeElements } from "../../constants/Themes";
 import { StyleSheet } from "react-native";
 import { Row } from "../../components/Row";
 import { TireInfo } from "./TireInfo";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { useCurrentTheme } from "../../hooks/ThemeState";
-import { useTireTempsViewModel } from "../../context/viewModels/TireTempViewModel";
 
 export interface TireTempsProps {
   // Nothing
@@ -17,17 +17,18 @@ export function TireTemps(props: TireTempsProps) {
   const theme = useCurrentTheme();
   const style = themeStyles(theme);
   const navigation = useNavigation<StackNavigation>();
-  const tireTempVM = useTireTempsViewModel();
+  const store = useViewModelStore();
+  const viewModel = store.tireTemps;
   
   const temps = useMemo(() => {
     return [
-      tireTempVM.leftFront,
-      tireTempVM.rightFront,
-      tireTempVM.leftRear,
-      tireTempVM.rightRear
+      viewModel.leftFront,
+      viewModel.rightFront,
+      viewModel.leftRear,
+      viewModel.rightRear
     ]
-  }, [tireTempVM.leftFront, tireTempVM.rightFront,
-    tireTempVM.leftRear, tireTempVM.rightRear
+  }, [viewModel.leftFront, viewModel.rightFront,
+    viewModel.leftRear, viewModel.rightRear
   ]);
 
   return (

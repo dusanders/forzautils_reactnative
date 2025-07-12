@@ -7,11 +7,11 @@ import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { ThemeText } from "../../components/ThemeText";
 import { randomKey } from "../../constants/types";
 import { HpTqCurves } from "./HpTqCurves";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
 import { useCurrentTheme } from "../../hooks/ThemeState";
-import { useHpTqGraphViewModel } from "../../context/viewModels/HpTqGraphViewModel";
 
 export interface HpTqGraphProps {
   // Nothing
@@ -21,7 +21,7 @@ export function HptqGraph(props: HpTqGraphProps) {
   const navigation = useNavigation<StackNavigation>();
     const theme = useCurrentTheme();
   const styles = themeStyles(theme);
-  const hpTqVM = useHpTqGraphViewModel();
+  const store = useViewModelStore().hpTqGraph;
   const windowMeasure = withScaledWindow(0.9, 1);
 
   const separator = () => {
@@ -41,7 +41,7 @@ export function HptqGraph(props: HpTqGraphProps) {
         {
           id: randomKey(),
           onPress: () => {
-            hpTqVM.clearCache();
+            store.clearCache();
           },
           renderItem: () => (
             <ThemeText
@@ -54,7 +54,7 @@ export function HptqGraph(props: HpTqGraphProps) {
       ]}>
       <View
         style={styles.contentWrapper}>
-        {hpTqVM.gears.length < 1 && (
+        {store.gears.length < 1 && (
           <Paper style={styles.waitPaper}>
             <ThemeText
               fontFamily="bold"
@@ -69,14 +69,14 @@ export function HptqGraph(props: HpTqGraphProps) {
             <ActivityIndicator />
           </Paper>
         )}
-        {hpTqVM.gears.length > 0 && (
+        {store.gears.length > 0 && (
 
           <FlatList
             ItemSeparatorComponent={separator}
             style={{
               flexGrow: 1
             }}
-            data={hpTqVM.gears}
+            data={store.gears}
             keyExtractor={(item) => `${item.gear}`}
             // renderItem={renderItem}
             renderItem={(item) => {
