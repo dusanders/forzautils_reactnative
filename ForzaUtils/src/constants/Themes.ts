@@ -156,6 +156,90 @@ export const DarkColors: IThemeElements = {
     button: defaultButton
   }
 }
+export const ForestTheme: IThemeElements = {
+  colors: {
+    text: {
+      primary: {
+      onPrimary: "rgba(220, 226, 213, 1)",
+      onSecondary: 'rgba(33, 26, 20, 1)'
+      },
+      secondary: {
+      onPrimary: "rgba(142, 151, 122, 1)",
+      onSecondary: 'rgba(80, 73, 60, 1)'
+      },
+      warning: {
+      onPrimary: 'rgb(171, 115, 51)',
+      onSecondary: 'rgb(201, 145, 81)'
+      },
+      error: {
+      onPrimary: "rgb(145, 40, 33)",
+      onSecondary: 'rgb(115, 20, 13)'
+      }
+    },
+    background: {
+      primary: 'rgb(29, 36, 27)',
+      onPrimary: 'rgb(40, 48, 36)',
+      secondary: 'rgb(209, 200, 180)',
+      onSecondary: 'rgb(175, 165, 145)',
+      dialogBackdrop: 'rgba(15, 20, 10, 0.75)'
+    },
+    card: {
+      borderColor: 'rgb(54, 66, 48)'
+    },
+    },
+    sizes: {
+    icon: 25,
+    navBar: 50,
+    borderRadius: 8,
+    font: defaultFont,
+    paper: defaultPaper,
+    button: defaultButton
+    }
+}
+export const ClaudesTheme: IThemeElements = {
+  colors: {
+    text: {
+      primary: {
+        onPrimary: "rgba(180, 180, 190, 1)",
+        onSecondary: 'rgba(60, 60, 70, 1)'
+      },
+      secondary: {
+        onPrimary: "rgba(120, 120, 130, 1)",
+        onSecondary: 'rgba(90, 90, 100, 1)'
+      },
+      warning: {
+        onPrimary: 'rgb(130, 110, 80)',
+        onSecondary: 'rgb(150, 130, 90)'
+      },
+      error: {
+        onPrimary: "rgb(130, 90, 90)",
+        onSecondary: 'rgb(100, 70, 70)'
+      }
+    },
+    background: {
+      primary: 'rgb(25, 25, 30)',
+      onPrimary: 'rgb(35, 35, 40)',
+      secondary: 'rgb(50, 50, 60)',
+      onSecondary: 'rgb(70, 70, 80)',
+      dialogBackdrop: 'rgba(15, 15, 20, 0.8)'
+    },
+    card: {
+      borderColor: 'rgb(45, 45, 50)'
+    },
+  },
+  sizes: {
+    icon: 25,
+    navBar: 50,
+    borderRadius: 4,
+    font: defaultFont,
+    paper: defaultPaper,
+    button: {
+      ...defaultButton,
+      elevation: 1,
+      padding: 18
+    }
+  }
+}
 
 export const GlobalStyles = StyleSheet.create({
   centerContent: {

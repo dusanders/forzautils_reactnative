@@ -1,5 +1,5 @@
 import { ColorSchemeName } from "react-native";
-import { IThemeElements, DarkColors, LightColors } from "../constants/Themes";
+import { IThemeElements, DarkColors, LightColors, ForestTheme, ClaudesTheme } from "../constants/Themes";
 import { atom, useAtomValue } from "jotai";
 
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Dimensions, FlatList, ScrollView, StyleSheet, View } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
@@ -13,6 +13,8 @@ import { CircleCheckIcon } from "../components/CircleCheckIcon";
 import { useAtomValue } from "jotai";
 import { wifiState } from "../hooks/WifiState";
 import { useCurrentTheme } from "../hooks/ThemeState";
+import { useLocaleViewModel } from "../redux/LocaleStore";
+import { ISupportLocale } from "../locale/strings";
 
 export interface WifiInfoProps {
   // None
@@ -24,6 +26,17 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
   const wifiInfo = useAtomValue(wifiState);
   const styles = themeStyles(theme);
   const navigation = useNavigation<StackNavigation>();
+  const localeVM = useLocaleViewModel();
+  const currentLocale = localeVM.getLocale();
+  
+  useEffect(() => {
+    console.log(`${tag} - currentLocale changed: ${currentLocale}`);
+  }, [currentLocale]);
+
+  useEffect(() => {
+    console.log(`${tag} - Setting locale to French`);
+    localeVM.setLocale(ISupportLocale.fr);
+  }, []);
 
   return (
     <AppBarContainer hideBack>

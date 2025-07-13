@@ -2,8 +2,9 @@ import { Drivetrain } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
 import { useCache } from "../../Cache";
 import { useLogger } from "../../Logger";
-import { CalculatorParams, CalculatorResult, EngineLayout, GrokCalculator, hzBase } from "./Calculators";
+import { CalculatorParams, CalculatorResult, EngineLayout, hzBase } from "./Calculators";
 import { AxleData, ICache } from "../../../constants/types";
+import { GrokCalculator } from "./GrokCalc";
 
 export interface SuspensionSettings {
   springRate: number;
@@ -77,7 +78,7 @@ export function useTuningViewModel(): ITuningViewModel {
     const tryCache = async () => {
       const found = await cache.getItem<ICache<ITuningViewModel>>(tag);
       if(found && isTuningViewModel(found)) {
-        logger.log(tag, `found cache: ${JSON.stringify(found)}`);
+        // logger.log(tag, `found cache: ${JSON.stringify(found)}`);
         setInput(found.input);
         setSettings(found.settings);
       }

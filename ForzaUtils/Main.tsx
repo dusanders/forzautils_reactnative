@@ -5,20 +5,24 @@ import { NetworkWatcher } from "./src/context/Network";
 import { ViewModelStore_Hoc } from "./src/context/viewModels/ViewModelStore";
 import { CacheProvider } from "./src/context/Cache";
 import { RecorderProvider } from "./src/context/Recorder";
+import { Provider } from "react-redux";
+import { AppStore } from "./src/redux/AppStore";
 
 function Main() {
   return (
-    <CacheProvider>
-      <PermissionsWatcher>
-        <RecorderProvider>
-          <NetworkWatcher>
-            <ViewModelStore_Hoc>
-              <App />
-            </ViewModelStore_Hoc>
-          </NetworkWatcher>
-        </RecorderProvider>
-      </PermissionsWatcher>
-    </CacheProvider>
+    <Provider store={AppStore}>
+      <CacheProvider>
+        <PermissionsWatcher>
+          <RecorderProvider>
+            <NetworkWatcher>
+              <ViewModelStore_Hoc>
+                <App />
+              </ViewModelStore_Hoc>
+            </NetworkWatcher>
+          </RecorderProvider>
+        </PermissionsWatcher>
+      </CacheProvider>
+    </Provider>
   )
 }
 
