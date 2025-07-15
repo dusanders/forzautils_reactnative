@@ -27,8 +27,9 @@ export const permissionReducer = permissionSlice.reducer;
 
 export function usePermissionViewModel() {
   const dispatch = useDispatch();
+  const permissionState = useAppSelector(permissionSlice.selectors.getPermissionState);
   return {
-    getPermissionState: () => useAppSelector(state => permissionSlice.selectors.getPermissionState(state)),
+    permissionState,
     setPermissionState: (state: IPermissionState) => dispatch(permissionSlice.actions.setPermissionState(state))
   }
 }

@@ -45,9 +45,11 @@ export const themeReducer = themeSlice.reducer;
 
 export function useThemeViewModel() {
   const dispatch = useDispatch();
+  const theme = useAppSelector(themeSlice.selectors.getTheme);
+  const themeType = useAppSelector(themeSlice.selectors.getThemeType);
   return {
-    getTheme: () => useAppSelector(state => themeSlice.selectors.getTheme(state)),
-    getThemeType: () => useAppSelector(state => themeSlice.selectors.getThemeType(state)),
+    theme,
+    themeType,
     setTheme: (theme: ThemeType) => dispatch(themeSlice.actions.setTheme(theme)),
     setThemeType: (theme: ThemeType) => dispatch(themeSlice.actions.setThemeType(theme)),
   }

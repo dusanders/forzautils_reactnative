@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Strings_enUS } from "../locale/enUS";
 import { IStringDefinitions, ISupportLocale } from "../locale/strings";
 import { useDispatch } from "react-redux";
-import { useAppSelector } from "./AppStore";
+import { AppStoreState, useAppSelector } from "./AppStore";
 import { Strings_fr } from "../locale/fr";
 
 export interface ILocaleState {
@@ -35,9 +35,11 @@ export const localeReducer = localeSlice.reducer;
 
 export function useLocaleViewModel() {
   const dispatch = useDispatch();
+  const locale = useAppSelector(localeSlice.selectors.getLocale);
+  const strings = useAppSelector(localeSlice.selectors.getStrings);
   return {
-    getLocale: () => useAppSelector(state => localeSlice.selectors.getLocale(state)),
-    getStrings: () => useAppSelector(state => localeSlice.selectors.getStrings(state)),
+    locale,
+    strings,
     setLocale: (type: ISupportLocale) => dispatch(localeSlice.actions.setLocale(type))
   }
 }

@@ -51,22 +51,27 @@ const wifiSlice = createSlice({
     getForzaPacket: (state: IWifiState) => state.packet,
   }
 });
-export const { setWifiState, setPort, setIp, setPacket, setUdpListening } = wifiSlice.actions;
 export const wifiReducer = wifiSlice.reducer;
 
 export function useWifiViewModel() {
   const dispatch = useDispatch();
+  const wifiState = useAppSelector(wifiSlice.selectors.getWifiState);
+  const isConnected = useAppSelector(wifiSlice.selectors.getIsConnected);
+  const isUdpListening = useAppSelector(wifiSlice.selectors.getIsUdpListening);
+  const wifiPort = useAppSelector(wifiSlice.selectors.getWifiPort);
+  const wifiIp = useAppSelector(wifiSlice.selectors.getWifiIp);
+  const forzaPacket = useAppSelector(wifiSlice.selectors.getForzaPacket);
   return {
-    getWifiState: () => useAppSelector(state => wifiSlice.selectors.getWifiState(state)),
-    getIsConnected: () => useAppSelector(state => wifiSlice.selectors.getIsConnected(state)),
-    getIsUdpListening: () => useAppSelector(state => wifiSlice.selectors.getIsUdpListening(state)),
-    getWifiPort: () => useAppSelector(state => wifiSlice.selectors.getWifiPort(state)),
-    getWifiIp: () => useAppSelector(state => wifiSlice.selectors.getWifiIp(state)),
-    getForzaPacket: () => useAppSelector(state => wifiSlice.selectors.getForzaPacket(state)),
-    setWifiState: (state: IWifiState) => dispatch(setWifiState(state)),
-    setPort: (port: number) => dispatch(setPort(port)),
-    setIp: (ip: string) => dispatch(setIp(ip)),
-    setPacket: (packet: ITelemetryData) => dispatch(setPacket(packet)),
-    setUdpListening: (isUdpListening: boolean) => dispatch(setUdpListening(isUdpListening)),
+    wifiState,
+    isConnected,
+    isUdpListening,
+    wifiPort,
+    wifiIp,
+    forzaPacket,
+    setWifiState: (state: IWifiState) => dispatch(wifiSlice.actions.setWifiState(state)),
+    setPort: (port: number) => dispatch(wifiSlice.actions.setPort(port)),
+    setIp: (ip: string) => dispatch(wifiSlice.actions.setIp(ip)),
+    setPacket: (packet: ITelemetryData) => dispatch(wifiSlice.actions.setPacket(packet)),
+    setUdpListening: (isUdpListening: boolean) => dispatch(wifiSlice.actions.setUdpListening(isUdpListening)),
   }
 }

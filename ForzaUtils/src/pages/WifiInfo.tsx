@@ -27,7 +27,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
   const styles = themeStyles(theme);
   const navigation = useNavigation<StackNavigation>();
   const localeVM = useLocaleViewModel();
-  const currentLocale = localeVM.getLocale();
+  const currentLocale = localeVM.locale;
   
   useEffect(() => {
     console.log(`${tag} - currentLocale changed: ${currentLocale}`);
