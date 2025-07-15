@@ -36,8 +36,8 @@ export const localeReducer = localeSlice.reducer;
 export function useLocaleViewModel() {
   const dispatch = useDispatch();
   return {
-    getLocale: () => useAppSelector(state => state.locale.type),
-    getStrings: () => useAppSelector(state => state.locale.strings),
+    getLocale: () => useAppSelector(state => localeSlice.selectors.getLocale(state)),
+    getStrings: () => useAppSelector(state => localeSlice.selectors.getStrings(state)),
     setLocale: (type: ISupportLocale) => dispatch(localeSlice.actions.setLocale(type))
   }
 }

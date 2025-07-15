@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
-import { AppStoreState } from "./AppStore";
+import { AppStoreState, useAppSelector } from "./AppStore";
 import { ForzaTelemetryApi, ITelemetryData } from "ForzaTelemetryApi";
 
 export interface IWifiState {
@@ -41,33 +41,32 @@ const wifiSlice = createSlice({
     setUdpListening: (state, action: PayloadAction<boolean>) => {
       state.isUdpListening = action.payload;
     },
+  },
+  selectors: {
+    getWifiState: (state: IWifiState) => state,
+    getIsConnected: (state: IWifiState) => state.isConnected,
+    getIsUdpListening: (state: IWifiState) => state.isUdpListening,
+    getWifiPort: (state: IWifiState) => state.port,
+    getWifiIp: (state: IWifiState) => state.ip,
+    getForzaPacket: (state: IWifiState) => state.packet,
   }
 });
 export const { setWifiState, setPort, setIp, setPacket, setUdpListening } = wifiSlice.actions;
 export const wifiReducer = wifiSlice.reducer;
-export const useSetWifiState = () => {
+
+export function useWifiViewModel() {
   const dispatch = useDispatch();
-  return (state: IWifiState) => dispatch(setWifiState(state));
+  return {
+    getWifiState: () => useAppSelector(state => wifiSlice.selectors.getWifiState(state)),
+    getIsConnected: () => useAppSelector(state => wifiSlice.selectors.getIsConnected(state)),
+    getIsUdpListening: () => useAppSelector(state => wifiSlice.selectors.getIsUdpListening(state)),
+    getWifiPort: () => useAppSelector(state => wifiSlice.selectors.getWifiPort(state)),
+    getWifiIp: () => useAppSelector(state => wifiSlice.selectors.getWifiIp(state)),
+    getForzaPacket: () => useAppSelector(state => wifiSlice.selectors.getForzaPacket(state)),
+    setWifiState: (state: IWifiState) => dispatch(setWifiState(state)),
+    setPort: (port: number) => dispatch(setPort(port)),
+    setIp: (ip: string) => dispatch(setIp(ip)),
+    setPacket: (packet: ITelemetryData) => dispatch(setPacket(packet)),
+    setUdpListening: (isUdpListening: boolean) => dispatch(setUdpListening(isUdpListening)),
+  }
 }
-export const useSetPacket = () => {
-  const dispatch = useDispatch();
-  return (packet: ITelemetryData) => dispatch(setPacket(packet));
-}
-export const useSetPort = () => {
-  const dispatch = useDispatch();
-  return (port: number) => dispatch(setPort(port));
-}
-export const useSetUdpListening = () => {
-  const dispatch = useDispatch();
-  return (isUdpListening: boolean) => dispatch(setUdpListening(isUdpListening));
-}
-export const useSetIp = () => {
-  const dispatch = useDispatch();
-  return (ip: string) => dispatch(setIp(ip));
-}
-export const getWifiState = (state: AppStoreState) => state.wifi;
-export const getIsConnected = (state: AppStoreState) => state.wifi.isConnected;
-export const getIsUdpListening = (state: AppStoreState) => state.wifi.isUdpListening;
-export const getWifiPort = (state: AppStoreState) => state.wifi.port;
-export const getWifiIp = (state: AppStoreState) => state.wifi.ip;
-export const getForzaPacket = (state: AppStoreState) => state.wifi.packet;

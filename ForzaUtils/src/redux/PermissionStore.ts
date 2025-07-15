@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
+import { useAppSelector } from "./AppStore";
 
 
 export interface IPermissionState {
@@ -11,17 +12,23 @@ const initialState: IPermissionState = {
 };
 
 const permissionSlice = createSlice({
-  name: "permission",
+  name: "permissions",
   initialState,
   reducers: {
     setPermissionState: (state, action: PayloadAction<IPermissionState>) => {
       state.isGranted = action.payload.isGranted;
     }
+  },
+  selectors: {
+    getPermissionState: (permissions: IPermissionState) => permissions.isGranted,
   }
 });
-export const { setPermissionState } = permissionSlice.actions;
 export const permissionReducer = permissionSlice.reducer;
-export const useSetPermissionState = () => {
+
+export function usePermissionViewModel() {
   const dispatch = useDispatch();
-  return (state: IPermissionState) => dispatch(setPermissionState(state));
+  return {
+    getPermissionState: () => useAppSelector(state => permissionSlice.selectors.getPermissionState(state)),
+    setPermissionState: (state: IPermissionState) => dispatch(permissionSlice.actions.setPermissionState(state))
+  }
 }
