@@ -2,7 +2,7 @@ import React from "react";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { CardContainer } from "../CardContainer";
 import { StyleSheet } from "react-native";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 import { BaseLineGraph } from "./BaseLineGraph";
 
 export interface SlipAngleProps {
@@ -11,7 +11,7 @@ export interface SlipAngleProps {
 
 export function SlipAngle(props: SlipAngleProps) {
   const tag = 'SlipAngle';
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   const viewModel = useViewModelStore().grip;
 

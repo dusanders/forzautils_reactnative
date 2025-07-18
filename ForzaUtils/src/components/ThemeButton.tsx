@@ -1,14 +1,14 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, TouchableOpacityProps } from "react-native";
 import { IThemeElements } from "../constants/Themes";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { themeService } from "../hooks/ThemeState";
 
 export interface ThemeButtonProps extends TouchableOpacityProps {
   children?: any;
 }
 
 export function ThemeButton(props: ThemeButtonProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
 
   return (

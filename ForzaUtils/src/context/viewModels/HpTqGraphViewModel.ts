@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useLogger } from "../Logger";
 import { delay } from "../../constants/types";
 import { ForzaTelemetryApi, ITelemetryData } from "ForzaTelemetryApi";
-import { useAtomValue } from "jotai";
-import { packetAtom } from "../../hooks/PacketState";
+import { packetService } from "../../hooks/PacketState";
 
 export interface IHpTqGraphViewModel {
   gears: GearData[];
@@ -122,7 +121,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   }
   const tag = 'HpTqGraphViewModel';
   const logger = useLogger();
-  const forza = useAtomValue(packetAtom);
+  const forza = packetService().packet;
   const [gears, setGears] = useState<GearData[]>([]);
 
 

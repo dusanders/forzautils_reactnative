@@ -13,9 +13,8 @@ import { ThemeText } from "../components/ThemeText";
 import { ThemeSwitch } from "../components/ThemeSwitch";
 import { useReplay } from "../context/Recorder";
 import { useNetworkContext } from "../context/Network";
-import { useAtomValue } from "jotai";
-import { packetAtom } from "../hooks/PacketState";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { packetService } from "../hooks/PacketState";
+import { themeService } from "../hooks/ThemeState";
 import { SlipAngle } from "../components/Graphs/SlipAngle";
 
 export interface DataChooserProps {
@@ -24,9 +23,9 @@ export interface DataChooserProps {
 
 export function DataChooser(props: DataChooserProps) {
   const tag = 'DataChooser.tsx';
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
-  const packet = useAtomValue(packetAtom);
+  const packet = packetService().packet;
   const network = useNetworkContext();
   const logger = useLogger();
   const navigation = useNavigation<StackNavigation>();

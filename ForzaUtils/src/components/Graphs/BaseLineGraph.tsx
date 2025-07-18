@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
 import Svg, { Path, Text } from "react-native-svg";
 import { ThemeText } from "../ThemeText";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface IGraphData {
   color: string;
@@ -29,7 +29,7 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   const widthScalar = props.dataLength;
   const [renderedLayout, setRenderedLayout] = useState({ width: 1, height: 1 });
   const [viewBox, setViewBox] = useState({ minX: -1, minY: 1, width: 1, height: 1 });
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   const [paths, setPaths] = useState<string[]>([]);
   const [yLimits, setYLimits] = useState<YValueLimits>({

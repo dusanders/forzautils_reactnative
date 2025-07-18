@@ -4,7 +4,7 @@ import Svg, { Circle, Path } from "react-native-svg";
 import { useViewModelStore } from "../context/viewModels/ViewModelStore";
 import { ThemeText } from "./ThemeText";
 import { Paper } from "./Paper";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { themeService } from "../hooks/ThemeState";
 
 export interface TrackMapProps {
   style?: StyleProp<ViewStyle>;
@@ -14,7 +14,7 @@ export function TrackMap(props: TrackMapProps) {
   const isValidNumber = (value: number) => {
     return typeof value === 'number' && !isNaN(value) && isFinite(value);
   }
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const viewModel = useViewModelStore().map;
   const minSvgX = isValidNumber(viewModel.viewBox.minX)
     ? viewModel.viewBox.minX

@@ -1,7 +1,7 @@
 import React from "react";
 import { IThemeElements } from "../constants/Themes";
 import { StyleSheet, View, ViewStyle } from "react-native";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { themeService } from "../hooks/ThemeState";
 
 export interface CardContainerProps {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ export interface CardContainerProps {
 }
 
 export function CardContainer(props: CardContainerProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   const doCenter = props.centerContent ? styles.center : {};
 

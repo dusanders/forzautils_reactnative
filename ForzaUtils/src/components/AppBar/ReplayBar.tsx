@@ -5,7 +5,7 @@ import { useLogger } from "../../context/Logger";
 import { ThemeIcon } from "../ThemeIcon";
 import { ReplayState, useNetworkContext } from "../../context/Network";
 import { ThemeText } from "../ThemeText";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface ReplayBarProps {
 }
@@ -13,7 +13,7 @@ export function ReplayBar(props: ReplayBarProps) {
   const tag = `ReplayBar.tsx`;
   const logger = useLogger();
   const network = useNetworkContext();
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
 
   return (

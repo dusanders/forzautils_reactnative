@@ -1,14 +1,14 @@
 import React, {  } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { IThemeElements } from "../constants/Themes";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { themeService } from "../hooks/ThemeState";
 
 export interface SplashProps {
 
 }
 
 export function Splash(props: SplashProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const style = withStyles(theme);
   return (
     <View style={style.root}>

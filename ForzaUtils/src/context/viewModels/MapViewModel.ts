@@ -1,8 +1,7 @@
 import { DirectionalData } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
 import { useLogger } from "../Logger";
-import { useAtomValue } from "jotai";
-import { packetAtom } from "../../hooks/PacketState";
+import { packetService } from "../../hooks/PacketState";
 
 export interface PlayerPosition {
   x: number;
@@ -49,7 +48,7 @@ const initialViewBox: SvgViewBoxMeasures = {
 export function useMapViewModel(): IMapViewModel {
   const tag = 'MapViewModel';
   const logger = useLogger();
-  const forza = useAtomValue(packetAtom);
+  const forza = packetService().packet;
   const [trackId, setTrackId] = useState(0);
   const [svg, setSvg] = useState('');
   const [viewBox, setViewBox] = useState<SvgViewBoxMeasures>(initialViewBox);

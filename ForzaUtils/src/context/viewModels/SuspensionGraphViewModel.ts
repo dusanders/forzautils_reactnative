@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { AxleData, useDataWindow } from "../../constants/types";
-import { useAtomValue } from "jotai";
-import { packetAtom } from "../../hooks/PacketState";
+import { packetService } from "../../hooks/PacketState";
 
 export interface ISuspensionGraphViewModel {
   leftFront: number;
@@ -96,7 +95,7 @@ const debugData = [
 export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
   const windowSize = 50;
-  const forza = useAtomValue(packetAtom);
+  const forza = packetService().packet;
   const avgTravelWindow = useDataWindow<AxleData<number>>(windowSize);
 
   useEffect(() => {

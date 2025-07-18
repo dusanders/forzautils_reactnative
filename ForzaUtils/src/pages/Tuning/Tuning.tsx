@@ -12,7 +12,7 @@ import { Drivetrain } from "ForzaTelemetryApi";
 import { TextCard } from "../../components/TextCard";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { Dropdown } from "./Dropdown";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 import { EngineLayout } from "../../context/viewModels/Tuning/Calculators";
 
 export interface TuningPageProps {
@@ -23,7 +23,7 @@ export function TuningPage(props: TuningPageProps) {
   const tag = 'TuningPage.tsx';
   const viewModel = useViewModelStore().tuning;
   const navigation = useNavigation();
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   const [weightInput, setWeightInput] = useState(viewModel.input.totalWeight.toString());
   const [frontDistInput, setFrontDistInput] = useState(viewModel.input.frontWeightDistribution.toLocaleString());

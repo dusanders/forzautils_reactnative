@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
-import { AppStoreState, useAppSelector } from "./AppStore";
-import { ForzaTelemetryApi, ITelemetryData } from "ForzaTelemetryApi";
+import { useAppSelector } from "./AppStore";
+import { ITelemetryData } from "ForzaTelemetryApi";
 
 export interface IWifiState {
   isConnected: boolean;
@@ -18,7 +18,7 @@ const initialState: IWifiState = {
   ip: "",
   packet: undefined,
 };
-const wifiSlice = createSlice({
+export const wifiSlice = createSlice({
   name: "wifi",
   initialState: initialState,
   reducers: {
@@ -49,7 +49,7 @@ const wifiSlice = createSlice({
     getWifiPort: (state: IWifiState) => state.port,
     getWifiIp: (state: IWifiState) => state.ip,
     getForzaPacket: (state: IWifiState) => state.packet,
-  }
+  },
 });
 export const wifiReducer = wifiSlice.reducer;
 

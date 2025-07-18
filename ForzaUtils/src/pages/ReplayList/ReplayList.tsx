@@ -11,7 +11,7 @@ import { useLogger } from "../../context/Logger";
 import { useNetworkContext } from "../../context/Network";
 import { type ReplayNavigationProps, StackNavigation } from "../../constants/types";
 import { DeleteDialog } from "./DeleteDialog";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface ReplayRouteParams  {
   listId: string; // Optional listId for filtering sessions
@@ -25,7 +25,7 @@ export function ReplayList() {
   const navigation = useNavigation<StackNavigation>();
   const replay = useReplay();
   const network = useNetworkContext();
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   const [sessions, setSessions] = useState<ISessionInfo[]>([]);
   const [toDelete, setToDelete] = useState<ISessionInfo | undefined>(undefined);

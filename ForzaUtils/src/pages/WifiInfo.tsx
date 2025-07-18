@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Dimensions, FlatList, ScrollView, StyleSheet, View } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
@@ -10,11 +10,9 @@ import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { Row } from "../components/Row";
 import { useNavigation } from "@react-navigation/native";
 import { CircleCheckIcon } from "../components/CircleCheckIcon";
-import { useAtomValue } from "jotai";
-import { wifiState } from "../hooks/WifiState";
-import { useCurrentTheme } from "../hooks/ThemeState";
-import { useLocaleViewModel } from "../redux/LocaleStore";
-import { ISupportLocale } from "../locale/strings";
+import { wifiService } from "../hooks/WifiState";
+import { themeService } from "../hooks/ThemeState";
+import { localeService } from "../hooks/LocaleState";
 
 export interface WifiInfoProps {
   // None
@@ -22,21 +20,11 @@ export interface WifiInfoProps {
 
 export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps> {
   const tag = "WifiInfo.tsx";
-  const theme = useCurrentTheme();
-  const wifiInfo = useAtomValue(wifiState);
-  const styles = themeStyles(theme);
+  const theme = themeService();
+  const wifiVm = wifiService();
+  const styles = themeStyles(theme.theme);
   const navigation = useNavigation<StackNavigation>();
-  const localeVM = useLocaleViewModel();
-  const currentLocale = localeVM.locale;
-  
-  useEffect(() => {
-    console.log(`${tag} - currentLocale changed: ${currentLocale}`);
-  }, [currentLocale]);
-
-  useEffect(() => {
-    console.log(`${tag} - Setting locale to French`);
-    localeVM.setLocale(ISupportLocale.fr);
-  }, []);
+  const localeVM = localeService();
 
   return (
     <AppBarContainer hideBack>
@@ -80,13 +68,13 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
               allcapsLabel
               allcapsTitle
               centerContent
-              title={wifiInfo.ip || '-'}
+              title={wifiVm.wifi.ip || '-'}
               body="IP Address" />
             <TextCard
               allcapsLabel
               allcapsTitle
               centerContent
-              title={`${wifiInfo.port || '-'}`}
+              title={`${wifiVm.wifi.port || '-'}`}
               body="Port" />
           </Row>
           <Row>
@@ -94,7 +82,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
               allcapsLabel
               allcapsTitle
               centerContent
-              title={wifiInfo.isUdpListening ? 'Listening' : 'Error'}
+              title={wifiVm.wifi.isUdpListening ? 'Listening' : 'Error'}
               body="Forza Data" />
             <TextCard
               allcapsLabel

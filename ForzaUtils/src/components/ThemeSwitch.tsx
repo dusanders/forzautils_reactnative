@@ -1,6 +1,6 @@
 import React from "react";
 import { Switch, SwitchProps } from "react-native";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { themeService } from "../hooks/ThemeState";
 
 export type SwitchOnPalette = 'primary' | 'secondary';
 
@@ -9,7 +9,7 @@ export interface ThemeSwitchProps extends SwitchProps {
 }
 
 export function ThemeSwitch(props: ThemeSwitchProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   let trueBg = theme.colors.background.onSecondary;
   let falseBg = theme.colors.background.onPrimary;
   let thumb = props.value

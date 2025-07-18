@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { AxleData, useDataWindow } from "../../constants/types";
-import { useAtomValue } from "jotai";
-import { packetAtom } from "../../hooks/PacketState";
+import { packetService } from "../../hooks/PacketState";
 
 export interface ITireTempViewModel {
   leftFront: number;
@@ -38,7 +37,7 @@ const debugData: AxleData<number>[] = [
 export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 50;
-  const forza = useAtomValue(packetAtom);
+  const forza = packetService().packet;
   const avgTempWindow = useDataWindow<AxleData<number>>(windowSize);
 
   useEffect(() => {

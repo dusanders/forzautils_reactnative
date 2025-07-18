@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
 import { TextCard } from "../../components/TextCard";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface DeleteDialogProps {
   session: ISessionInfo;
@@ -13,7 +13,7 @@ export interface DeleteDialogProps {
 }
 
 export function DeleteDialog(props: DeleteDialogProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   return (
     <View style={styles.root}>

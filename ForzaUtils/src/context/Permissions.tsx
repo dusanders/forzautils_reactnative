@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Permission, PERMISSIONS, requestMultiple } from "react-native-permissions";
-import { useSelector } from "react-redux";
 import { PermissionError } from "../pages/PermissionError";
 import { AppState, AppStateStatus, Platform } from "react-native";
 import { Splash } from "../pages/Splash";
-import { useAtom, useSetAtom } from "jotai";
-import { setPermissionAtom, useCurrentPermission } from "../hooks/PermissionState";
+import { permissionService } from "../hooks/PermissionState";
+import { usePermissionViewModel } from "../redux/PermissionStore";
 
 export interface PermissionsWatchProps {
   children?: any;
@@ -21,12 +20,12 @@ const iosPermissionList: Permission[] = [
 
 export function PermissionsWatcher(props: PermissionsWatchProps) {
   const tag = "PermissionsWatch.tsx";
-  const permissionState = useCurrentPermission();
-  const setPermissions = useSetAtom(setPermissionAtom);
+  const permissionVM = permissionService();
+  const permissionViewModel = usePermissionViewModel();
   const [loaded, setLoaded] = useState(false);
 
   const ensurePermissions = async () => {
-    if (permissionState == 'blocked') {
+    if (permissionVM.permission == 'blocked') {
       setLoaded(true);
       return;
     }
@@ -46,10 +45,12 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
     });
     if (allAllowed) {
       setLoaded(true);
-      setPermissions({ isGranted: 'granted' });
+      permissionViewModel.setPermissionState({ isGranted: 'granted' });
+      permissionVM.setPermission({ isGranted: 'granted' });
     } else {
       setLoaded(true);
-      setPermissions({ isGranted: 'blocked' });
+      permissionViewModel.setPermissionState({ isGranted: 'blocked' });
+      permissionVM.setPermission({ isGranted: 'blocked' });
     }
   }
 
@@ -70,12 +71,13 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
   }, []);
 
   if (!loaded) return (<Splash />);
-  if (permissionState != undefined) return props.children;
+  if (permissionVM.permission != undefined) return props.children;
   return (
     <PermissionError
       onIgnore={() => {
         setLoaded(true);
-        setPermissions({ isGranted: 'granted' });
+        permissionViewModel.setPermissionState({ isGranted: 'granted' });
+        permissionVM.setPermission({ isGranted: 'granted' });
       }}
       onOpenSettings={async () => {
         await ensurePermissions();

@@ -2,7 +2,7 @@ import React, { memo, useEffect, useState } from "react";
 import { LayoutRectangle, StyleSheet, View } from "react-native";
 import { ThemeText } from "../../components/ThemeText";
 import { IThemeElements } from "../../constants/Themes";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface SteeringChartProps {
   steeringAngle: number;
@@ -16,7 +16,7 @@ const defaultLayout: LayoutRectangle = {
 }
 
 export const SteeringChart = memo((props: SteeringChartProps) => {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const style = themeStyles(theme);
   const [steeringViewLayout, setSteeringViewLayout] = useState<LayoutRectangle>(defaultLayout);
   const [indicatorPosition, setIndicatorPosition] = useState(50);

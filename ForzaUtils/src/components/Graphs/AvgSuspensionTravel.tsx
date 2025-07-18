@@ -4,13 +4,13 @@ import { StyleSheet } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
 import { BaseLineGraph } from "./BaseLineGraph";
 import { CardContainer } from "../CardContainer";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface IAvgSuspensionTravelProps {
 }
 
 export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   const viewModel = useViewModelStore().suspensionGraph;
 

@@ -6,8 +6,8 @@ import { ThemeIcon } from "../ThemeIcon";
 import { Container } from "../Container";
 import { ThemeSwitch } from "../ThemeSwitch";
 import { AppBarSettingsButtonParams, AppSettingsButton } from "./AppSettingsButton";
-import { setThemeAtom, themeAtom, themeTypeAtom } from "../../hooks/ThemeState";
 import { useAtomValue, useSetAtom } from "jotai";
+import { themeService } from "../../hooks/ThemeState";
 
 export const AppBarTestID = {
   root: 'app-bar-root',
@@ -29,9 +29,9 @@ export interface AppBarProps {
 
 export function AppBar(props: AppBarProps) {
   const [showSettings, setShowSettings] = useState(false);
-  const theme = useAtomValue(themeAtom);
-  const themeType = useAtomValue(themeTypeAtom);
-  const setNewTheme = useSetAtom(setThemeAtom);
+  const themeVM = themeService();
+  const theme = themeVM.theme;
+  const themeType = themeVM.themeType;
   const style = themeStyles(theme);
   let doShowSettingsButton = true;
   if (props.hideSettings != undefined) {
@@ -104,7 +104,7 @@ export function AppBar(props: AppBarProps) {
                 <ThemeSwitch
                   onPalette={'secondary'}
                   onValueChange={(val) => {
-                    setNewTheme(val ? 'dark' : 'light');
+                    themeVM.updateTheme(val ? 'dark' : 'light');
                   }}
                   value={themeType === 'dark'} />
               </View>

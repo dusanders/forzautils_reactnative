@@ -10,7 +10,7 @@ export interface ILocaleState {
   strings: IStringDefinitions;
 }
 
-const localeSlice = createSlice({
+export const localeSlice = createSlice({
   name: 'locale',
   initialState: {
     type: ISupportLocale.enUS,

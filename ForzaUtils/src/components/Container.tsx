@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
 import { BackgroundVariantType, IThemeElements } from "../constants/Themes";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { themeService } from "../hooks/ThemeState";
 
 export type ContainerFlex = 'row' | 'column';
 export type ContainerFill = 'parent' | 'width' | 'height';
@@ -13,7 +13,7 @@ export interface ContainerProps extends ViewProps {
 }
 
 export function Container(props: ContainerProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   let baseStyle = styles.rootPrimary;
   switch(props.variant) {

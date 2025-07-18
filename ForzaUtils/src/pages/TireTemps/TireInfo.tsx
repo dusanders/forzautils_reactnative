@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
 import { CardContainer } from "../../components/CardContainer";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface TireInfoProps {
   temp: number;
@@ -11,7 +11,7 @@ export interface TireInfoProps {
 }
 
 export function TireInfo(props: TireInfoProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const style = themeStyles(theme);
 
   const colorForTemp = (temp: number) => {

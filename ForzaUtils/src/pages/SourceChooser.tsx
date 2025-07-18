@@ -8,7 +8,7 @@ import { Row } from "../components/Row";
 import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "../components/ThemeText";
 import { useLogger } from "../context/Logger";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { themeService } from "../hooks/ThemeState";
 
 export interface SourceChooserProps {
   // None
@@ -18,7 +18,7 @@ export function SourceChooser(props: SourceChooserProps) {
   const tag = 'SourceChooser.tsx';
   const navigation = useNavigation<StackNavigation>();
   const logger = useLogger();
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
 
   return (

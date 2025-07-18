@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { TireData } from "ForzaTelemetryApi";
-import { packetAtom } from "../../hooks/PacketState";
-import { useAtomValue } from "jotai";
+import { packetService } from "../../hooks/PacketState";
 import { AxleData, useDataWindow } from "../../constants/types";
 
 
@@ -15,7 +14,7 @@ export interface IGripViewModel {
 }
 
 export function useGripViewModel(): IGripViewModel {
-  const forza = useAtomValue(packetAtom);
+  const forza = packetService().packet;
   const windowSize = 50;
   const slipAngleWindow = useDataWindow<AxleData<number>>(windowSize);
 

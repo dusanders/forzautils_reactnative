@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { ThemeText } from "../components/ThemeText";
 import { Paper } from "../components/Paper";
 import { ThemeButton } from "../components/ThemeButton";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { themeService } from "../hooks/ThemeState";
 
 
 export interface PermissionErrorProps {
@@ -13,7 +13,7 @@ export interface PermissionErrorProps {
 }
 
 export function PermissionError(props: PermissionErrorProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   return (
     <Container fill="parent"
       flex="column"

@@ -2,7 +2,7 @@ import React from "react";
 import { StyleProp, StyleSheet, TextInput, View, ViewStyle } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { LabelText } from "./ThemeText";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { themeService } from "../hooks/ThemeState";
 
 export interface CardInputProps {
   value: string;
@@ -12,7 +12,7 @@ export interface CardInputProps {
   style?: StyleProp<ViewStyle>;
 }
 export function CardInput(props: CardInputProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
 
   return (

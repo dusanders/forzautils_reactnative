@@ -5,7 +5,7 @@ import { View } from "react-native";
 import { useLogger } from "../../context/Logger";
 import { ReplayBar } from "./ReplayBar";
 import { useNetworkContext } from "../../context/Network";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface AppBarContainerProps extends ContainerProps, AppBarProps {
 
@@ -13,7 +13,7 @@ export interface AppBarContainerProps extends ContainerProps, AppBarProps {
 
 export function AppBarContainer(props: AppBarContainerProps) {
   const tag = `AppBarContainer.tsx`;
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const logger = useLogger();
   const network = useNetworkContext();
 

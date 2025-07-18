@@ -7,8 +7,8 @@ import { ITelemetryData } from 'ForzaTelemetryApi';
 import { ISocketCallback, Socket } from '../services/Socket';
 import { ISession } from '../services/Database/DatabaseInterfaces';
 import { useAtom } from 'jotai';
-import { initialState, wifiState } from '../hooks/WifiState';
-import { packetState } from '../hooks/PacketState';
+import { wifiService } from '../hooks/WifiState';
+import { packetService } from '../hooks/PacketState';
 
 //#region Definitions
 
@@ -86,8 +86,8 @@ export interface NetworkWatcherProps {
 export function NetworkWatcher(props: NetworkWatcherProps) {
   const tag = "NetworkWatcher.tsx";
   const logger = useLogger();
-  const [currentWifiState, setNewWifiState] = useAtom(wifiState);
-  const [currentPacket, setCurrentPacket] = useAtom(packetState);
+  const wifiVm = wifiService();
+  const packetVm = packetService();
   const [loaded, setLoaded] = useState(false);
   const [renderHack, setRenderHack] = useState(false);
   const replayState = useRef<ReplayState>(ReplayState.STOPPED);
@@ -102,15 +102,15 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   const socketCallbacks = useMemo<ISocketCallback>(() => ({
     onClose: (ev) => {
       logger.debug(tag, `socket did close ${(ev as Error)?.message}`);
-      setNewWifiState({
-        ...currentWifiState,
+      wifiVm.setWifi({
+        ...wifiVm.wifi,
         port: 0
-      });
+      })
     },
     onError: (ev) => {
       logger.error(tag, `Socket error: ${ev?.message}`);
-      setNewWifiState({
-        ...currentWifiState,
+      wifiVm.setWifi({
+        ...wifiVm.wifi,
         port: 0
       });
     },
@@ -142,7 +142,7 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
       await delay(replayDelay.current);
     }
     if (throttledPacket.current) {
-      setCurrentPacket({ packet: throttledPacket.current });
+      packetVm.setPacket(throttledPacket.current);
     }
     animationFrameId.current = requestAnimationFrame(() => { updatePacketState() });
   }
@@ -153,16 +153,12 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   useEffect(() => {
     let netInfoSub: NetInfoSubscription = addEventListener((state: NetInfoState) => {
       if (!state || state.type !== NetInfoStateType.wifi) {
-        setNewWifiState(initialState);
+        wifiVm.resetState();
       } else if (state.type === NetInfoStateType.wifi && state.isConnected) {
-        setNewWifiState((prev) => {
-          return {
-            isConnected: true,
-            isUdpListening: prev.isUdpListening,
-            port: prev.port,
-            ip: state.details?.ipAddress || ""
-          }
-        });
+        wifiVm.setWifi({
+          isConnected: true,
+          ip: state.details?.ipAddress || '',
+        })
       }
     });
     return () => {
@@ -178,14 +174,14 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
    * Throttle the packet data to avoid flooding the UI
    */
   useEffect(() => {
-    if (currentWifiState.isUdpListening) {
+    if (wifiVm.wifi.isUdpListening) {
       logger.debug(tag, `Starting packet flush interval`);
       updatePacketState();
     } else {
       logger.debug(tag, `Stopping packet flush interval`);
       closeAnimationFrame();
     }
-  }, [currentWifiState.isUdpListening]);
+  }, [wifiVm.wifi.isUdpListening]);
 
   /**
    * Handle Wifi connection state changes
@@ -195,23 +191,21 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
     const tryConnect = async () => {
       socket = Socket.getInstance(logger);
       let listeningPort = await socket.bind(LISTEN_PORT, socketCallbacks);
-      setNewWifiState({
-        isConnected: currentWifiState.isConnected,
+      wifiVm.setWifi({
         isUdpListening: listeningPort > 0,
         port: listeningPort,
-        ip: currentWifiState.ip
       });
       setLoaded(true);
     }
-    if (currentWifiState.isConnected) {
+    if (wifiVm.wifi.isConnected) {
       logger.debug(tag, `Wifi connected!`);
       tryConnect();
     } else {
       logger.debug(tag, `Wifi disconnected!`);
-      setNewWifiState(initialState);
+      wifiVm.resetState();
       socket?.close()
     }
-  }, [currentWifiState.isConnected]);
+  }, [wifiVm.wifi.isConnected]);
 
   return (
     <NetworkContext.Provider value={{

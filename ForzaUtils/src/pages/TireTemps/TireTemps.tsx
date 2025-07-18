@@ -7,14 +7,14 @@ import { TireInfo } from "./TireInfo";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface TireTempsProps {
   // Nothing
 }
 
 export function TireTemps(props: TireTempsProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const style = themeStyles(theme);
   const navigation = useNavigation<StackNavigation>();
   const store = useViewModelStore();

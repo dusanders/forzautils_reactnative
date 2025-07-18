@@ -1,12 +1,32 @@
 import { ITelemetryData } from 'ForzaTelemetryApi';
-import {atom} from 'jotai';
+import {atom, useAtomValue, useSetAtom} from 'jotai';
 
 export interface IPacketState {
   packet: ITelemetryData | undefined;
 }
 
-export const initialState: IPacketState = {
+const initialState: IPacketState = {
   packet: undefined,
 };
-export const packetState = atom<IPacketState>(initialState);
-export const packetAtom = atom((get) => get(packetState).packet);
+const packetState = atom<IPacketState>(initialState);
+const packetAtom = atom((get) => get(packetState).packet);
+const setPacketAtom = atom(
+  null,
+  (get, set, newPacket: ITelemetryData | undefined) => {
+    const currentState = get(packetState);
+    set(packetState, { ...currentState, packet: newPacket });
+  }
+);
+
+export function packetService() {
+  const packet = useAtomValue(packetAtom);
+  const setPacket = useSetAtom(setPacketAtom);
+
+  return {
+    packet,
+    setPacket,
+    resetState: () => {
+      setPacket(undefined);
+    },
+  };
+}

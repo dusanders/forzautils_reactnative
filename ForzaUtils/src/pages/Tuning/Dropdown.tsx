@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { IThemeElements } from "../../constants/Themes";
 import { Picker } from "@react-native-picker/picker";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface IDropdownOption {
   label: string;
@@ -16,7 +16,7 @@ export interface DropdownProps {
 }
 
 export function Dropdown(props: DropdownProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   const [value, setValue] = useState(props.value);
 

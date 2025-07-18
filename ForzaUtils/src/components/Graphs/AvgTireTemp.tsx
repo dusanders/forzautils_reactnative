@@ -3,13 +3,13 @@ import { CardContainer } from "../CardContainer";
 import { BaseLineGraph } from "./BaseLineGraph";
 import { StyleSheet } from "react-native";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
-import { useCurrentTheme } from "../../hooks/ThemeState";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface AvgTireTempProps {
 }
 
 export function AvgTireTemps(props: AvgTireTempProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   const viewModel = useViewModelStore().tireTemps;
 

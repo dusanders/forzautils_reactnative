@@ -2,7 +2,7 @@ import React from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import { IThemeElements } from "../constants/Themes";
 import { ContainerProps } from "./Container";
-import { useCurrentTheme } from "../hooks/ThemeState";
+import { themeService } from "../hooks/ThemeState";
 
 
 export interface PaperProps extends ContainerProps {
@@ -10,7 +10,7 @@ export interface PaperProps extends ContainerProps {
 }
 
 export function Paper(props: PaperProps) {
-  const theme = useCurrentTheme();
+  const theme = themeService().theme;
   const styles = themeStyles(theme);
   let variantStyle: StyleProp<ViewStyle> = {
     backgroundColor: theme.colors.background.onPrimary
