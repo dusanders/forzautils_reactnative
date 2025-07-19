@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { Row } from "../../components/Row";
 import { ThemeText } from "../../components/ThemeText";
 import { IThemeElements } from "../../constants/Themes";
@@ -9,20 +8,19 @@ import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
 import { useReplay } from "../../context/Recorder";
 import { useLogger } from "../../context/Logger";
 import { useNetworkContext } from "../../context/Network";
-import { type ReplayNavigationProps, StackNavigation } from "../../constants/types";
+import { AppRoutes, RootStackParamList } from "../../constants/types";
 import { DeleteDialog } from "./DeleteDialog";
 import { themeService } from "../../hooks/ThemeState";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 export interface ReplayRouteParams  {
   listId: string; // Optional listId for filtering sessions
 }
-
-export function ReplayList() {
+type ReplayScreenProps = NativeStackScreenProps<RootStackParamList, AppRoutes.REPLAY_LIST>;
+export function ReplayList(props: ReplayScreenProps) {
   const tag = 'ReplayList';
-  const route = useRoute<ReplayNavigationProps>();
-  console.log(`${tag} - props:`, route.params.listId);
+  const {route, navigation} = props;
   const logger = useLogger();
-  const navigation = useNavigation<StackNavigation>();
   const replay = useReplay();
   const network = useNetworkContext();
   const theme = themeService().theme;
@@ -40,10 +38,7 @@ export function ReplayList() {
   }, []);
 
   return (
-    <AppBarContainer
-      onBack={() => {
-        navigation.goBack();
-      }}>
+    <AppBarContainer>
       <View style={styles.root}>
         {Boolean(toDelete) && (
           <DeleteDialog

@@ -58,8 +58,7 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
 
   return (
     <AppBarContainer
-      title="Suspension Travel"
-      onBack={() => { navigation.goBack() }}>
+      title="Suspension Travel">
       <Paper style={style.content}>
         <BarChart
           style={{

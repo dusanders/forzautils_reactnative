@@ -1,27 +1,39 @@
-import { ColorSchemeName } from "react-native";
-import { IThemeElements, DarkColors, LightColors, ForestTheme, ClaudesTheme } from "../constants/Themes";
+import { IThemeElements, DarkColors, LightColors, ForestTheme, ClaudesTheme, ThemeType } from "../constants/Themes";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 
-
+function getThemeByType(themeType: ThemeType): IThemeElements {
+  switch (themeType) {
+    case ThemeType.LIGHT:
+      return LightColors;
+    case ThemeType.DARK:
+      return DarkColors;
+    case ThemeType.FOREST:
+      return ForestTheme;
+    case ThemeType.CLAUDES:
+      return ClaudesTheme;
+    default:
+      return DarkColors; // Fallback to dark theme
+  }
+}
 export interface IThemeState {
-  current: ColorSchemeName;
+  current: ThemeType;
   theme: IThemeElements;
 }
 const initialState: IThemeState = {
-  current: 'dark',
+  current: ThemeType.DARK,
   theme: DarkColors,
 };
 const themeState = atom<IThemeState>(initialState);
 const themeAtom = atom((get) => get(themeState).theme);
-const themeTypeAtom = atom((get) => get(themeState).current);
+const themeTypeAtom = atom<ThemeType>((get) => get(themeState).current);
 const setThemeAtom = atom(
   initialState,
-  (get, set, newTheme: ColorSchemeName) => {
+  (get, set, newTheme: ThemeType) => {
     const currentTheme = get(themeState);
     set(themeState, {
       ...currentTheme,
       current: newTheme,
-      theme: newTheme === 'dark' ? DarkColors : LightColors,
+      theme: getThemeByType(newTheme),
     });
   }
 );
@@ -30,7 +42,7 @@ export function themeService() {
   const theme = useAtomValue(themeAtom);
   const themeType = useAtomValue(themeTypeAtom);
   const setTheme = useSetAtom(setThemeAtom);
-  const updateTheme = (newTheme: ColorSchemeName) => {
+  const updateTheme = (newTheme: ThemeType) => {
     setTheme(newTheme);
   };
   return {

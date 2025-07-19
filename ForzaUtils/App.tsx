@@ -17,6 +17,7 @@ import { Grip } from './src/pages/Grip/Grip';
 import { SourceChooser } from './src/pages/SourceChooser';
 import { TuningPage } from './src/pages/Tuning/Tuning';
 import { ReplayList } from './src/pages/ReplayList/ReplayList';
+import { Settings } from './src/pages/Settings/Settings';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -71,6 +72,9 @@ function App(): React.JSX.Element {
               name={AppRoutes.REPLAY_LIST}
               component={ReplayList}
               initialParams={{listId: 'none'}} />
+            <Stack.Screen
+              name={AppRoutes.SETTINGS}
+              component={Settings} />
           </Stack.Navigator>
         </SafeStack>
       </NavigationContainer>

@@ -22,10 +22,7 @@ export function SourceChooser(props: SourceChooserProps) {
   const styles = themeStyles(theme);
 
   return (
-    <AppBarContainer
-      onBack={() => {
-        navigation.goBack();
-      }}>
+    <AppBarContainer>
       <View style={styles.root}>
         <Row style={styles.cardRow}>
           <View style={{
@@ -77,7 +74,7 @@ export function SourceChooser(props: SourceChooserProps) {
             title={'Replay'}
             body="View a previously recorded session"
             onPress={() => {
-              navigation.push(AppRoutes.REPLAY_LIST, { listId: 'default' });
+              navigation.push(AppRoutes.REPLAY_LIST, { listId: 'fromSourceChooser' });
             }} />
         </Row>
       </View>

@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
+import { IThemeElements, ThemeType } from "../../constants/Themes";
 import { ThemeText } from "../ThemeText";
 import { ThemeIcon } from "../ThemeIcon";
 import { Container } from "../Container";
 import { ThemeSwitch } from "../ThemeSwitch";
 import { AppBarSettingsButtonParams, AppSettingsButton } from "./AppSettingsButton";
-import { useAtomValue, useSetAtom } from "jotai";
 import { themeService } from "../../hooks/ThemeState";
+import { useNavigation } from "@react-navigation/native";
+import { AppRoutes, StackNavigation } from "../../constants/types";
 
 export const AppBarTestID = {
   root: 'app-bar-root',
@@ -24,10 +25,10 @@ export interface AppBarProps {
   hideSettings?: boolean;
   hideBack?: boolean;
   injectElements?: AppBarSettingsButtonParams[];
-  onBack?: () => void;
 }
 
 export function AppBar(props: AppBarProps) {
+  const navigation = useNavigation<StackNavigation>();
   const [showSettings, setShowSettings] = useState(false);
   const themeVM = themeService();
   const theme = themeVM.theme;
@@ -65,9 +66,7 @@ export function AppBar(props: AppBarProps) {
           <TouchableOpacity testID={AppBarTestID.backIconView}
             style={style.backIconView}
             onPress={() => {
-              if (props.onBack) {
-                props.onBack()
-              }
+              navigation.goBack();
             }}>
             <ThemeIcon name={'chevron-left'}
               size={theme.sizes.icon} />
@@ -80,6 +79,7 @@ export function AppBar(props: AppBarProps) {
           <TouchableOpacity testID={AppBarTestID.settingIconView}
             style={style.settingIconView}
             onPress={() => {
+              navigation.push(AppRoutes.SETTINGS);
               setShowSettings(!showSettings)
             }}>
             <ThemeIcon name={'settings'}
@@ -104,9 +104,9 @@ export function AppBar(props: AppBarProps) {
                 <ThemeSwitch
                   onPalette={'secondary'}
                   onValueChange={(val) => {
-                    themeVM.updateTheme(val ? 'dark' : 'light');
+                    themeVM.updateTheme(val ? ThemeType.DARK : ThemeType.LIGHT);
                   }}
-                  value={themeType === 'dark'} />
+                  value={themeType === ThemeType.DARK} />
               </View>
               {props.injectElements && (
                 <View style={{

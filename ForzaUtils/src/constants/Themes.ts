@@ -1,5 +1,12 @@
 import { StyleSheet } from "react-native";
 
+export enum ThemeType {
+  LIGHT = 'light',
+  DARK = 'dark',
+  FOREST = 'forest',
+  CLAUDES = 'claudes'
+}
+
 export interface IThemeElements {
   colors: {
     text: {

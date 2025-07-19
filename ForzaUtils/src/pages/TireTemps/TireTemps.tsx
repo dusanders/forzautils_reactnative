@@ -33,10 +33,7 @@ export function TireTemps(props: TireTempsProps) {
 
   return (
     <AppBarContainer
-      title="Tire Temps"
-      onBack={() => {
-        navigation.goBack()
-      }}>
+      title="Tire Temps">
       <Row style={style.halfHeight}>
         <TireInfo temp={temps[0]}
           title="Left Front" />

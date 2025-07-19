@@ -138,9 +138,6 @@ export function DataChooser(props: DataChooserProps) {
   return (
     <AppBarContainer
       title="Data Chooser"
-      onBack={() => {
-        navigation.goBack();
-      }}
       injectElements={Boolean(network.replay)
         ? []
         : [{

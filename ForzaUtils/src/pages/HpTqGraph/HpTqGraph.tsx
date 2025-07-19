@@ -34,9 +34,6 @@ export function HptqGraph(props: HpTqGraphProps) {
 
   return (
     <AppBarContainer title="Hp / Tq Graph"
-      onBack={() => {
-        navigation.goBack()
-      }}
       injectElements={[
         {
           id: randomKey(),

@@ -33,7 +33,6 @@ export function Grip(props: GripProps) {
 
   return (
     <AppBarContainer
-      onBack={() => { navigation.pop() }}
       title="Grip">
       <ScrollView
         style={{ paddingBottom: 24 }}>

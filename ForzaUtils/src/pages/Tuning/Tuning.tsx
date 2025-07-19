@@ -11,7 +11,7 @@ import { LabelText } from "../../components/ThemeText";
 import { Drivetrain } from "ForzaTelemetryApi";
 import { TextCard } from "../../components/TextCard";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
-import { Dropdown } from "./Dropdown";
+import { Dropdown } from "../../components/Dropdown";
 import { themeService } from "../../hooks/ThemeState";
 import { EngineLayout } from "../../context/viewModels/Tuning/Calculators";
 
@@ -167,10 +167,7 @@ export function TuningPage(props: TuningPageProps) {
 
   return (
     <AppBarContainer 
-    title="All Units Imperial"
-    onBack={() => {
-      navigation.goBack();
-    }}>
+    title="All Units Imperial">
       <ScrollView>
         <Row>
           <CardInput
@@ -252,6 +249,7 @@ export function TuningPage(props: TuningPageProps) {
             style={styles.pickerContainer}>
             <View style={styles.column}>
               <Dropdown
+                label={'Engine Layout'}
                 value={selectedLayout}
                 options={[
                   { value: EngineLayout.FRONT, label: labelForLayout(EngineLayout.FRONT) },
@@ -264,15 +262,13 @@ export function TuningPage(props: TuningPageProps) {
                     engineLayout: option.value
                   })
                 }} />
-              <LabelText style={{ textAlign: 'center' }}>
-                Engine Layout
-              </LabelText>
             </View>
           </CardContainer>
           <CardContainer
             style={styles.pickerContainer}>
             <View style={styles.column}>
               <Dropdown
+                label="Drivetrain"
                 value={selectedDrivetrain}
                 options={[
                   { value: Drivetrain.FWD, label: labelForDrivetrain(Drivetrain.FWD) },
@@ -285,9 +281,6 @@ export function TuningPage(props: TuningPageProps) {
                     drivetrain: option.value
                   });
                 }} />
-              <LabelText style={{ textAlign: 'center' }}>
-                Drivetrain
-              </LabelText>
             </View>
           </CardContainer>
         </Row>
