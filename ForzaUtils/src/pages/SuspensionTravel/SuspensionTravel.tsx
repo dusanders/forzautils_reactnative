@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
-import { IThemeElements } from "../../constants/Themes";
 import { BarChart } from "react-native-chart-kit";
 import { ChartData, Dataset } from "react-native-chart-kit/dist/HelperTypes";
 import { Paper } from "../../components/Paper";
@@ -9,7 +8,7 @@ import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
 
 export interface SuspensionTravelProps {
   // Nothing
@@ -40,7 +39,7 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   const navigation = useNavigation<StackNavigation>();
   const theme = themeService().theme;
   const dimensions = withScaledWindow(0.9, 0.3);
-  const style = themeStyles(theme);
+  const style = themeStyles();
 
   const frontChartData = useMemo<ChartData>(() => {
     return {
@@ -112,8 +111,8 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     content: {
       width: '95%',
       justifyContent: 'center',
@@ -122,5 +121,5 @@ function themeStyles(theme: IThemeElements) {
       paddingBottom: 0,
       marginBottom: theme.sizes.borderRadius
     }
-  })
+  }));
 }

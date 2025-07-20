@@ -3,14 +3,13 @@ import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { StyleSheet } from "react-native";
 import { BaseLineGraph } from "./BaseLineGraph";
 import { CardContainer } from "../CardContainer";
-import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 
 export interface IAvgSuspensionTravelProps {
 }
 
 export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
   const styles = themeStyles();
-  const theme = themeService().theme;
   const viewModel = useViewModelStore().suspensionGraph;
 
   return (
@@ -24,12 +23,12 @@ export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
           {
             data: viewModel.avgTravel.map((point) => point.front),
             label: 'Front Avg Travel',
-            color: theme.colors.text.primary.onPrimary
+            color: invokeWithTheme(theme => theme.colors.text.primary.onPrimary)
           },
           {
             data: viewModel.avgTravel.map((point) => point.rear),
             label: 'Rear Avg Travel',
-            color: theme.colors.text.secondary.onPrimary
+            color: invokeWithTheme(theme => theme.colors.text.secondary.onPrimary)
           }
         ]} />
 

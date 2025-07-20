@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import { ContainerProps } from "./Container";
-import { invokeWithTheme, themeService } from "../hooks/ThemeState";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 
 export interface PaperProps extends ContainerProps {
@@ -9,13 +9,12 @@ export interface PaperProps extends ContainerProps {
 }
 
 export function Paper(props: PaperProps) {
-  const theme = themeService().theme;
   const styles = themeStyles();
   let variantStyle: StyleProp<ViewStyle> = {
-    backgroundColor: theme.colors.background.onPrimary
+    backgroundColor: invokeWithTheme(theme => theme.colors.background.onPrimary)
   }
   if (props.variant) {
-    variantStyle.backgroundColor = theme.colors.background[props.variant]
+    variantStyle.backgroundColor = invokeWithTheme(theme => theme.colors.background[props.variant!])
   }
 
   let centerContentStyle: StyleProp<ViewStyle> = {};

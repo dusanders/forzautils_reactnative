@@ -3,13 +3,12 @@ import { CardContainer } from "../CardContainer";
 import { BaseLineGraph } from "./BaseLineGraph";
 import { StyleSheet } from "react-native";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
-import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 
 export interface AvgTireTempProps {
 }
 
 export function AvgTireTemps(props: AvgTireTempProps) {
-  const theme = themeService().theme;
   const styles = themeStyles();
   const viewModel = useViewModelStore().tireTemps;
 
@@ -24,12 +23,12 @@ export function AvgTireTemps(props: AvgTireTempProps) {
         {
           data: viewModel.avgTemps.map((point) => point.front),
           label: 'Front Avg Temp',
-          color: theme.colors.text.primary.onPrimary
-        }, 
+          color: invokeWithTheme(theme => theme.colors.text.primary.onPrimary)
+        },
         {
           data: viewModel.avgTemps.map((point) => point.rear),
           label: 'Rear Avg Temp',
-          color: theme.colors.text.secondary.onPrimary
+          color: invokeWithTheme(theme => theme.colors.text.secondary.onPrimary)
         }
       ]}/>
     </CardContainer>

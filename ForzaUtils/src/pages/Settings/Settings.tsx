@@ -1,9 +1,6 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React from "react";
 import { AppRoutes, RootStackParamList } from "../../constants/types";
-import { View } from "react-native";
-import { ThemeButton } from "../../components/ThemeButton";
-import { ThemeText } from "../../components/ThemeText";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { Dropdown } from "../../components/Dropdown";
 import { themeService } from "../../hooks/ThemeState";

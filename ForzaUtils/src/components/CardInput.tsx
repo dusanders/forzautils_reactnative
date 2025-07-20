@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleProp, StyleSheet, TextInput, View, ViewStyle } from "react-native";
 import { LabelText } from "./ThemeText";
-import { invokeWithTheme, themeService } from "../hooks/ThemeState";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 export interface CardInputProps {
   value: string;
@@ -11,7 +11,6 @@ export interface CardInputProps {
   style?: StyleProp<ViewStyle>;
 }
 export function CardInput(props: CardInputProps) {
-  const theme = themeService().theme;
   const styles = themeStyles();
 
   return (
@@ -20,7 +19,7 @@ export function CardInput(props: CardInputProps) {
         value={props.value}
         onChangeText={(text) => props.onChange(text)}
         placeholder={props.placeholder || ""}
-        placeholderTextColor={theme.colors.text.secondary.onSecondary}
+        placeholderTextColor={invokeWithTheme(theme => theme.colors.text.secondary.onSecondary)}
         style={styles.input}
         keyboardType={'numeric'}
         autoCapitalize="none"

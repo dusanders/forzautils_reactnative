@@ -3,7 +3,7 @@ import { Paper } from "../Paper";
 import { StyleSheet, View } from "react-native";
 import Svg, { Path, Text } from "react-native-svg";
 import { ThemeText } from "../ThemeText";
-import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 
 export interface IGraphData {
   color: string;
@@ -28,7 +28,6 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   const widthScalar = props.dataLength;
   const [renderedLayout, setRenderedLayout] = useState({ width: 1, height: 1 });
   const [viewBox, setViewBox] = useState({ minX: -1, minY: 1, width: 1, height: 1 });
-  const theme = themeService().theme;
   const styles = themeStyles();
   const [paths, setPaths] = useState<string[]>([]);
   const [yLimits, setYLimits] = useState<YValueLimits>({
@@ -139,13 +138,13 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
               <Text
                 fontSize={fontSize}
                 y={0 + (fontSize / 1.4)}
-                fill={theme.colors.text.primary.onPrimary}>
+                fill={invokeWithTheme(theme => theme.colors.text.primary.onPrimary)}>
                 {yLimits.maxY === Number.MIN_SAFE_INTEGER ? 0 : yLimits.maxY.toFixed(2)}
               </Text>
               <Text
                 fontSize={fontSize}
                 y={viewBox.height - (fontSize / 1.4)}
-                fill={theme.colors.text.primary.onPrimary}>
+                fill={invokeWithTheme(theme => theme.colors.text.primary.onPrimary)}>
                 {yLimits.minY === Number.MAX_SAFE_INTEGER ? 0 : yLimits.minY.toFixed(2)}
               </Text>
             </>
