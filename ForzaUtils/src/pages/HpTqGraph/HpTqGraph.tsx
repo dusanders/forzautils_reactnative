@@ -1,6 +1,5 @@
 import React, {  } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
 import { Assets } from "../../assets";
 import { Paper } from "../../components/Paper";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
@@ -11,7 +10,7 @@ import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 
 export interface HpTqGraphProps {
   // Nothing
@@ -19,8 +18,7 @@ export interface HpTqGraphProps {
 
 export function HptqGraph(props: HpTqGraphProps) {
   const navigation = useNavigation<StackNavigation>();
-  const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const store = useViewModelStore().hpTqGraph;
   const windowMeasure = withScaledWindow(0.9, 1);
 
@@ -92,8 +90,8 @@ export function HptqGraph(props: HpTqGraphProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     waitBodyText: {
       width: '70%',
       textAlign: 'center',
@@ -122,5 +120,5 @@ function themeStyles(theme: IThemeElements) {
       color: theme.colors.text.primary.onPrimary,
       fontFamily: Assets.SupportedFonts.Regular
     }
-  })
+  }));
 }

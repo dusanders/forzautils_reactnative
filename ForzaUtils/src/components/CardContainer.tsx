@@ -1,7 +1,6 @@
 import React from "react";
-import { IThemeElements } from "../constants/Themes";
 import { StyleSheet, View, ViewStyle } from "react-native";
-import { themeService } from "../hooks/ThemeState";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 export interface CardContainerProps {
   children: React.ReactNode;
@@ -10,8 +9,7 @@ export interface CardContainerProps {
 }
 
 export function CardContainer(props: CardContainerProps) {
-  const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const doCenter = props.centerContent ? styles.center : {};
 
   const styleCombined = {
@@ -26,8 +24,8 @@ export function CardContainer(props: CardContainerProps) {
     </View>
   )
 }
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       padding: theme.sizes.paper.padding,
       marginTop: theme.sizes.paper.spacingY / 2,
@@ -44,5 +42,5 @@ function themeStyles(theme: IThemeElements) {
       justifyContent: 'center',
       alignItems: 'center'
     }
-  });
+  }));
 }

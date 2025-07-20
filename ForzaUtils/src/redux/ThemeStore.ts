@@ -1,16 +1,15 @@
 import { ColorSchemeName } from "react-native";
-import { DarkColors, IThemeElements, LightColors } from "../constants/Themes";
+import { DarkColors, IThemeElements, LightColors, ThemeType } from "../constants/Themes";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "./AppStore";
 
-export type ThemeType = ColorSchemeName;
 export interface IThemeState {
   current: ThemeType;
   theme: IThemeElements;
 }
 const initialState: IThemeState = {
-  current: 'dark',
+  current: ThemeType.DARK,
   theme: DarkColors,
 };
 export interface IThemeActions {
@@ -43,7 +42,7 @@ const themeSlice = createSlice({
 
 export const themeReducer = themeSlice.reducer;
 
-export function useThemeViewModel() {
+export function useReduxTheme() {
   const dispatch = useDispatch();
   const theme = useAppSelector(themeSlice.selectors.getTheme);
   const themeType = useAppSelector(themeSlice.selectors.getThemeType);

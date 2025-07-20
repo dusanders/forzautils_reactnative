@@ -1,15 +1,13 @@
 import React, {  } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { IThemeElements } from "../constants/Themes";
-import { themeService } from "../hooks/ThemeState";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 export interface SplashProps {
 
 }
 
 export function Splash(props: SplashProps) {
-  const theme = themeService().theme;
-  const style = withStyles(theme);
+  const style = withStyles();
   return (
     <View style={style.root}>
       <Text
@@ -23,8 +21,8 @@ export function Splash(props: SplashProps) {
   )
 }
 
-function withStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function withStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       height: '100%',
       width: '100%',
@@ -50,5 +48,5 @@ function withStyles(theme: IThemeElements) {
       color: theme.colors.text.primary.onPrimary,
       textAlign: 'center',
     }
-  });
+  }));
 }

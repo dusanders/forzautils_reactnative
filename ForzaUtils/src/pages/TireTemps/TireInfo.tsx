@@ -12,13 +12,13 @@ export interface TireInfoProps {
 
 export function TireInfo(props: TireInfoProps) {
   const theme = themeService().theme;
-  const style = themeStyles(theme);
+  const style = themeStyles();
 
   const colorForTemp = (temp: number) => {
-    if(temp < 210) {
+    if (temp < 210) {
       return theme.colors.text.primary.onPrimary
     }
-    if(temp < 240) {
+    if (temp < 240) {
       return theme.colors.text.warning.onPrimary
     }
     return theme.colors.text.error.onPrimary
@@ -40,12 +40,12 @@ export function TireInfo(props: TireInfoProps) {
     )
   }
   const DataCard = (props: { children: any }) => (
-    <CardContainer 
-    centerContent
-    style={{
-      ...style.halfWidth,
-      ...style.centerContent
-    }}>
+    <CardContainer
+      centerContent
+      style={{
+        ...style.halfWidth,
+        ...style.centerContent
+      }}>
       {props.children}
     </CardContainer>
   )
@@ -62,7 +62,7 @@ export function TireInfo(props: TireInfoProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
+function themeStyles() {
   return StyleSheet.create({
     halfWidth: {
       width: '50%'

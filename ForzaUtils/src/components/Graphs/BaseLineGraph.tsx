@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Paper } from "../Paper";
 import { StyleSheet, View } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
 import Svg, { Path, Text } from "react-native-svg";
 import { ThemeText } from "../ThemeText";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
 
 export interface IGraphData {
   color: string;
@@ -30,7 +29,7 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   const [renderedLayout, setRenderedLayout] = useState({ width: 1, height: 1 });
   const [viewBox, setViewBox] = useState({ minX: -1, minY: 1, width: 1, height: 1 });
   const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const [paths, setPaths] = useState<string[]>([]);
   const [yLimits, setYLimits] = useState<YValueLimits>({
     minY: Number.MAX_SAFE_INTEGER,
@@ -177,8 +176,8 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     </View>
   )
 }
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     titleText: {
       paddingTop: 5,
       paddingBottom: 5,
@@ -224,5 +223,5 @@ function themeStyles(theme: IThemeElements) {
     labelText: {
       color: theme.colors.text.primary.onPrimary
     }
-  })
+  }));
 }

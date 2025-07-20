@@ -1,17 +1,16 @@
 import React, {  } from "react";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { StyleSheet } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
 import { BaseLineGraph } from "./BaseLineGraph";
 import { CardContainer } from "../CardContainer";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
 
 export interface IAvgSuspensionTravelProps {
 }
 
 export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
+  const styles = themeStyles();
   const theme = themeService().theme;
-  const styles = themeStyles(theme);
   const viewModel = useViewModelStore().suspensionGraph;
 
   return (
@@ -37,8 +36,8 @@ export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
     </CardContainer>
   );
 }
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     card: {
       height: 180,
       width: '100%',
@@ -46,5 +45,5 @@ function themeStyles(theme: IThemeElements) {
       paddingTop: 24,
       paddingBottom: 24,
     },
-  })
+  }));
 }

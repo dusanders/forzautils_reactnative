@@ -31,16 +31,6 @@ export function Settings(props: SettingsScreenProps) {
         onValueChanged={(option) => {
           themeVm.updateTheme(option.value);
         }} />
-      {/* Settings UI goes here */}
-      <ThemeButton onPress={() => navigation.goBack()}>
-        <ThemeText>Back</ThemeText>
-      </ThemeButton>
-      <ThemeButton onPress={() => console.log("Settings saved")}>
-        <ThemeText>Save</ThemeText>
-      </ThemeButton>
-      <ThemeButton onPress={() => console.log("Settings reset")}>
-        <ThemeText>Reset</ThemeText>
-      </ThemeButton>
     </AppBarContainer>
   );
 }

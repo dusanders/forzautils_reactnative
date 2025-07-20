@@ -2,7 +2,7 @@ import React from "react";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { CardContainer } from "../CardContainer";
 import { StyleSheet } from "react-native";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
 import { BaseLineGraph } from "./BaseLineGraph";
 
 export interface SlipAngleProps {
@@ -12,7 +12,7 @@ export interface SlipAngleProps {
 export function SlipAngle(props: SlipAngleProps) {
   const tag = 'SlipAngle';
   const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const viewModel = useViewModelStore().grip;
 
   return (
@@ -38,8 +38,8 @@ export function SlipAngle(props: SlipAngleProps) {
   )
 };
 
-function themeStyles(theme: any) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     card: {
       height: 180,
       width: '100%',
@@ -47,5 +47,5 @@ function themeStyles(theme: any) {
       paddingTop: 24,
       paddingBottom: 24,
     },
-  });
+  }));
 }

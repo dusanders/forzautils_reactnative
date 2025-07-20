@@ -1,10 +1,8 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
 import { Row } from "../../components/Row";
 import { TextCard } from "../../components/TextCard";
-import { themeService } from "../../hooks/ThemeState";
 
 export interface TireSlipProps {
   leftFront: number;
@@ -14,8 +12,7 @@ export interface TireSlipProps {
 }
 
 export function TireSlip(props: TireSlipProps) {
-  const theme = themeService().theme;
-  const style = themeStyles(theme);
+  const style = themeStyles();
 
   return (
     <View style={style.root}>
@@ -77,7 +74,7 @@ export function TireSlip(props: TireSlipProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
+function themeStyles() {
   return StyleSheet.create({
     root: {
       marginTop: 18,

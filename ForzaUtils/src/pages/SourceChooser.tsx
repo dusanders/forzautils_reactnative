@@ -5,10 +5,9 @@ import { TextCard } from "../components/TextCard";
 import { useNavigation } from "@react-navigation/native";
 import { AppRoutes, StackNavigation } from "../constants/types";
 import { Row } from "../components/Row";
-import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "../components/ThemeText";
 import { useLogger } from "../context/Logger";
-import { themeService } from "../hooks/ThemeState";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 export interface SourceChooserProps {
   // None
@@ -18,8 +17,7 @@ export function SourceChooser(props: SourceChooserProps) {
   const tag = 'SourceChooser.tsx';
   const navigation = useNavigation<StackNavigation>();
   const logger = useLogger();
-  const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
 
   return (
     <AppBarContainer>
@@ -82,8 +80,8 @@ export function SourceChooser(props: SourceChooserProps) {
   );
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       height: '100%',
       width: '100%',
@@ -110,5 +108,5 @@ function themeStyles(theme: IThemeElements) {
       color: theme.colors.text.secondary.onPrimary,
       textAlign: 'center',
     }
-  });
+  }));
 }

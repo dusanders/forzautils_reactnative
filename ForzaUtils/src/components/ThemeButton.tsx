@@ -1,15 +1,13 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, TouchableOpacityProps } from "react-native";
-import { IThemeElements } from "../constants/Themes";
-import { themeService } from "../hooks/ThemeState";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 export interface ThemeButtonProps extends TouchableOpacityProps {
   children?: any;
 }
 
 export function ThemeButton(props: ThemeButtonProps) {
-  const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
 
   return (
     <TouchableOpacity
@@ -24,8 +22,8 @@ export function ThemeButton(props: ThemeButtonProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       padding: theme.sizes.button.padding,
       elevation: theme.sizes.button.elevation,
@@ -35,5 +33,5 @@ function themeStyles(theme: IThemeElements) {
       minHeight: theme.sizes.button.size,
       minWidth: theme.sizes.button.size
     }
-  })
+  }));
 }

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { AppRoutes, StackNavigation } from "../constants/types";
-import { IThemeElements } from "../constants/Themes";
 import { TextCard } from "../components/TextCard";
 import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
@@ -14,7 +13,7 @@ import { ThemeSwitch } from "../components/ThemeSwitch";
 import { useReplay } from "../context/Recorder";
 import { useNetworkContext } from "../context/Network";
 import { packetService } from "../hooks/PacketState";
-import { themeService } from "../hooks/ThemeState";
+import { invokeWithTheme } from "../hooks/ThemeState";
 import { SlipAngle } from "../components/Graphs/SlipAngle";
 
 export interface DataChooserProps {
@@ -23,8 +22,7 @@ export interface DataChooserProps {
 
 export function DataChooser(props: DataChooserProps) {
   const tag = 'DataChooser.tsx';
-  const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const packet = packetService().packet;
   const network = useNetworkContext();
   const logger = useLogger();
@@ -32,78 +30,50 @@ export function DataChooser(props: DataChooserProps) {
   const replay = useReplay();
   const [isRecording, setIsRecording] = useState(false);
 
+  const CardButton = ({ title, body, onPress }: { title: string, body: string, onPress: () => void }) => {
+    return (
+      <TextCard
+        allcapsTitle
+        centerContent
+        title={title}
+        body={body}
+        titleStyle={styles.cardButtonTitle}
+        bodyStyle={styles.cardButtonBody}
+        onPress={onPress} />
+    );
+  }
   const dataElements = [
     (<AvgSuspensionTravel />),
     (<AvgTireTemps />),
     (<SlipAngle />),
     (
       <View style={{ display: 'flex', flexDirection: 'row' }}>
-        <TextCard
-          allcapsTitle
-          centerContent
+        <CardButton
           title={'HP / TQ Graph'}
           body={'Graph Horsepower and Torque'}
-          titleStyle={{
-            fontSize: theme.sizes.font.medium,
-            textAlign: 'center'
-          }}
-          bodyStyle={{
-            textAlign: 'center',
-            fontSize: theme.sizes.font.small
-          }}
-          onPress={(id) => {
-            navigation.navigate(AppRoutes.HP_TQ_GRAPH)
+          onPress={() => {
+            navigation.navigate(AppRoutes.HP_TQ_GRAPH);
           }} />
-        <TextCard
-          allcapsTitle
-          centerContent
+        <CardButton
           title={'Suspension Travel'}
           body={'Visually display suspension travel'}
-          titleStyle={{
-            fontSize: theme.sizes.font.medium,
-            textAlign: 'center'
-          }}
-          bodyStyle={{
-            textAlign: 'center',
-            fontSize: theme.sizes.font.small
-          }}
-          onPress={(id) => {
-            navigation.navigate(AppRoutes.SUSPENSION_GRAPH)
+          onPress={() => {
+            navigation.navigate(AppRoutes.SUSPENSION_GRAPH);
           }} />
       </View>
     ),
     (
       <View style={{ display: 'flex', flexDirection: 'row' }}>
-        <TextCard
-          allcapsTitle
-          centerContent
+        <CardButton
           title={'Tire Temps'}
           body={'Display tire temperature information'}
-          titleStyle={{
-            fontSize: theme.sizes.font.medium,
-            textAlign: 'center'
-          }}
-          bodyStyle={{
-            textAlign: 'center',
-            fontSize: theme.sizes.font.small
-          }}
-          onPress={(id) => {
+          onPress={() => {
             navigation.navigate(AppRoutes.TIRE_TEMPS)
           }} />
-        <TextCard
-          allcapsTitle
-          centerContent
+        <CardButton
           title={'Grip'}
           body={'Compare tire slip, steering angle, throttle, and brake'}
-          titleStyle={{
-            fontSize: theme.sizes.font.medium,
-            textAlign: 'center'
-          }}
-          bodyStyle={{
-            textAlign: 'center',
-            fontSize: theme.sizes.font.small
-          }}
-          onPress={(id) => {
+          onPress={() => {
             navigation.navigate(AppRoutes.GRIP)
           }} />
       </View>
@@ -172,8 +142,8 @@ export function DataChooser(props: DataChooserProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       height: '100%',
       alignItems: 'center',
@@ -186,6 +156,14 @@ function themeStyles(theme: IThemeElements) {
       flexGrow: 0,
       margin: 0,
       width: '100%',
+    },
+    cardButtonTitle: {
+      fontSize: theme.sizes.font.medium,
+      textAlign: 'center'
+    },
+    cardButtonBody: {
+      textAlign: 'center',
+      fontSize: theme.sizes.font.small
     }
-  })
+  }));
 }

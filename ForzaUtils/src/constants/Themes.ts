@@ -167,84 +167,80 @@ export const ForestTheme: IThemeElements = {
   colors: {
     text: {
       primary: {
-      onPrimary: "rgba(220, 226, 213, 1)",
-      onSecondary: 'rgba(33, 26, 20, 1)'
+        onPrimary: "rgba(240, 235, 220, 1)", // Moonlight through canopy
+        onSecondary: 'rgba(45, 35, 25, 1)' // Rich dark earth
       },
       secondary: {
-      onPrimary: "rgba(142, 151, 122, 1)",
-      onSecondary: 'rgba(80, 73, 60, 1)'
+        onPrimary: "rgba(156, 139, 102, 1)", // Aged moss green
+        onSecondary: 'rgba(101, 67, 33, 1)' // Deep bark brown
       },
       warning: {
-      onPrimary: 'rgb(171, 115, 51)',
-      onSecondary: 'rgb(201, 145, 81)'
+        onPrimary: 'rgb(191, 144, 73)', // Autumn leaf gold
+        onSecondary: 'rgb(218, 165, 32)' // Golden rod
       },
       error: {
-      onPrimary: "rgb(145, 40, 33)",
-      onSecondary: 'rgb(115, 20, 13)'
+        onPrimary: "rgb(139, 69, 19)", // Rustic red-brown
+        onSecondary: 'rgb(160, 82, 45)' // Saddle brown
       }
     },
     background: {
-      primary: 'rgb(29, 36, 27)',
-      onPrimary: 'rgb(40, 48, 36)',
-      secondary: 'rgb(209, 200, 180)',
-      onSecondary: 'rgb(175, 165, 145)',
-      dialogBackdrop: 'rgba(15, 20, 10, 0.75)'
+      primary: 'rgb(25, 35, 20)', // Deep forest floor
+      onPrimary: 'rgb(35, 50, 28)', // Shadowed undergrowth
+      secondary: 'rgb(139, 121, 94)', // Rich loamy soil
+      onSecondary: 'rgb(160, 134, 96)', // Lighter earth tone
+      dialogBackdrop: 'rgba(20, 30, 15, 0.85)' // Dense canopy shadow
     },
     card: {
-      borderColor: 'rgb(54, 66, 48)'
-    },
-    },
-    sizes: {
-    icon: 25,
-    navBar: 50,
-    borderRadius: 8,
-    font: defaultFont,
-    paper: defaultPaper,
-    button: defaultButton
-    }
-}
-export const ClaudesTheme: IThemeElements = {
-  colors: {
-    text: {
-      primary: {
-        onPrimary: "rgba(180, 180, 190, 1)",
-        onSecondary: 'rgba(60, 60, 70, 1)'
-      },
-      secondary: {
-        onPrimary: "rgba(120, 120, 130, 1)",
-        onSecondary: 'rgba(90, 90, 100, 1)'
-      },
-      warning: {
-        onPrimary: 'rgb(130, 110, 80)',
-        onSecondary: 'rgb(150, 130, 90)'
-      },
-      error: {
-        onPrimary: "rgb(130, 90, 90)",
-        onSecondary: 'rgb(100, 70, 70)'
-      }
-    },
-    background: {
-      primary: 'rgb(25, 25, 30)',
-      onPrimary: 'rgb(35, 35, 40)',
-      secondary: 'rgb(50, 50, 60)',
-      onSecondary: 'rgb(70, 70, 80)',
-      dialogBackdrop: 'rgba(15, 15, 20, 0.8)'
-    },
-    card: {
-      borderColor: 'rgb(45, 45, 50)'
+      borderColor: 'rgb(76, 111, 58)' // Pine needle green
     },
   },
   sizes: {
     icon: 25,
     navBar: 50,
-    borderRadius: 4,
+    borderRadius: 6, // More natural, organic edges
     font: defaultFont,
     paper: defaultPaper,
-    button: {
-      ...defaultButton,
-      elevation: 1,
-      padding: 18
-    }
+    button: defaultButton
+  }
+}
+export const ClaudesTheme: IThemeElements = {
+  colors: {
+    text: {
+      primary: {
+        onPrimary: "rgba(255, 250, 235, 1)", // Warm sand white
+        onSecondary: 'rgba(20, 30, 40, 1)' // Deep ocean blue
+      },
+      secondary: {
+        onPrimary: "rgba(184, 134, 11, 1)", // Golden sunset
+        onSecondary: 'rgba(139, 69, 19, 1)' // Driftwood brown
+      },
+      warning: {
+        onPrimary: 'rgb(255, 140, 0)', // Tropical orange
+        onSecondary: 'rgb(255, 165, 0)' // Bright sunset orange
+      },
+      error: {
+        onPrimary: "rgb(220, 20, 60)", // Coral red
+        onSecondary: 'rgb(178, 34, 34)' // Deep coral
+      }
+    },
+    background: {
+      primary: 'rgb(0, 128, 128)', // Teal water
+      onPrimary: 'rgb(32, 178, 170)', // Lighter teal
+      secondary: 'rgb(245, 222, 179)', // Sandy beige
+      onSecondary: 'rgb(210, 180, 140)', // Tan sand
+      dialogBackdrop: 'rgba(0, 105, 105, 0.75)' // Dark teal overlay
+    },
+    card: {
+      borderColor: 'rgb(72, 209, 204)' // Medium sea green
+    },
+  },
+  sizes: {
+    icon: 25,
+    navBar: 50,
+    borderRadius: 16, // Smoother, more organic feel
+    font: defaultFont,
+    paper: defaultPaper,
+    button: defaultButton
   }
 }
 

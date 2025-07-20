@@ -1,8 +1,7 @@
 import React, { memo, useEffect, useState } from "react";
 import { LayoutRectangle, StyleSheet, View } from "react-native";
 import { ThemeText } from "../../components/ThemeText";
-import { IThemeElements } from "../../constants/Themes";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 
 export interface SteeringChartProps {
   steeringAngle: number;
@@ -16,17 +15,16 @@ const defaultLayout: LayoutRectangle = {
 }
 
 export const SteeringChart = memo((props: SteeringChartProps) => {
-  const theme = themeService().theme;
-  const style = themeStyles(theme);
   const [steeringViewLayout, setSteeringViewLayout] = useState<LayoutRectangle>(defaultLayout);
   const [indicatorPosition, setIndicatorPosition] = useState(50);
+  const style = themeStyles(indicatorPosition);
   useEffect(() => {
-    if(props.steeringAngle === 0 || steeringViewLayout.width === 0) {
+    if (props.steeringAngle === 0 || steeringViewLayout.width === 0) {
       setIndicatorPosition(steeringViewLayout.width / 2);
       return;
     }
     const halfWidth = steeringViewLayout.width / 2;
-    if(props.steeringAngle < 0) {
+    if (props.steeringAngle < 0) {
       const angleNormalized = ((props.steeringAngle - (-127)) / (0 - (-127)));
       const leftPercent = angleNormalized * halfWidth;
       setIndicatorPosition(leftPercent);
@@ -45,30 +43,17 @@ export const SteeringChart = memo((props: SteeringChartProps) => {
         style={style.labelText}>
         Steering Input
       </ThemeText>
-      <View style={{
-        backgroundColor: theme.colors.background.onPrimary,
-        height: 40,
-        width: '90%',
-        margin: 'auto'
-      }}
-      onLayout={(ev) => {
-        setSteeringViewLayout(ev.nativeEvent.layout);
-      }}>
-        <View style={[
-          {
-            height: '100%',
-            width: 4,
-            backgroundColor: theme.colors.text.primary.onPrimary,
-            position: 'absolute',
-            left: indicatorPosition
-          }
-        ]}/>
+      <View style={style.spacerView}
+        onLayout={(ev) => {
+          setSteeringViewLayout(ev.nativeEvent.layout);
+        }}>
+        <View style={[style.indicatorView]} />
       </View>
     </View>
   )
 });
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles(indicatorPosition: number) {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       width: '100%',
       display: 'flex',
@@ -79,6 +64,19 @@ function themeStyles(theme: IThemeElements) {
     labelText: {
       textAlign: 'center',
       marginBottom: 12
+    },
+    indicatorView: {
+      height: '100%',
+      width: 4,
+      backgroundColor: theme.colors.text.primary.onPrimary,
+      position: 'absolute',
+      left: indicatorPosition
+    },
+    spacerView: {
+      backgroundColor: theme.colors.background.onPrimary,
+      height: 40,
+      width: '90%',
+      margin: 'auto'
     }
-  })
+  }));
 }

@@ -3,14 +3,14 @@ import { CardContainer } from "../CardContainer";
 import { BaseLineGraph } from "./BaseLineGraph";
 import { StyleSheet } from "react-native";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
 
 export interface AvgTireTempProps {
 }
 
 export function AvgTireTemps(props: AvgTireTempProps) {
   const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const viewModel = useViewModelStore().tireTemps;
 
   return (
@@ -36,8 +36,8 @@ export function AvgTireTemps(props: AvgTireTempProps) {
   )
 }
 
-function themeStyles(theme: any) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     card: {
       height: 180,
       width: '100%',
@@ -45,5 +45,5 @@ function themeStyles(theme: any) {
       paddingTop: 24,
       paddingBottom: 24,
     },
-  });
+  }));
 }

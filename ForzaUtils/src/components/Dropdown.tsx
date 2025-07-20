@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { IThemeElements } from "../constants/Themes";
 import { Picker } from "@react-native-picker/picker";
-import { themeService } from "../hooks/ThemeState";
-import { ThemeText, TitleText } from "./ThemeText";
+import { invokeWithTheme } from "../hooks/ThemeState";
+import { TitleText } from "./ThemeText";
 
 export interface IDropdownOption {
   label: string;
@@ -18,8 +17,7 @@ export interface DropdownProps {
 }
 
 export function Dropdown(props: DropdownProps) {
-  const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const [value, setValue] = useState(props.value);
 
   return (
@@ -53,8 +51,8 @@ export function Dropdown(props: DropdownProps) {
     </View>
   )
 }
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     titleView: {
       width: '100%',
       alignItems: 'center',
@@ -69,5 +67,5 @@ function themeStyles(theme: IThemeElements) {
     labelStyle: {
       color: theme.colors.text.primary.onPrimary
     }
-  })
+  }));
 }

@@ -1,6 +1,5 @@
 import React from "react";
 import { Dimensions, FlatList, ScrollView, StyleSheet, View } from "react-native";
-import { IThemeElements } from "../constants/Themes";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
 import { AppRoutes, StackNavigation } from "../constants/types";
 import { TextCard } from "../components/TextCard";
@@ -11,7 +10,6 @@ import { Row } from "../components/Row";
 import { useNavigation } from "@react-navigation/native";
 import { CircleCheckIcon } from "../components/CircleCheckIcon";
 import { wifiService } from "../hooks/WifiState";
-import { themeService } from "../hooks/ThemeState";
 import { localeService } from "../hooks/LocaleState";
 
 export interface WifiInfoProps {
@@ -20,9 +18,8 @@ export interface WifiInfoProps {
 
 export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps> {
   const tag = "WifiInfo.tsx";
-  const theme = themeService();
   const wifiVm = wifiService();
-  const styles = themeStyles(theme.theme);
+  const styles = themeStyles();
   const navigation = useNavigation<StackNavigation>();
   const localeVM = localeService();
 
@@ -111,7 +108,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
   )
 }
 
-function themeStyles(theme: IThemeElements) {
+function themeStyles() {
   return StyleSheet.create({
     content: {
       justifyContent: 'center',

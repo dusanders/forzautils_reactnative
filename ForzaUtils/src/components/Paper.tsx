@@ -1,8 +1,7 @@
 import React from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
-import { IThemeElements } from "../constants/Themes";
 import { ContainerProps } from "./Container";
-import { themeService } from "../hooks/ThemeState";
+import { invokeWithTheme, themeService } from "../hooks/ThemeState";
 
 
 export interface PaperProps extends ContainerProps {
@@ -11,7 +10,7 @@ export interface PaperProps extends ContainerProps {
 
 export function Paper(props: PaperProps) {
   const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   let variantStyle: StyleProp<ViewStyle> = {
     backgroundColor: theme.colors.background.onPrimary
   }
@@ -40,8 +39,8 @@ export function Paper(props: PaperProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       padding: theme.sizes.borderRadius,
       borderRadius: theme.sizes.borderRadius,
@@ -49,5 +48,5 @@ function themeStyles(theme: IThemeElements) {
       width: '100%',
       overflow: 'hidden'
     },
-  })
+  }));
 }

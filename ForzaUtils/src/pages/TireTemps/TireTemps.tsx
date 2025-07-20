@@ -1,21 +1,18 @@
 import React, { useMemo } from "react";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
-import { IThemeElements } from "../../constants/Themes";
 import { StyleSheet } from "react-native";
 import { Row } from "../../components/Row";
 import { TireInfo } from "./TireInfo";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
-import { themeService } from "../../hooks/ThemeState";
 
 export interface TireTempsProps {
   // Nothing
 }
 
 export function TireTemps(props: TireTempsProps) {
-  const theme = themeService().theme;
-  const style = themeStyles(theme);
+  const style = themeStyles();
   const navigation = useNavigation<StackNavigation>();
   const store = useViewModelStore();
   const viewModel = store.tireTemps;
@@ -50,7 +47,7 @@ export function TireTemps(props: TireTempsProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
+function themeStyles() {
   return StyleSheet.create({
     halfWidth: {
       width: '50%'

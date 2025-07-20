@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { IThemeElements } from "../../constants/Themes";
 import { CardInput } from "../../components/CardInput";
 import { Row } from "../../components/Row";
 import { CardContainer } from "../../components/CardContainer";
@@ -12,7 +11,6 @@ import { Drivetrain } from "ForzaTelemetryApi";
 import { TextCard } from "../../components/TextCard";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { Dropdown } from "../../components/Dropdown";
-import { themeService } from "../../hooks/ThemeState";
 import { EngineLayout } from "../../context/viewModels/Tuning/Calculators";
 
 export interface TuningPageProps {
@@ -23,8 +21,7 @@ export function TuningPage(props: TuningPageProps) {
   const tag = 'TuningPage.tsx';
   const viewModel = useViewModelStore().tuning;
   const navigation = useNavigation();
-  const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const [weightInput, setWeightInput] = useState(viewModel.input.totalWeight.toString());
   const [frontDistInput, setFrontDistInput] = useState(viewModel.input.frontWeightDistribution.toLocaleString());
   const [frontHeightInput, setFrontHeightInput] = useState(viewModel.input.rideHeight.front.toLocaleString());
@@ -369,7 +366,7 @@ export function TuningPage(props: TuningPageProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
+function themeStyles() {
   return StyleSheet.create({
     weightCard: {
       padding: 4,

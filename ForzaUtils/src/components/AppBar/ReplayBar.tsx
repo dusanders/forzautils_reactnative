@@ -1,11 +1,10 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
 import { useLogger } from "../../context/Logger";
 import { ThemeIcon } from "../ThemeIcon";
 import { ReplayState, useNetworkContext } from "../../context/Network";
 import { ThemeText } from "../ThemeText";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 
 export interface ReplayBarProps {
 }
@@ -13,8 +12,7 @@ export function ReplayBar(props: ReplayBarProps) {
   const tag = `ReplayBar.tsx`;
   const logger = useLogger();
   const network = useNetworkContext();
-  const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
 
   return (
     <View style={styles.root}>
@@ -27,12 +25,11 @@ export function ReplayBar(props: ReplayBarProps) {
             );
           }}>
           <ThemeIcon
-            name={network.replayState === ReplayState.PLAYING ? 'pause' : 'play-arrow'}
-            size={theme.sizes.icon} />
+            name={network.replayState === ReplayState.PLAYING ? 'pause' : 'play-arrow'} />
         </TouchableOpacity>
       </View>
       <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        <ThemeText style={{ marginRight: theme.sizes.borderRadius }}>
+        <ThemeText style={styles.replayProgressText}>
           {network.replay?.currentReadOffset} / {network.replay?.info.length}
         </ThemeText>
         <ThemeText>
@@ -47,16 +44,15 @@ export function ReplayBar(props: ReplayBarProps) {
             logger.log(tag, `Stopped replay`);
           }}>
           <ThemeIcon
-            name={'close'}
-            size={theme.sizes.icon} />
+            name={'close'} />
         </TouchableOpacity>
       </View>
     </View>
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       width: '100%',
       height: theme.sizes.navBar,
@@ -70,6 +66,9 @@ function themeStyles(theme: IThemeElements) {
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: theme.sizes.borderRadius,
+    },
+    replayProgressText: {
+      marginRight: theme.sizes.borderRadius,
     }
-  })
+  }));
 }

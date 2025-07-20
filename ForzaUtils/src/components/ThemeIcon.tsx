@@ -12,7 +12,7 @@ export function ThemeIcon<T>(props: ThemeIconProps<T>) {
   return (
     <Icon name={props.name}
       color={theme.colors.text.primary.onPrimary}
-      size={theme.sizes.icon}
+      size={props.size || theme.sizes.icon}
       style={{
         textAlign: 'center'
       }}

@@ -3,14 +3,13 @@ import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { Row } from "../../components/Row";
 import { ThemeText } from "../../components/ThemeText";
-import { IThemeElements } from "../../constants/Themes";
 import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
 import { useReplay } from "../../context/Recorder";
 import { useLogger } from "../../context/Logger";
 import { useNetworkContext } from "../../context/Network";
 import { AppRoutes, RootStackParamList } from "../../constants/types";
 import { DeleteDialog } from "./DeleteDialog";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 export interface ReplayRouteParams  {
@@ -23,8 +22,7 @@ export function ReplayList(props: ReplayScreenProps) {
   const logger = useLogger();
   const replay = useReplay();
   const network = useNetworkContext();
-  const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const [sessions, setSessions] = useState<ISessionInfo[]>([]);
   const [toDelete, setToDelete] = useState<ISessionInfo | undefined>(undefined);
 
@@ -109,8 +107,8 @@ export function ReplayList(props: ReplayScreenProps) {
     </AppBarContainer>
   )
 }
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     listRow: {
       flexGrow: 1
     },
@@ -157,5 +155,5 @@ function themeStyles(theme: IThemeElements) {
       color: theme.colors.text.secondary.onPrimary,
       textAlign: 'center',
     }
-  });
+  }));
 }

@@ -19,9 +19,10 @@ export interface IThemeState {
   current: ThemeType;
   theme: IThemeElements;
 }
+const initialTheme = ThemeType.FOREST;
 const initialState: IThemeState = {
-  current: ThemeType.DARK,
-  theme: DarkColors,
+  current: initialTheme,
+  theme: getThemeByType(initialTheme),
 };
 const themeState = atom<IThemeState>(initialState);
 const themeAtom = atom((get) => get(themeState).theme);
@@ -50,4 +51,11 @@ export function themeService() {
     themeType,
     updateTheme,
   };
+}
+export function invokeWithTheme<T>(fn: (theme: IThemeElements) => T): T {
+  const colors = themeService().theme;
+  return fn(colors);
+}
+export function useThemeColors() {
+  return themeService().theme;
 }

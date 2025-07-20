@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { IThemeElements, ThemeType } from "../../constants/Themes";
 import { ThemeText } from "../ThemeText";
 import { ThemeIcon } from "../ThemeIcon";
 import { Container } from "../Container";
-import { ThemeSwitch } from "../ThemeSwitch";
 import { AppBarSettingsButtonParams, AppSettingsButton } from "./AppSettingsButton";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 import { useNavigation } from "@react-navigation/native";
 import { AppRoutes, StackNavigation } from "../../constants/types";
 
@@ -30,10 +28,7 @@ export interface AppBarProps {
 export function AppBar(props: AppBarProps) {
   const navigation = useNavigation<StackNavigation>();
   const [showSettings, setShowSettings] = useState(false);
-  const themeVM = themeService();
-  const theme = themeVM.theme;
-  const themeType = themeVM.themeType;
-  const style = themeStyles(theme);
+  const style = themeStyles();
   let doShowSettingsButton = true;
   if (props.hideSettings != undefined) {
     doShowSettingsButton = !props.hideSettings
@@ -42,7 +37,7 @@ export function AppBar(props: AppBarProps) {
   if (props.hideBack != undefined) {
     doShowBackButton = !props.hideBack
   }
-  
+
   return (
     <>
       {showSettings && (
@@ -68,8 +63,7 @@ export function AppBar(props: AppBarProps) {
             onPress={() => {
               navigation.goBack();
             }}>
-            <ThemeIcon name={'chevron-left'}
-              size={theme.sizes.icon} />
+            <ThemeIcon name={'chevron-left'}/>
           </TouchableOpacity>
         )}
 
@@ -79,11 +73,14 @@ export function AppBar(props: AppBarProps) {
           <TouchableOpacity testID={AppBarTestID.settingIconView}
             style={style.settingIconView}
             onPress={() => {
-              navigation.push(AppRoutes.SETTINGS);
-              setShowSettings(!showSettings)
+              if (!props.injectElements) {
+                navigation.push(AppRoutes.SETTINGS);
+              }
+              else {
+                setShowSettings(!showSettings)
+              }
             }}>
-            <ThemeIcon name={'settings'}
-              size={theme.sizes.icon} />
+            <ThemeIcon name={'settings'}/>
           </TouchableOpacity>
         )}
 
@@ -96,17 +93,18 @@ export function AppBar(props: AppBarProps) {
               testID={AppBarTestID.settingsFlyoutContent}
               style={style.settingsFlyoutContent}>
               <View style={style.themeButtonView}>
-                <ThemeText
-                  variant={'primary'}
-                  onBackground={'onSecondary'}>
-                  Dark Mode
-                </ThemeText>
-                <ThemeSwitch
-                  onPalette={'secondary'}
-                  onValueChange={(val) => {
-                    themeVM.updateTheme(val ? ThemeType.DARK : ThemeType.LIGHT);
+                <AppSettingsButton
+                  onPress={() => {
+                    navigation.push(AppRoutes.SETTINGS);
+                    setShowSettings(false);
                   }}
-                  value={themeType === ThemeType.DARK} />
+                  testID={'app-bar-settings-button'}>
+                  <ThemeText
+                    variant={'primary'}
+                    onBackground={'onSecondary'}>
+                    Go to Settings
+                  </ThemeText>
+                </AppSettingsButton>
               </View>
               {props.injectElements && (
                 <View style={{
@@ -131,8 +129,8 @@ export function AppBar(props: AppBarProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       position: 'absolute',
       top: 0,
@@ -192,5 +190,5 @@ function themeStyles(theme: IThemeElements) {
       position: 'absolute',
       textTransform: 'uppercase',
     }
-  })
+  }));
 }

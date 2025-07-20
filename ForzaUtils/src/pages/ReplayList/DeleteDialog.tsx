@@ -1,10 +1,9 @@
 import React from "react";
 import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
 import { StyleSheet, View } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../../components/ThemeText";
 import { TextCard } from "../../components/TextCard";
-import { themeService } from "../../hooks/ThemeState";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 
 export interface DeleteDialogProps {
   session: ISessionInfo;
@@ -13,8 +12,7 @@ export interface DeleteDialogProps {
 }
 
 export function DeleteDialog(props: DeleteDialogProps) {
-  const theme = themeService().theme;
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   return (
     <View style={styles.root}>
       <View
@@ -52,8 +50,8 @@ export function DeleteDialog(props: DeleteDialogProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     spacer: {
       height: '5%'
     },
@@ -86,5 +84,5 @@ function themeStyles(theme: IThemeElements) {
       flexDirection: 'column',
       alignSelf: 'center'
     }
-  })
+  }));
 }

@@ -4,7 +4,6 @@ import { View } from "react-native";
 import { ThemeText } from "../components/ThemeText";
 import { Paper } from "../components/Paper";
 import { ThemeButton } from "../components/ThemeButton";
-import { themeService } from "../hooks/ThemeState";
 
 
 export interface PermissionErrorProps {
@@ -13,7 +12,6 @@ export interface PermissionErrorProps {
 }
 
 export function PermissionError(props: PermissionErrorProps) {
-  const theme = themeService().theme;
   return (
     <Container fill="parent"
       flex="column"
@@ -28,8 +26,8 @@ export function PermissionError(props: PermissionErrorProps) {
         <ThemeText
           fontFamily={'bold'}
           variant="error"
+          fontSize={'large'}
           style={{
-            fontSize: theme.sizes.font.large,
             textTransform: 'uppercase',
             marginBottom: 5
           }}>
