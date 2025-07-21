@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { AppRoutes, StackNavigation } from "../constants/types";
 import { TextCard } from "../components/TextCard";
@@ -8,12 +8,11 @@ import { TrackMap } from "../components/TrackMap";
 import { AvgSuspensionTravel } from "../components/Graphs/AvgSuspensionTravel";
 import { AvgTireTemps } from "../components/Graphs/AvgTireTemp";
 import { useLogger } from "../context/Logger";
-import { ThemeText } from "../components/ThemeText";
-import { ThemeSwitch } from "../components/ThemeSwitch";
-import { ReplayState, useReplay } from "../context/Recorder";
-import { useNetworkContext } from "../context/Network";
+import { ReplayState, useReplayControls } from "../context/Recorder";
 import { invokeWithTheme } from "../hooks/ThemeState";
 import { SlipAngle } from "../components/Graphs/SlipAngle";
+import { ThemeText } from "../components/ThemeText";
+import { ThemeSwitch } from "../components/ThemeSwitch";
 
 export interface DataChooserProps {
 
@@ -22,11 +21,10 @@ export interface DataChooserProps {
 export function DataChooser(props: DataChooserProps) {
   const tag = 'DataChooser.tsx';
   const styles = themeStyles();
-  const network = useNetworkContext();
   const logger = useLogger();
   const navigation = useNavigation<StackNavigation>();
-  const replay = useReplay();
-
+  const replay = useReplayControls();
+  logger.debug(tag, 'Rendering DataChooser');
   const CardButton = ({ title, body, onPress }: { title: string, body: string, onPress: () => void }) => {
     return (
       <TextCard
@@ -84,7 +82,8 @@ export function DataChooser(props: DataChooserProps) {
     }
   }
   const getFlyoutOptions = () => {
-    if (replay.replayState === ReplayState.RECORDING || replay.replayState === ReplayState.IDLE) {
+    if (replay.replayState === ReplayState.RECORDING
+      || replay.replayState === ReplayState.IDLE) {
       return [
         {
           id: 'record-button',
@@ -111,14 +110,6 @@ export function DataChooser(props: DataChooserProps) {
       return [];
     }
   }
-
-  useEffect(() => {
-    if (replay.replayState !== ReplayState.RECORDING) {
-      // network.DEBUG();
-    } else {
-      network.STOP_DEBUG();
-    }
-  }, [replay.replayState]);
 
   return (
     <AppBarContainer
