@@ -6,7 +6,6 @@ import { ThemeText } from "../../components/ThemeText";
 import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
 import { useReplay } from "../../context/Recorder";
 import { useLogger } from "../../context/Logger";
-import { useNetworkContext } from "../../context/Network";
 import { AppRoutes, RootStackParamList } from "../../constants/types";
 import { DeleteDialog } from "./DeleteDialog";
 import { invokeWithTheme } from "../../hooks/ThemeState";
@@ -21,7 +20,6 @@ export function ReplayList(props: ReplayScreenProps) {
   const {route, navigation} = props;
   const logger = useLogger();
   const replay = useReplay();
-  const network = useNetworkContext();
   const styles = themeStyles();
   const [sessions, setSessions] = useState<ISessionInfo[]>([]);
   const [toDelete, setToDelete] = useState<ISessionInfo | undefined>(undefined);
@@ -81,8 +79,7 @@ export function ReplayList(props: ReplayScreenProps) {
                 }}
                 onPress={async () => {
                   logger.log(tag, `Setting replay: ${info.item.name}`);
-                  const session = await replay.getOrCreate(info.item);
-                  network.setReplaySession(session);
+                  replay.loadReplay(info.item);
                   navigation.goBack();
                 }}>
                 <Row>

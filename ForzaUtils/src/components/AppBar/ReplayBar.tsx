@@ -2,16 +2,16 @@ import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useLogger } from "../../context/Logger";
 import { ThemeIcon } from "../ThemeIcon";
-import { ReplayState, useNetworkContext } from "../../context/Network";
 import { ThemeText } from "../ThemeText";
 import { invokeWithTheme } from "../../hooks/ThemeState";
+import { ReplayState, useReplay } from "../../context/Recorder";
 
 export interface ReplayBarProps {
 }
 export function ReplayBar(props: ReplayBarProps) {
   const tag = `ReplayBar.tsx`;
   const logger = useLogger();
-  const network = useNetworkContext();
+  const replay = useReplay();
   const styles = themeStyles();
 
   return (
@@ -19,28 +19,28 @@ export function ReplayBar(props: ReplayBarProps) {
       <View>
         <TouchableOpacity
           onPress={() => {
-            network.setReplayState(network.replayState === ReplayState.PLAYING
-              ? ReplayState.PAUSED
-              : ReplayState.PLAYING
-            );
+            if(replay.replayState === ReplayState.PLAYING){
+              replay.pause();
+            } else {
+              replay.resume();
+            }
           }}>
           <ThemeIcon
-            name={network.replayState === ReplayState.PLAYING ? 'pause' : 'play-arrow'} />
+            name={replay.replayState === ReplayState.PLAYING ? 'pause' : 'play-arrow'} />
         </TouchableOpacity>
       </View>
       <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         <ThemeText style={styles.replayProgressText}>
-          {network.replay?.currentReadOffset} / {network.replay?.info.length}
+          {replay.replayPosition} / {replay.replayLength}
         </ThemeText>
         <ThemeText>
-          {network.replay ? network.replay.info.name : 'No Replay'}
+          {replay.replayPacket ? replay.replayInfo?.name : 'No Replay'}
         </ThemeText>
       </View>
       <View>
         <TouchableOpacity
           onPress={() => {
-            network.setReplayState(ReplayState.STOPPED);
-            network.setReplaySession(undefined);
+            replay.closeReplay();
             logger.log(tag, `Stopped replay`);
           }}>
           <ThemeIcon

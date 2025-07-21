@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { AppRoutes, StackNavigation } from "../constants/types";
 import { TextCard } from "../components/TextCard";
@@ -10,9 +10,8 @@ import { AvgTireTemps } from "../components/Graphs/AvgTireTemp";
 import { useLogger } from "../context/Logger";
 import { ThemeText } from "../components/ThemeText";
 import { ThemeSwitch } from "../components/ThemeSwitch";
-import { useReplay } from "../context/Recorder";
+import { ReplayState, useReplay } from "../context/Recorder";
 import { useNetworkContext } from "../context/Network";
-import { packetService } from "../hooks/PacketState";
 import { invokeWithTheme } from "../hooks/ThemeState";
 import { SlipAngle } from "../components/Graphs/SlipAngle";
 
@@ -23,12 +22,10 @@ export interface DataChooserProps {
 export function DataChooser(props: DataChooserProps) {
   const tag = 'DataChooser.tsx';
   const styles = themeStyles();
-  const packet = packetService().packet;
   const network = useNetworkContext();
   const logger = useLogger();
   const navigation = useNavigation<StackNavigation>();
   const replay = useReplay();
-  const [isRecording, setIsRecording] = useState(false);
 
   const CardButton = ({ title, body, onPress }: { title: string, body: string, onPress: () => void }) => {
     return (
@@ -79,38 +76,17 @@ export function DataChooser(props: DataChooserProps) {
       </View>
     )
   ]
-
   const setRecording = async () => {
-    if (!isRecording) {
-      const file = await replay.getOrCreate();
-      replay.setRecording(file);
-      setIsRecording(true);
+    if (replay.replayState !== ReplayState.RECORDING) {
+      replay.startRecording();
     } else {
       replay.closeRecording();
-      setIsRecording(false);
     }
   }
-
-  useEffect(() => {
-    if (!Boolean(network.replay)) {
-      // network.DEBUG();
-    } else {
-      network.STOP_DEBUG();
-    }
-  }, [network.replay]);
-
-  useEffect(() => {
-    if (packet && isRecording) {
-      replay.submitPacket(packet);
-    }
-  }, [packet]);
-
-  return (
-    <AppBarContainer
-      title="Data Chooser"
-      injectElements={Boolean(network.replay)
-        ? []
-        : [{
+  const getFlyoutOptions = () => {
+    if (replay.replayState === ReplayState.RECORDING || replay.replayState === ReplayState.IDLE) {
+      return [
+        {
           id: 'record-button',
           onPress: () => {
             // Nothing - this is handled by the switch
@@ -123,13 +99,31 @@ export function DataChooser(props: DataChooserProps) {
                 Record
               </ThemeText>
               <ThemeSwitch
-                value={isRecording}
+                value={Boolean(replay.replayState === ReplayState.RECORDING)}
                 onChange={(ev) => {
                   setRecording();
                 }} />
             </>
           )
-        }]}>
+        }
+      ]
+    } else {
+      return [];
+    }
+  }
+
+  useEffect(() => {
+    if (replay.replayState !== ReplayState.RECORDING) {
+      // network.DEBUG();
+    } else {
+      network.STOP_DEBUG();
+    }
+  }, [replay.replayState]);
+
+  return (
+    <AppBarContainer
+      title="Data Chooser"
+      injectElements={getFlyoutOptions()}>
       <View style={styles.root}>
         <TrackMap
           style={styles.trackMapRoot} />

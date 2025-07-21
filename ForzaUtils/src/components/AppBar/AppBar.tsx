@@ -100,6 +100,7 @@ export function AppBar(props: AppBarProps) {
                   }}
                   testID={'app-bar-settings-button'}>
                   <ThemeText
+                    allcaps
                     variant={'primary'}
                     onBackground={'onSecondary'}>
                     Go to Settings

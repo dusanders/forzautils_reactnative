@@ -2,45 +2,16 @@ import React, { createContext, useContext, useEffect, useMemo, useRef, useState 
 import { useLogger } from './Logger';
 import { addEventListener, NetInfoState, NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
 import { Splash } from '../pages/Splash';
-import { delay, LISTEN_PORT } from '../constants/types';
+import { LISTEN_PORT } from '../constants/types';
 import { ITelemetryData } from 'ForzaTelemetryApi';
 import { ISocketCallback, Socket } from '../services/Socket';
-import { ISession } from '../services/Database/DatabaseInterfaces';
-import { useAtom } from 'jotai';
 import { wifiService } from '../hooks/WifiState';
 import { packetService } from '../hooks/PacketState';
+import { ReplayState, useReplay } from './Recorder';
 
 //#region Definitions
 
-export enum ReplayState {
-  STOPPED = 'STOPPED',
-  PLAYING = 'PLAYING',
-  PAUSED = 'PAUSED'
-}
-
 export interface INetworkContext {
-  /**
-   * Current replay session
-   */
-  replay?: ISession;
-  /**
-   * Delay in milliseconds between reading and sending replay packets
-   */
-  replayDelay: number;
-  /**
-   * Current replay state
-   */
-  replayState: ReplayState;
-  /**
-   * Set the replay state
-   * @param state Replay state to set
-   */
-  setReplayState(state: ReplayState): void;
-  /**
-   * Time to wait between reading and sending replay packets
-   * @param ms Time delay in MS
-   */
-  setReplayDelay(ms: number): void;
   /**
    * Start a debug stream of randomly generated telemetry packets
    */
@@ -49,11 +20,6 @@ export interface INetworkContext {
    * Stop the debug stream 
    */
   STOP_DEBUG(): void;
-  /**
-   * Set the replay session 
-   * @param session Session to use for replay packets
-   */
-  setReplaySession(session?: ISession): void;
 }
 
 /**
@@ -88,13 +54,11 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   const logger = useLogger();
   const wifiVm = wifiService();
   const packetVm = packetService();
+  const replay = useReplay();
+  const replayService = useReplay();
   const [loaded, setLoaded] = useState(false);
-  const [renderHack, setRenderHack] = useState(false);
-  const replayState = useRef<ReplayState>(ReplayState.STOPPED);
-  const replaySession = useRef<ISession | undefined>(undefined);
   const throttledPacket = useRef<ITelemetryData>(undefined);
   const animationFrameId = useRef<number | undefined>(undefined);
-  const replayDelay = useRef<number>(100);
 
   /**
    * Handler for the Socket service instance
@@ -115,11 +79,11 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
       });
     },
     onPacket: (packet) => {
-      if (!replaySession.current) {
+      if (replayService.replayState !== ReplayState.PLAYING) {
         throttledPacket.current = packet;
       }
     }
-  }), []);
+  }), [replayService, replayService.replayState]);
 
   /**
    * Close the animation frame request
@@ -137,10 +101,6 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
    * This is called at a regular interval to avoid flooding the UI
    */
   const updatePacketState = async () => {
-    if (replaySession.current && replayState.current === ReplayState.PLAYING) {
-      throttledPacket.current = (await replaySession.current.readPacket()) || undefined;
-      await delay(replayDelay.current);
-    }
     if (throttledPacket.current) {
       packetVm.setPacket(throttledPacket.current);
     }
@@ -207,29 +167,18 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
     }
   }, [wifiVm.wifi.isConnected]);
 
+  useEffect(() => {
+    if(replay.replayState === ReplayState.PLAYING){
+      // Handle replay playing state
+      if (replay.replayPacket) {
+        packetVm.setPacket(replay.replayPacket);
+      }
+      animationFrameId.current = requestAnimationFrame(() => { updatePacketState() });
+    }
+  }, [replay.replayState, replay.replayPacket, packetVm]);
+
   return (
     <NetworkContext.Provider value={{
-      replay: replaySession.current,
-      replayDelay: replayDelay.current,
-      replayState: replayState.current,
-      setReplayState: (state) => {
-        logger.debug(tag, `Setting replay state: ${replayState.current} -> ${state}`);
-        replayState.current = state;
-        setRenderHack(!renderHack);
-      },
-      setReplayDelay: (ms) => {
-        replayDelay.current = ms;
-      },
-      setReplaySession: (session) => {
-        replaySession.current = session;
-        replayState.current = Boolean(session)
-          ? ReplayState.PAUSED
-          : ReplayState.STOPPED;
-        if (!animationFrameId.current) {
-          updatePacketState();
-        }
-        setRenderHack(!renderHack);
-      },
       DEBUG: () => {
         Socket.getInstance(logger).DEBUG();
       },

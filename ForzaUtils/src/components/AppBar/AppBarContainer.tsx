@@ -6,6 +6,7 @@ import { useLogger } from "../../context/Logger";
 import { ReplayBar } from "./ReplayBar";
 import { useNetworkContext } from "../../context/Network";
 import { invokeWithTheme } from "../../hooks/ThemeState";
+import { ReplayState, useReplay } from "../../context/Recorder";
 
 export interface AppBarContainerProps extends ContainerProps, AppBarProps {
 
@@ -14,14 +15,19 @@ export interface AppBarContainerProps extends ContainerProps, AppBarProps {
 export function AppBarContainer(props: AppBarContainerProps) {
   const tag = `AppBarContainer.tsx`;
   const logger = useLogger();
-  const network = useNetworkContext();
-  const styles = themeStyles(Boolean(network.replay));
+  const replay = useReplay();
+  const styles = themeStyles(Boolean(replay.replayState));
+
+  const shouldShowReplayBar = () => {
+    return replay.replayState !== ReplayState.IDLE 
+    && replay.replayState !== ReplayState.RECORDING;
+  }
 
   useEffect(() => {
-    if (network.replay) {
-      logger.log(tag, `replay: ${network.replay.info.name}`);
+    if (replay.replayState) {
+      logger.log(tag, `replay: ${replay.replayInfo?.name}, state: ${replay.replayState}, position: ${replay.replayPosition}, length: ${replay.replayLength}`);
     }
-  }, [network.replay]);
+  }, [replay.replayState]);
 
   return (
     <Container
@@ -32,9 +38,10 @@ export function AppBarContainer(props: AppBarContainerProps) {
       <View style={styles.contentView}>
         {props.children}
       </View>
-      {Boolean(network.replay) && (
-        <ReplayBar />
-      )}
+      {shouldShowReplayBar() && (
+          <ReplayBar />
+        )
+      }
     </Container>
   )
 }
