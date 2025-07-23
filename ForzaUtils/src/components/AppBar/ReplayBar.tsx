@@ -34,7 +34,7 @@ export function ReplayBar(props: ReplayBarProps) {
           {replay.replayPosition} / {replay.replayLength}
         </ThemeText>
         <ThemeText>
-          {replay.replayPacket ? replay.replayInfo?.name : 'No Replay'}
+          {replay.replayInfo ? replay.replayInfo?.name : 'No Replay'}
         </ThemeText>
       </View>
       <View>

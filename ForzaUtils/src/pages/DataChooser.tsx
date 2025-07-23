@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { AppRoutes, StackNavigation } from "../constants/types";
 import { TextCard } from "../components/TextCard";
@@ -25,7 +25,8 @@ export function DataChooser(props: DataChooserProps) {
   const navigation = useNavigation<StackNavigation>();
   const replay = useReplayControls();
   logger.debug(tag, 'Rendering DataChooser');
-  const CardButton = ({ title, body, onPress }: { title: string, body: string, onPress: () => void }) => {
+
+  const CardButton = useMemo(() => ({ title, body, onPress }: { title: string, body: string, onPress: () => void }) => {
     return (
       <TextCard
         allcapsTitle
@@ -36,80 +37,58 @@ export function DataChooser(props: DataChooserProps) {
         bodyStyle={styles.cardButtonBody}
         onPress={onPress} />
     );
-  }
-  const dataElements = [
-    (<AvgSuspensionTravel />),
-    (<AvgTireTemps />),
-    (<SlipAngle />),
-    (
-      <View style={{ display: 'flex', flexDirection: 'row' }}>
-        <CardButton
-          title={'HP / TQ Graph'}
-          body={'Graph Horsepower and Torque'}
-          onPress={() => {
-            navigation.navigate(AppRoutes.HP_TQ_GRAPH);
-          }} />
-        <CardButton
-          title={'Suspension Travel'}
-          body={'Visually display suspension travel'}
-          onPress={() => {
-            navigation.navigate(AppRoutes.SUSPENSION_GRAPH);
-          }} />
-      </View>
-    ),
-    (
-      <View style={{ display: 'flex', flexDirection: 'row' }}>
-        <CardButton
-          title={'Tire Temps'}
-          body={'Display tire temperature information'}
-          onPress={() => {
-            navigation.navigate(AppRoutes.TIRE_TEMPS)
-          }} />
-        <CardButton
-          title={'Grip'}
-          body={'Compare tire slip, steering angle, throttle, and brake'}
-          onPress={() => {
-            navigation.navigate(AppRoutes.GRIP)
-          }} />
-      </View>
-    )
-  ]
-  const setRecording = async () => {
+  }, [styles.cardButtonTitle, styles.cardButtonBody]);
+
+  const dataElements = useMemo(() => [
+    <AvgSuspensionTravel key="avgSuspension" />, 
+    <AvgTireTemps key="avgTireTemps" />, 
+    <SlipAngle key="slipAngle" />, 
+    <View key="row1" style={{ flexDirection: 'row' }}>
+      <CardButton
+        title='HP / TQ Graph'
+        body='Graph Horsepower and Torque'
+        onPress={() => navigation.navigate(AppRoutes.HP_TQ_GRAPH)} />
+      <CardButton
+        title='Suspension Travel'
+        body='Visually display suspension travel'
+        onPress={() => navigation.navigate(AppRoutes.SUSPENSION_GRAPH)} />
+    </View>,
+    <View key="row2" style={{ flexDirection: 'row' }}>
+      <CardButton
+        title='Tire Temps'
+        body='Display tire temperature information'
+        onPress={() => navigation.navigate(AppRoutes.TIRE_TEMPS)} />
+      <CardButton
+        title='Grip'
+        body='Compare tire slip, steering angle, throttle, and brake'
+        onPress={() => navigation.navigate(AppRoutes.GRIP)} />
+    </View>
+  ], [navigation, CardButton]);
+
+  const setRecording = useCallback(async () => {
     if (replay.replayState !== ReplayState.RECORDING) {
       replay.startRecording();
     } else {
       replay.closeRecording();
     }
-  }
-  const getFlyoutOptions = () => {
-    if (replay.replayState === ReplayState.RECORDING
-      || replay.replayState === ReplayState.IDLE) {
-      return [
-        {
+  }, [replay]);
+
+  const getFlyoutOptions = useCallback(() => (
+    replay.replayState === ReplayState.RECORDING || replay.replayState === ReplayState.IDLE
+      ? [{
           id: 'record-button',
-          onPress: () => {
-            // Nothing - this is handled by the switch
-          },
+          onPress: () => {},
           renderItem: () => (
             <>
-              <ThemeText
-                variant={'primary'}
-                onBackground={'onSecondary'}>
-                Record
-              </ThemeText>
+              <ThemeText variant='primary' onBackground='onSecondary'>Record</ThemeText>
               <ThemeSwitch
-                value={Boolean(replay.replayState === ReplayState.RECORDING)}
-                onChange={(ev) => {
-                  setRecording();
-                }} />
+                value={replay.replayState === ReplayState.RECORDING}
+                onChange={() => setRecording()} />
             </>
           )
-        }
-      ]
-    } else {
-      return [];
-    }
-  }
+        }]
+      : []
+  ), [replay.replayState, setRecording]);
 
   return (
     <AppBarContainer
@@ -121,7 +100,8 @@ export function DataChooser(props: DataChooserProps) {
         <FlatList
           style={styles.listRoot}
           data={dataElements}
-          renderItem={(item) => item.item} />
+          keyExtractor={(_, index) => index.toString()}
+          renderItem={({ item }) => item} />
       </View>
     </AppBarContainer>
   )

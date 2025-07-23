@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Paper } from "../Paper";
 import { StyleSheet, View } from "react-native";
 import Svg, { Path, Text } from "react-native-svg";
@@ -29,7 +29,6 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   const [renderedLayout, setRenderedLayout] = useState({ width: 1, height: 1 });
   const [viewBox, setViewBox] = useState({ minX: -1, minY: 1, width: 1, height: 1 });
   const styles = themeStyles();
-  const [paths, setPaths] = useState<string[]>([]);
   const [yLimits, setYLimits] = useState<YValueLimits>({
     minY: Number.MAX_SAFE_INTEGER,
     maxY: Number.MIN_SAFE_INTEGER
@@ -39,42 +38,29 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     return typeof value === 'number' && !isNaN(value) && isFinite(value);
   }
 
-  const reRenderData = () => {
-    if (widthScalar === 0) {
-      console.warn(tag, 'widthScalar is 0, cannot render graph');
-      return;
+  // compute SVG paths directly for smoother updates
+  const paths = useMemo(() => {
+    if (props.data.length === 0 || viewBox.height === 0 || viewBox.width === 0) {
+      return [];
     }
     const height = viewBox.height / 1.5;
     const width = viewBox.width;
     const deltaY = yLimits.maxY - yLimits.minY;
     const deltaX = width / widthScalar;
     if (!isValidNumber(deltaY) || !isValidNumber(deltaX)) {
-      console.warn(tag, 'Invalid deltaY or deltaX', { deltaY, deltaX });
-      return;
+      return [];
     }
-    const newPaths = props.data.map((data) => {
-      return data.data.map((value, index) => {
+    return props.data.map((graph) =>
+      graph.data.map((value, index) => {
         const xMove = (index + 1) * deltaX;
-        const yMove = height - ((value - yLimits.minY) / deltaY) * height; // Map minY to the top and maxY to the bottom
+        const yMove = height - ((value - yLimits.minY) / deltaY) * height;
         if (!isValidNumber(yMove) || !isValidNumber(xMove)) {
           return '';
         }
-
-        if (index === 0) {
-          return `M${24},${yMove}`;
-        }
-        return ` L${xMove},${yMove}`;
-      }).join(' ');
-    });
-    setPaths(newPaths);
-  }
-
-  useEffect(() => {
-    if (!props.data.length || viewBox.height == 0 || viewBox.width === 0) {
-      return;
-    }
-    reRenderData();
-  }, [yLimits, viewBox]);
+        return index === 0 ? `M${24},${yMove}` : ` L${xMove},${yMove}`;
+      }).join(' ')
+    );
+  }, [props.data, viewBox, yLimits]);
 
   useEffect(() => {
     if (!props.data.length || viewBox.height == 0 || viewBox.width === 0) {
@@ -94,10 +80,8 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
         minY,
         maxY
       });
-    } else {
-      reRenderData();
     }
-  }, [props.data, viewBox]);
+  }, [props.data, viewBox, yLimits.minY, yLimits.maxY]);
 
 
   useEffect(() => {
@@ -224,3 +208,5 @@ function themeStyles() {
     }
   }));
 }
+
+export const MemoBaseLineGraph = React.memo(BaseLineGraph);

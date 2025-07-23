@@ -7,7 +7,7 @@ import { ITelemetryData } from 'ForzaTelemetryApi';
 import { ISocketCallback, Socket } from '../services/Socket';
 import { wifiService } from '../hooks/WifiState';
 import { packetService } from '../hooks/PacketState';
-import { ReplayState, useReplay } from './Recorder';
+import { ReplayState, useReplay, useReplayControls } from './Recorder';
 
 //#region Definitions
 
@@ -54,8 +54,7 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   const logger = useLogger();
   const wifiVm = wifiService();
   const packetVm = packetService();
-  const replay = useReplay();
-  const replayService = useReplay();
+  const replay = useReplayControls();
   const [loaded, setLoaded] = useState(false);
   const throttledPacket = useRef<ITelemetryData>(undefined);
   const animationFrameId = useRef<number | undefined>(undefined);
@@ -79,11 +78,11 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
       });
     },
     onPacket: (packet) => {
-      if (replayService.replayState !== ReplayState.PLAYING) {
+      if (replay.replayState !== ReplayState.PLAYING) {
         throttledPacket.current = packet;
       }
     }
-  }), [replayService, replayService.replayState]);
+  }), [replay, replay.replayState]);
 
   /**
    * Close the animation frame request
@@ -101,8 +100,10 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
    * This is called at a regular interval to avoid flooding the UI
    */
   const updatePacketState = async () => {
-    if (throttledPacket.current) {
-      packetVm.setPacket(throttledPacket.current);
+    if (replay.replayState !== ReplayState.PLAYING) {
+      if (throttledPacket.current) {
+        packetVm.setPacket(throttledPacket.current);
+      }
     }
     animationFrameId.current = requestAnimationFrame(() => { updatePacketState() });
   }
@@ -168,14 +169,10 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   }, [wifiVm.wifi.isConnected]);
 
   useEffect(() => {
-    if(replay.replayState === ReplayState.PLAYING){
-      // Handle replay playing state
-      if (replay.replayPacket) {
-        packetVm.setPacket(replay.replayPacket);
-      }
+    if (replay.replayState === ReplayState.PLAYING) {
       animationFrameId.current = requestAnimationFrame(() => { updatePacketState() });
     }
-  }, [replay.replayState, replay.replayPacket, packetVm]);
+  }, [replay.replayState, packetVm]);
 
   return (
     <NetworkContext.Provider value={{

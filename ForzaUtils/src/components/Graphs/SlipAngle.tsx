@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { CardContainer } from "../CardContainer";
 import { StyleSheet } from "react-native";
-import { invokeWithTheme } from "../../hooks/ThemeState";
-import { BaseLineGraph } from "./BaseLineGraph";
+import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
+import { BaseLineGraph, MemoBaseLineGraph } from "./BaseLineGraph";
 
 export interface SlipAngleProps {
 
@@ -13,26 +13,29 @@ export function SlipAngle(props: SlipAngleProps) {
   const tag = 'SlipAngle';
   const styles = themeStyles();
   const viewModel = useViewModelStore().grip;
-
+  const theme = themeService().theme;
+  const graphData = useMemo(() => {
+    return [
+      {
+        data: viewModel.slipAngle.map((point) => point.front),
+        label: 'Front Slip Angle',
+        color: theme.colors.text.primary.onPrimary
+      },
+      {
+        data: viewModel.slipAngle.map((point) => point.rear),
+        label: 'Rear Slip Angle',
+        color: theme.colors.text.secondary.onPrimary
+      }
+    ];
+  }, [viewModel.slipAngle, theme.colors.text.primary.onPrimary, theme.colors.text.secondary.onPrimary]);
   return (
     <CardContainer
       centerContent
       style={styles.card}>
-      <BaseLineGraph
+      <MemoBaseLineGraph
         title="Slip Angle"
         dataLength={viewModel.slipAngleWindowSize}
-        data={[
-          {
-            data: viewModel.slipAngle.map((point) => point.front),
-            label: 'Front Slip Angle',
-            color: invokeWithTheme(theme => theme.colors.text.primary.onPrimary)
-          },
-          {
-            data: viewModel.slipAngle.map((point) => point.rear),
-            label: 'Rear Slip Angle',
-            color: invokeWithTheme(theme => theme.colors.text.secondary.onPrimary)
-          }
-        ]} />
+        data={graphData} />
     </CardContainer>
   )
 };

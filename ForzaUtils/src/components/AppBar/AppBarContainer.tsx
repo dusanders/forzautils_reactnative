@@ -23,12 +23,6 @@ export function AppBarContainer(props: AppBarContainerProps) {
     && replay.replayState !== ReplayState.RECORDING;
   }
 
-  useEffect(() => {
-    if (replay.replayState) {
-      logger.log(tag, `replay: ${replay.replayInfo?.name}, state: ${replay.replayState}, position: ${replay.replayPosition}, length: ${replay.replayLength}`);
-    }
-  }, [replay.replayState]);
-
   return (
     <Container
       fill={'parent'}

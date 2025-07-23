@@ -17,7 +17,6 @@ export interface IRecorder {
   replayState: ReplayState;
   replayInfo?: ISessionInfo;
   replayDelay: number;
-  replayPacket: ITelemetryData | undefined;
   replayPosition: number;
   replayLength: number;
   setReplayDelay(ms: number): void;
@@ -51,10 +50,9 @@ export function RecorderProvider(props: RecorderProviderProps) {
   const tag = 'RecorderProvider.tsx';
   let replayInterval: NodeJS.Timeout | undefined = undefined;
   const logger = useLogger();
-  const wifiPacket = packetService();
+  const forzaPacket = packetService();
   const dbService = useRef(DatabaseService.getInstance());
   const currentFile = useRef<ISession>(undefined);
-  const replayPacket = useRef<ITelemetryData | undefined>(undefined);
   const [replayState, setReplayState] = useState<ReplayState>(ReplayState.PAUSED);
   const [replayDelay, setReplayDelay] = useState<number>(1000 / 24); // 24 FPS
   const [replayPosition, setReplayPosition] = useState<number>(0);
@@ -129,7 +127,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
       currentFile.current = undefined;
     }
     setReplayState(ReplayState.PAUSED);
-    replayPacket.current = undefined;
+    forzaPacket.setPacket(undefined);
     setReplayPosition(0);
     setReplayLength(0);
   }, []);
@@ -142,7 +140,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
       if (currentFile.current) {
         const packet = (await currentFile.current.readPacket()) || undefined;
         if (packet) {
-          replayPacket.current = packet;
+          forzaPacket.setPacket(packet);
           setReplayPosition(currentFile.current.currentReadOffset);
         } else {
           logger.log(tag, `No more packets to read, stopping replay`);
@@ -161,10 +159,10 @@ export function RecorderProvider(props: RecorderProviderProps) {
   }, []);
 
   useEffect(() => {
-    if (currentFile.current && replayState === ReplayState.RECORDING && wifiPacket.packet) {
-      currentFile.current.addPacket(wifiPacket.packet)
+    if (currentFile.current && replayState === ReplayState.RECORDING && forzaPacket.packet) {
+      currentFile.current.addPacket(forzaPacket.packet)
     }
-  }, [currentFile.current, wifiPacket.packet, replayState]);
+  }, [currentFile.current, forzaPacket.packet, replayState]);
 
   useEffect(() => {
     if (replayState === ReplayState.PLAYING) {
@@ -180,7 +178,6 @@ export function RecorderProvider(props: RecorderProviderProps) {
     replayInfo: currentFile.current?.info,
     replayPosition,
     replayLength,
-    replayPacket: replayPacket.current,
     replayState: currentFile.current ? replayState : ReplayState.IDLE,
     replayDelay,
     setReplayDelay,
@@ -197,7 +194,6 @@ export function RecorderProvider(props: RecorderProviderProps) {
     currentFile.current?.info,
     replayPosition,
     replayLength,
-    replayPacket.current,
     replayState,
     replayDelay,
     setReplayDelay,

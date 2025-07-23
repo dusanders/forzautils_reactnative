@@ -1,9 +1,9 @@
-import React, {  } from "react";
+import React, { useMemo } from "react";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { StyleSheet } from "react-native";
-import { BaseLineGraph } from "./BaseLineGraph";
+import { BaseLineGraph, MemoBaseLineGraph } from "./BaseLineGraph";
 import { CardContainer } from "../CardContainer";
-import { invokeWithTheme } from "../../hooks/ThemeState";
+import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
 
 export interface IAvgSuspensionTravelProps {
 }
@@ -11,26 +11,30 @@ export interface IAvgSuspensionTravelProps {
 export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
   const styles = themeStyles();
   const viewModel = useViewModelStore().suspensionGraph;
+  const theme = themeService().theme;
+  const graphData = useMemo(() => {
+    return [
+      {
+        data: viewModel.avgTravel.map((point) => point.front),
+        label: 'Front Avg Travel',
+        color: theme.colors.text.primary.onPrimary
+      },
+      {
+        data: viewModel.avgTravel.map((point) => point.rear),
+        label: 'Rear Avg Travel',
+        color: theme.colors.text.secondary.onPrimary
+      }
+    ];
+  }, [viewModel.avgTravel]);
 
   return (
     <CardContainer
       centerContent
       style={styles.card}>
-      <BaseLineGraph
+      <MemoBaseLineGraph
         title={'Suspension Travel'}
         dataLength={viewModel.windowSize}
-        data={[
-          {
-            data: viewModel.avgTravel.map((point) => point.front),
-            label: 'Front Avg Travel',
-            color: invokeWithTheme(theme => theme.colors.text.primary.onPrimary)
-          },
-          {
-            data: viewModel.avgTravel.map((point) => point.rear),
-            label: 'Rear Avg Travel',
-            color: invokeWithTheme(theme => theme.colors.text.secondary.onPrimary)
-          }
-        ]} />
+        data={graphData} />
 
     </CardContainer>
   );
