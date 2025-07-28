@@ -8,9 +8,7 @@ import { ITuningCalculator, CalculatorParams, CalculatorResult, hzBase, EngineLa
  */
 export class SonnetCalculator implements ITuningCalculator {
     // Physics constants
-    private readonly GRAVITY = 9.81; // m/s²
     private readonly LBS_TO_KG = 0.453592;
-    private readonly KG_TO_LBS = 2.20462;
     private readonly N_M_TO_LB_IN = 0.00571015; // 1 N/m = 0.00571015 lb/in
     private readonly LB_IN_TO_N_M = 175.127; // 1 lb/in = 175.127 N/m
     
