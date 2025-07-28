@@ -1,6 +1,11 @@
 import { Drivetrain } from "ForzaTelemetryApi";
 import { AxleData } from "../../../constants/types";
 
+export enum CalculatorTypes {
+  GROK = "Grok",
+  SONNET = "Sonnet"
+}
+
 export enum EngineLayout {
   FRONT,
   REAR,

@@ -2,9 +2,10 @@ import { Drivetrain } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
 import { useCache } from "../../Cache";
 import { useLogger } from "../../Logger";
-import { CalculatorParams, CalculatorResult, EngineLayout, hzBase } from "./Calculators";
+import { CalculatorParams, CalculatorResult, CalculatorTypes, EngineLayout, hzBase, ITuningCalculator } from "./Calculators";
 import { AxleData, ICache } from "../../../constants/types";
 import { GrokCalculator } from "./GrokCalc";
+import { SonnetCalculator } from "./Sonnet_37";
 
 export interface SuspensionSettings {
   springRate: number;
@@ -22,7 +23,8 @@ export interface ITuningViewModel {
   input: CalculatorParams;
   settings: CalculatorResult;
   setInput(params: CalculatorParams): void;
-  
+  calculatorType: CalculatorTypes;
+  setCalculatorType(type: CalculatorTypes): void;
 }
 
 function isTuningViewModel(obj: any): obj is ITuningViewModel {
@@ -32,6 +34,7 @@ function isTuningViewModel(obj: any): obj is ITuningViewModel {
 export function useTuningViewModel(): ITuningViewModel {
   const tag = 'TuningViewModel';
   const logger = useLogger();
+  const [calculatorType, setCalculatorType] = useState<CalculatorTypes>(CalculatorTypes.GROK);
 
   //#region State
 
@@ -68,6 +71,7 @@ export function useTuningViewModel(): ITuningViewModel {
     const cacheModel: ICache<ITuningViewModel> = {
       input: input,
       settings: settings,
+      calculatorType: calculatorType
     }
     cache.setItem(tag, cacheModel);
   }
@@ -81,6 +85,9 @@ export function useTuningViewModel(): ITuningViewModel {
         // logger.log(tag, `found cache: ${JSON.stringify(found)}`);
         setInput(found.input);
         setSettings(found.settings);
+        if(found.calculatorType) {
+          setCalculatorType(found.calculatorType);
+        }
       }
     }
     tryCache();
@@ -88,12 +95,21 @@ export function useTuningViewModel(): ITuningViewModel {
 
   useEffect(() => {
     updateCache();
-  }, [input, settings]);
+  }, [input, settings, calculatorType]);
 
   useEffect(() => {
-    const settings = new GrokCalculator().calculate(input);
-    setSettings(settings);
-  }, [input]);
+    switch (calculatorType) {
+      case CalculatorTypes.GROK:
+        logger.log(tag, `Using Grok Calculator`);
+        return setSettings(new GrokCalculator().calculate(input));
+      case CalculatorTypes.SONNET:
+        logger.log(tag, `Using Sonnet Calculator`);
+        return setSettings(new SonnetCalculator().calculate(input));
+      default:
+        logger.warn(tag, `Unknown calculator type: ${calculatorType}`);
+        return setSettings(new GrokCalculator().calculate(input));
+    }
+  }, [input, calculatorType, logger]);
 
   //#endregion
 
@@ -101,5 +117,7 @@ export function useTuningViewModel(): ITuningViewModel {
     input,
     setInput,
     settings,
+    calculatorType,
+    setCalculatorType,
   }
 }

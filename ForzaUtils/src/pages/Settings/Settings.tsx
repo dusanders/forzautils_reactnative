@@ -5,6 +5,9 @@ import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { Dropdown } from "../../components/Dropdown";
 import { themeService } from "../../hooks/ThemeState";
 import { ThemeType } from "../../constants/Themes";
+import { useTuningViewModel } from "../../context/viewModels/Tuning/TuningViewModel";
+import { CalculatorTypes } from "../../context/viewModels/Tuning/Calculators";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 
 export interface SettingsProps {
   // Nothing specific for now
@@ -13,6 +16,7 @@ type SettingsScreenProps = NativeStackScreenProps<RootStackParamList, AppRoutes.
 export function Settings(props: SettingsScreenProps) {
   const { navigation } = props;
   const themeVm = themeService();
+  const tuningVm = useViewModelStore().tuning;
   return (
     <AppBarContainer hideSettings
       title="Settings">
@@ -27,6 +31,16 @@ export function Settings(props: SettingsScreenProps) {
         ]}
         onValueChanged={(option) => {
           themeVm.updateTheme(option.value);
+        }} />
+      <Dropdown
+        label="Calculator Type"
+        value={tuningVm.calculatorType}
+        options={[
+          { label: CalculatorTypes.GROK, value: CalculatorTypes.GROK },
+          { label: CalculatorTypes.SONNET, value: CalculatorTypes.SONNET },
+        ]}
+        onValueChanged={(option) => {
+          tuningVm.setCalculatorType(option.value);
         }} />
     </AppBarContainer>
   );
