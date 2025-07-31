@@ -3,6 +3,7 @@ import { AxleData } from "../../../constants/types";
 
 export enum CalculatorTypes {
   GROK = "Grok",
+  GROK2 = "Grok2",
   SONNET = "Sonnet"
 }
 

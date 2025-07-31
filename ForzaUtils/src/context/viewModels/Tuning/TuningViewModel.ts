@@ -6,6 +6,7 @@ import { CalculatorParams, CalculatorResult, CalculatorTypes, EngineLayout, hzBa
 import { AxleData, ICache } from "../../../constants/types";
 import { GrokCalculator } from "./GrokCalc";
 import { SonnetCalculator } from "./Sonnet_37";
+import { Grok2Calculator } from "./Grok2";
 
 export interface SuspensionSettings {
   springRate: number;
@@ -105,6 +106,9 @@ export function useTuningViewModel(): ITuningViewModel {
       case CalculatorTypes.SONNET:
         logger.log(tag, `Using Sonnet Calculator`);
         return setSettings(new SonnetCalculator().calculate(input));
+      case CalculatorTypes.GROK2:
+        logger.log(tag, `Using Grok2 Calculator`);
+        return setSettings(new Grok2Calculator().calculate(input));
       default:
         logger.warn(tag, `Unknown calculator type: ${calculatorType}`);
         return setSettings(new GrokCalculator().calculate(input));

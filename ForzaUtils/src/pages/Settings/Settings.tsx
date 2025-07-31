@@ -5,7 +5,6 @@ import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { Dropdown } from "../../components/Dropdown";
 import { themeService } from "../../hooks/ThemeState";
 import { ThemeType } from "../../constants/Themes";
-import { useTuningViewModel } from "../../context/viewModels/Tuning/TuningViewModel";
 import { CalculatorTypes } from "../../context/viewModels/Tuning/Calculators";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 
@@ -37,6 +36,7 @@ export function Settings(props: SettingsScreenProps) {
         value={tuningVm.calculatorType}
         options={[
           { label: CalculatorTypes.GROK, value: CalculatorTypes.GROK },
+          { label: CalculatorTypes.GROK2, value: CalculatorTypes.GROK2 },
           { label: CalculatorTypes.SONNET, value: CalculatorTypes.SONNET },
         ]}
         onValueChanged={(option) => {
