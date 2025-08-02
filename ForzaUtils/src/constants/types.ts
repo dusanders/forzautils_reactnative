@@ -1,7 +1,7 @@
 import { RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useState } from "react";
-import { ReplayRouteParams  } from "../pages/ReplayList/ReplayList";
+import { useEffect, useState } from "react";
+import { ReplayRouteParams } from "../pages/ReplayList/ReplayList";
 import { SettingsProps } from "../pages/Settings/Settings";
 
 /**
@@ -114,14 +114,27 @@ export function randomKey(): string {
 
 export interface DataWindow<T> {
   size: number;
+  min: number;
+  max: number;
   data: T[];
   add: (data: T) => void;
   clear: () => void;
 }
 
-export function useDataWindow<T>(size: number, initialValues?: T[]): DataWindow<T> {
+export function useDataWindow<T>(size: number,
+  parseMin: (data: T) => number,
+  parseMax: (data: T) => number,
+  initialValues?: T[]): DataWindow<T> {
   const [data, setData] = useState<T[]>(initialValues ? initialValues : []);
+  const [min, setMin] = useState(Number.MAX_SAFE_INTEGER);
+  const [max, setMax] = useState(Number.MIN_SAFE_INTEGER);
   const add = (data: T) => {
+    if (data) {
+      const minValue = parseMin(data);
+      const maxValue = parseMax(data);
+      if (minValue < min) setMin(minValue);
+      if (maxValue > max) setMax(maxValue);
+    }
     setData((prev) => {
       if (prev.length >= size) {
         return [...prev.slice(1), data];
@@ -134,6 +147,8 @@ export function useDataWindow<T>(size: number, initialValues?: T[]): DataWindow<
   }
   return {
     size,
+    min: min,
+    max: max,
     data,
     add,
     clear,

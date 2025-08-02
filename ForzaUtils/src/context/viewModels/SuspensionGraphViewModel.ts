@@ -9,6 +9,8 @@ export interface ISuspensionGraphViewModel {
   rightRear: number;
   windowSize: number;
   avgTravel: AxleData<number>[];
+  avgTravelMin: number;
+  avgTravelMax: number;
 }
 const debugData = [
   {
@@ -96,7 +98,12 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
   const windowSize = 50;
   const forza = packetService().packet;
-  const avgTravelWindow = useDataWindow<AxleData<number>>(windowSize);
+  const avgTravelWindow = useDataWindow<AxleData<number>>(
+    windowSize,
+    (data) => Math.min(data.front, data.rear),
+    (data) => Math.max(data.front, data.rear),
+    []
+  );
 
   useEffect(() => {
     if (!forza || !forza.isRaceOn) {
@@ -133,6 +140,8 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
     rightFront: rightFront,
     rightRear: rightRear,
     windowSize: windowSize,
-    avgTravel: avgTravelWindow.data
+    avgTravel: avgTravelWindow.data,
+    avgTravelMin: avgTravelWindow.min,
+    avgTravelMax: avgTravelWindow.max
   };
 }

@@ -35,7 +35,9 @@ export function AvgTireTemps(props: AvgTireTempProps) {
       <MemoBaseLineGraph
         title="Average Tire Temps"
         dataLength={viewModel.avgTempWindowSize}
-        data={graphData} />
+        data={graphData} 
+        minY={viewModel.avgTempWindowMin}
+        maxY={viewModel.avgTempWindowMax}/>
     </CardContainer>
   )
 }

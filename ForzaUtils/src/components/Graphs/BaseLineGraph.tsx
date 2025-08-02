@@ -13,13 +13,10 @@ export interface IGraphData {
 
 export interface BaseLineGraphProps {
   data: IGraphData[];
-  dataLength: number;
-  title?: string;
-}
-
-interface YValueLimits {
   minY: number;
   maxY: number;
+  dataLength: number;
+  title?: string;
 }
 
 export function BaseLineGraph(props: BaseLineGraphProps) {
@@ -29,10 +26,6 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   const [renderedLayout, setRenderedLayout] = useState({ width: 1, height: 1 });
   const [viewBox, setViewBox] = useState({ minX: -1, minY: 1, width: 1, height: 1 });
   const styles = themeStyles();
-  const [yLimits, setYLimits] = useState<YValueLimits>({
-    minY: Number.MAX_SAFE_INTEGER,
-    maxY: Number.MIN_SAFE_INTEGER
-  });
 
   const isValidNumber = (value: number) => {
     return typeof value === 'number' && !isNaN(value) && isFinite(value);
@@ -43,55 +36,50 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     if (props.data.length === 0 || viewBox.height === 0 || viewBox.width === 0) {
       return [];
     }
-    const height = viewBox.height / 1.5;
+
+    // Use 100% of the viewBox height to provide some vertical padding
+    const height = viewBox.height * 1.0;
     const width = viewBox.width;
-    const deltaY = yLimits.maxY - yLimits.minY;
+
+    // Fix the deltaY calculation (should be maxY - minY)
+    const deltaY = props.maxY - props.minY;
     const deltaX = width / widthScalar;
-    if (!isValidNumber(deltaY) || !isValidNumber(deltaX)) {
+
+    if (!isValidNumber(deltaY) || !isValidNumber(deltaX) || deltaY === 0) {
       return [];
     }
+
+    // Calculate vertical offset to center the graph
+    const verticalOffset = viewBox.height * 0.02; // 2% padding from top
+
     return props.data.map((graph) =>
       graph.data.map((value, index) => {
         const xMove = (index + 1) * deltaX;
-        const yMove = height - ((value - yLimits.minY) / deltaY) * height;
+
+        // Adjust yMove calculation to properly scale and center vertically
+        const normalizedValue = (value - props.minY) / deltaY; // 0 to 1
+        const yMove = verticalOffset + (height * (1 - normalizedValue)); // Invert and offset
+
         if (!isValidNumber(yMove) || !isValidNumber(xMove)) {
           return '';
         }
-        return index === 0 ? `M${24},${yMove}` : ` L${xMove},${yMove}`;
+        return index === 0 ? `M${0},${yMove}` : ` L${xMove},${yMove}`;
       }).join(' ')
     );
-  }, [props.data, viewBox, yLimits]);
+  }, [props.data, viewBox, props.minY, props.maxY]);
 
   useEffect(() => {
-    if (!props.data.length || viewBox.height == 0 || viewBox.width === 0) {
-      return;
-    }
-    const minY = Math.min(
-      ...props.data.map((graph) => Math.min(...graph.data)),
-      yLimits.minY);
-    const maxY = Math.max(
-      ...props.data.map((graph) => Math.max(...graph.data)),
-      yLimits.maxY);
-    if (!isValidNumber(minY) || !isValidNumber(maxY)) {
-      return;
-    }
-    if (minY !== yLimits.minY || maxY !== yLimits.maxY) {
-      setYLimits({
-        minY,
-        maxY
-      });
-    }
-  }, [props.data, viewBox, yLimits.minY, yLimits.maxY]);
-
-
-  useEffect(() => {
-    const minX = -4;
-    const minY = -4;
+    // Set up viewBox with proper dimensions
+    const minX = 0;
+    const minY = 0;
     const width = renderedLayout.width;
-    const height = renderedLayout.height - 12;
+    // Don't subtract as much from the height to allow more vertical space
+    const height = renderedLayout.height - 4;
+
     if (!isValidNumber(width) || !isValidNumber(height)) {
       return;
     }
+
     setViewBox({
       minX,
       minY,
@@ -101,8 +89,7 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   }, [renderedLayout]);
 
   return (
-    <View
-      style={styles.root}>
+    <View style={styles.root}>
       {props.title && (
         <ThemeText style={styles.titleText}>
           {props.title}
@@ -117,19 +104,19 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
               height: ev.nativeEvent.layout.height
             })
           }}>
-          {(isValidNumber(yLimits.minY) && isValidNumber(yLimits.maxY)) && (
+          {(isValidNumber(props.minY) && isValidNumber(props.maxY)) && (
             <>
               <Text
                 fontSize={fontSize}
-                y={0 + (fontSize / 1.4)}
+                y={viewBox.height * 0.05 + (fontSize / 1.4)} // Position near the top with padding
                 fill={invokeWithTheme(theme => theme.colors.text.primary.onPrimary)}>
-                {yLimits.maxY === Number.MIN_SAFE_INTEGER ? 0 : yLimits.maxY.toFixed(2)}
+                {props.maxY === Number.MIN_SAFE_INTEGER ? 0 : props.maxY.toFixed(2)}
               </Text>
               <Text
                 fontSize={fontSize}
-                y={viewBox.height - (fontSize / 1.4)}
+                y={viewBox.height * 0.95} // Position near the bottom with padding
                 fill={invokeWithTheme(theme => theme.colors.text.primary.onPrimary)}>
-                {yLimits.minY === Number.MAX_SAFE_INTEGER ? 0 : yLimits.minY.toFixed(2)}
+                {props.minY === Number.MAX_SAFE_INTEGER ? 0 : props.minY.toFixed(2)}
               </Text>
             </>
           )}
@@ -159,10 +146,10 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     </View>
   )
 }
+
 function themeStyles() {
   return invokeWithTheme((theme) => StyleSheet.create({
     titleText: {
-      paddingTop: 5,
       paddingBottom: 5,
       color: theme.colors.text.primary.onPrimary
     },
@@ -173,15 +160,16 @@ function themeStyles() {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingTop: 12,
-      paddingBottom: 12
     },
     paper: {
       width: '95%',
       marginBottom: 5,
       padding: 0,
       paddingBottom: 4,
-      paddingTop: 4
+      paddingTop: 4,
+      flex: 1, // Add flex to fill available space
+      display: 'flex',
+      justifyContent: 'center' // Center content vertically
     },
     labelView: {
       display: 'flex',
@@ -195,7 +183,6 @@ function themeStyles() {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-evenly',
-      paddingBottom: 5
     },
     labelIcon: {
       width: 12,

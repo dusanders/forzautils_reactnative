@@ -11,12 +11,19 @@ export interface IGripViewModel {
   slipRatio: TireData;
   slipAngle: AxleData<number>[];
   slipAngleWindowSize: number;
+  slipAngleMin: number;
+  slipAngleMax: number;
 }
 
 export function useGripViewModel(): IGripViewModel {
   const forza = packetService().packet;
   const windowSize = 50;
-  const slipAngleWindow = useDataWindow<AxleData<number>>(windowSize);
+  const slipAngleWindow = useDataWindow<AxleData<number>>(
+    windowSize,
+    (data) => Math.min(data.front, data.rear),
+    (data) => Math.max(data.front, data.rear),
+    []
+  );
 
   const steering = useMemo(() => {
     return forza?.steer || 0
@@ -65,6 +72,8 @@ export function useGripViewModel(): IGripViewModel {
     brake: brake,
     slipRatio: tireSlip,
     slipAngle: slipAngleWindow.data,
-    slipAngleWindowSize: windowSize
+    slipAngleWindowSize: windowSize,
+    slipAngleMin: slipAngleWindow.min,
+    slipAngleMax: slipAngleWindow.max
   }
 }

@@ -34,8 +34,10 @@ export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
       <MemoBaseLineGraph
         title={'Suspension Travel'}
         dataLength={viewModel.windowSize}
-        data={graphData} />
-
+        data={graphData}
+        minY={viewModel.avgTravelMin}
+        maxY={viewModel.avgTravelMax}
+      />
     </CardContainer>
   );
 }

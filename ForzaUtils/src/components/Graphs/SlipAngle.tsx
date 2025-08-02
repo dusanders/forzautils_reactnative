@@ -35,7 +35,9 @@ export function SlipAngle(props: SlipAngleProps) {
       <MemoBaseLineGraph
         title="Slip Angle"
         dataLength={viewModel.slipAngleWindowSize}
-        data={graphData} />
+        data={graphData} 
+        minY={viewModel.slipAngleMin}
+        maxY={viewModel.slipAngleMax}/>
     </CardContainer>
   )
 };

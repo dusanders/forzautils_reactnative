@@ -8,6 +8,8 @@ export interface ITireTempViewModel {
   leftRear: number;
   rightRear: number;
   avgTempWindowSize: number;
+  avgTempWindowMin: number;
+  avgTempWindowMax: number;
   avgTemps: AxleData<number>[];
 }
 const debugData: AxleData<number>[] = [
@@ -38,7 +40,12 @@ export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 50;
   const forza = packetService().packet;
-  const avgTempWindow = useDataWindow<AxleData<number>>(windowSize);
+  const avgTempWindow = useDataWindow<AxleData<number>>(
+    windowSize,
+    (data) => Math.min(data.front, data.rear),
+    (data) => Math.max(data.front, data.rear),
+    []
+  );
 
   useEffect(() => {
     if(!forza || !forza.isRaceOn) {
@@ -81,6 +88,8 @@ export function useTireTempsViewModel(): ITireTempViewModel {
     leftRear: leftRear,
     rightRear: rightRear,
     avgTempWindowSize: windowSize,
+    avgTempWindowMin: avgTempWindow.min,
+    avgTempWindowMax: avgTempWindow.max,
     avgTemps: avgTempWindow.data,
   }
 }
