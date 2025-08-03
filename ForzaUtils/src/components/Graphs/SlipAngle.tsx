@@ -4,6 +4,7 @@ import { CardContainer } from "../CardContainer";
 import { StyleSheet } from "react-native";
 import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
 import { BaseLineGraph, MemoBaseLineGraph } from "./BaseLineGraph";
+import { MemoSkiaLineGraph } from "./SkiaLineGraph";
 
 export interface SlipAngleProps {
 
@@ -32,12 +33,19 @@ export function SlipAngle(props: SlipAngleProps) {
     <CardContainer
       centerContent
       style={styles.card}>
-      <MemoBaseLineGraph
+      <MemoSkiaLineGraph
         title="Slip Angle"
         dataLength={viewModel.slipAngleWindowSize}
-        data={graphData} 
+        data={graphData}
         minY={viewModel.slipAngleMin}
-        maxY={viewModel.slipAngleMax}/>
+        maxY={viewModel.slipAngleMax}
+      />
+      {/* <MemoBaseLineGraph
+        title="Slip Angle"
+        dataLength={viewModel.slipAngleWindowSize}
+        data={graphData}
+        minY={viewModel.slipAngleMin}
+        maxY={viewModel.slipAngleMax} /> */}
     </CardContainer>
   )
 };

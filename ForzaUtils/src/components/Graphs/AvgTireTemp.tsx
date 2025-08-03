@@ -4,6 +4,7 @@ import { BaseLineGraph, MemoBaseLineGraph } from "./BaseLineGraph";
 import { StyleSheet } from "react-native";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
+import { MemoSkiaLineGraph } from "./SkiaLineGraph";
 
 export interface AvgTireTempProps {
 }
@@ -32,12 +33,19 @@ export function AvgTireTemps(props: AvgTireTempProps) {
     <CardContainer
       centerContent
       style={styles.card}>
-      <MemoBaseLineGraph
+        <MemoSkiaLineGraph
+        title="Average Tire Temps"
+        dataLength={viewModel.avgTempWindowSize}
+        data={graphData}
+        minY={viewModel.avgTempWindowMin}
+        maxY={viewModel.avgTempWindowMax} />
+      {/* Uncomment the line below to use the base line graph instead of Skia */}
+      {/*<MemoBaseLineGraph
         title="Average Tire Temps"
         dataLength={viewModel.avgTempWindowSize}
         data={graphData} 
         minY={viewModel.avgTempWindowMin}
-        maxY={viewModel.avgTempWindowMax}/>
+        maxY={viewModel.avgTempWindowMax} /> */}
     </CardContainer>
   )
 }

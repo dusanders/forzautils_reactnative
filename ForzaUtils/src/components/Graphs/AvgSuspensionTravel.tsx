@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 import { BaseLineGraph, MemoBaseLineGraph } from "./BaseLineGraph";
 import { CardContainer } from "../CardContainer";
 import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
+import { MemoSkiaLineGraph } from "./SkiaLineGraph";
 
 export interface IAvgSuspensionTravelProps {
 }
@@ -31,13 +32,19 @@ export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
     <CardContainer
       centerContent
       style={styles.card}>
-      <MemoBaseLineGraph
+        <MemoSkiaLineGraph
+          title={'Suspension Travel'}
+          dataLength={viewModel.windowSize}
+          data={graphData}
+          minY={viewModel.avgTravelMin}
+          maxY={viewModel.avgTravelMax} />
+      {/* <MemoBaseLineGraph
         title={'Suspension Travel'}
         dataLength={viewModel.windowSize}
         data={graphData}
         minY={viewModel.avgTravelMin}
         maxY={viewModel.avgTravelMax}
-      />
+      /> */}
     </CardContainer>
   );
 }
