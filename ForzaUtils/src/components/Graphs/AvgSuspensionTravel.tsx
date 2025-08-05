@@ -47,8 +47,8 @@ function themeStyles() {
       height: 180,
       width: '100%',
       padding: 0,
-      paddingTop: 24,
-      paddingBottom: 24,
+      paddingTop: 8,
+      paddingBottom: 8,
     },
   }));
 }
