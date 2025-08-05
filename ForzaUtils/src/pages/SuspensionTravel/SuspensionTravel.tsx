@@ -9,6 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
 import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
+import { AvgSuspensionTravel } from "../../components/Graphs/AvgSuspensionTravel";
 
 export interface SuspensionTravelProps {
   // Nothing
@@ -58,7 +59,8 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
   return (
     <AppBarContainer
       title="Suspension Travel">
-      <Paper style={style.content}>
+      <AvgSuspensionTravel key={'avgSuspensionTravel'} />
+      {/* <Paper style={style.content}>
         <BarChart
           style={{
             marginBottom: 0,
@@ -106,7 +108,7 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
             backgroundGradientFromOpacity: 0,
             backgroundGradientToOpacity: 0,
           }} />
-      </Paper>
+      </Paper> */}
     </AppBarContainer>
   )
 }

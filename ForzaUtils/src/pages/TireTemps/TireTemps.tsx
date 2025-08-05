@@ -6,6 +6,7 @@ import { TireInfo } from "./TireInfo";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../constants/types";
+import { AvgTireTemps } from "../../components/Graphs/AvgTireTemp";
 
 export interface TireTempsProps {
   // Nothing
@@ -31,7 +32,8 @@ export function TireTemps(props: TireTempsProps) {
   return (
     <AppBarContainer
       title="Tire Temps">
-      <Row style={style.halfHeight}>
+        <AvgTireTemps key={'avgTireTemps'} />
+      {/* <Row style={style.halfHeight}>
         <TireInfo temp={temps[0]}
           title="Left Front" />
         <TireInfo temp={temps[1]}
@@ -42,7 +44,7 @@ export function TireTemps(props: TireTempsProps) {
           title="Left Rear" />
         <TireInfo temp={temps[3]}
           title="Right Rear" />
-      </Row>
+      </Row> */}
     </AppBarContainer>
   )
 }

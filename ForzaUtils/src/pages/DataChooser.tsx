@@ -40,9 +40,6 @@ export function DataChooser(props: DataChooserProps) {
   }, [styles.cardButtonTitle, styles.cardButtonBody]);
 
   const dataElements = useMemo(() => [
-    <AvgSuspensionTravel key="avgSuspension" />, 
-    <AvgTireTemps key="avgTireTemps" />, 
-    <SlipAngle key="slipAngle" />, 
     <View key="row1" style={{ flexDirection: 'row' }}>
       <CardButton
         title='HP / TQ Graph'

@@ -8,6 +8,7 @@ import { SteeringChart } from "./SteeringChart";
 import { TireSlip } from "./TireSlip";
 import { ScrollView } from "react-native";
 import { TireData } from "ForzaTelemetryApi";
+import { SlipAngle } from "../../components/Graphs/SlipAngle";
 
 export interface GripProps {
   // Nothing
@@ -41,11 +42,7 @@ export function Grip(props: GripProps) {
           throttle={brakeThrottle.throttle} />
         <SteeringChart
           steeringAngle={steering} />
-        <TireSlip
-          leftFront={tireSlipData.leftFront}
-          rightFront={tireSlipData.rightFront}
-          leftRear={tireSlipData.leftRear}
-          rightRear={tireSlipData.rightRear} />
+        <SlipAngle key={'slipAngle'} />
       </ScrollView>
     </AppBarContainer>
   )
