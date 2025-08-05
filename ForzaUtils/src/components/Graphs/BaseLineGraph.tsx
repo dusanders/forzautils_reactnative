@@ -163,10 +163,7 @@ function themeStyles() {
     },
     paper: {
       width: '95%',
-      marginBottom: 5,
       padding: 0,
-      paddingBottom: 4,
-      paddingTop: 4,
       flex: 1, // Add flex to fill available space
       display: 'flex',
       justifyContent: 'center' // Center content vertically
@@ -183,6 +180,8 @@ function themeStyles() {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-evenly',
+      margin: 0,
+      padding: 0
     },
     labelIcon: {
       width: 12,
