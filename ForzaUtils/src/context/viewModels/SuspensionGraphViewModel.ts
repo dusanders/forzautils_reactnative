@@ -11,6 +11,10 @@ export interface ISuspensionGraphViewModel {
   rightFront: number;
   rightRear: number;
   windowSize: number;
+  leftFrontWindow: number[];
+  rightFrontWindow: number[];
+  leftRearWindow: number[];
+  rightRearWindow: number[];
   avgTravel: AxleData<number>[];
   avgTravelMin: number;
   avgTravelMax: number;
@@ -18,7 +22,7 @@ export interface ISuspensionGraphViewModel {
 
 export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
-  const windowSize = 50;
+  const windowSize = 40;
   const replay = useReplay();
   const network = useNetworkContext();
   const [forza, setForza] = useState<ITelemetryData | null>(null);
@@ -27,6 +31,31 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
     windowSize,
     (data) => Math.min(data.front, data.rear),
     (data) => Math.max(data.front, data.rear),
+    []
+  );
+
+  const frontLeftWindow = useDataWindow<number>(
+    windowSize,
+    (data) => data,
+    (data) => data,
+    []
+  );
+  const frontRightWindow = useDataWindow<number>(
+    windowSize,
+    (data) => data,
+    (data) => data,
+    []
+  );
+  const rearLeftWindow = useDataWindow<number>(
+    windowSize,
+    (data) => data,
+    (data) => data,
+    []
+  );
+  const rearRightWindow = useDataWindow<number>(
+    windowSize,
+    (data) => data,
+    (data) => data,
     []
   );
 
@@ -39,6 +68,10 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
         front: (forza.normalizedSuspensionTravel.leftFront + forza.normalizedSuspensionTravel.rightFront) / 2,
         rear: (forza.normalizedSuspensionTravel.leftRear + forza.normalizedSuspensionTravel.rightRear) / 2
       });
+      frontLeftWindow.add(forza.normalizedSuspensionTravel.leftFront);
+      frontRightWindow.add(forza.normalizedSuspensionTravel.rightFront);
+      rearLeftWindow.add(forza.normalizedSuspensionTravel.leftRear);
+      rearRightWindow.add(forza.normalizedSuspensionTravel.rightRear);
     }
   }, [forza?.normalizedSuspensionTravel]);
 
@@ -89,6 +122,10 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
     rightFront: rightFront,
     rightRear: rightRear,
     windowSize: windowSize,
+    leftFrontWindow: frontLeftWindow.data,
+    rightFrontWindow: frontRightWindow.data,
+    leftRearWindow: rearLeftWindow.data,
+    rightRearWindow: rearRightWindow.data,
     avgTravel: avgTravelWindow.data,
     avgTravelMin: avgTravelWindow.min,
     avgTravelMax: avgTravelWindow.max

@@ -1,132 +1,73 @@
-import React, { useMemo } from "react";
-import { StyleSheet } from "react-native";
+import React, { useCallback } from "react";
+import { ScrollView } from "react-native";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
-import { BarChart } from "react-native-chart-kit";
-import { ChartData, Dataset } from "react-native-chart-kit/dist/HelperTypes";
-import { Paper } from "../../components/Paper";
-import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigation } from "../../types/types";
-import { withScaledWindow } from "../../hooks/withScaledWindow";
-import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
-import { AvgSuspensionTravel } from "../../components/Graphs/AvgSuspensionTravel";
+import { useThemeColors } from "../../hooks/ThemeState";
 import { AvgSuspensionGraph } from "../../components/Graphs/AvgSuspensionGraph";
+import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 
 export interface SuspensionTravelProps {
   // Nothing
 }
 
-export function SuspensionTravel(props: SuspensionTravelProps) {
-  const getDataSets = (toDisplay: number[]): Dataset[] => {
-    return [
-      {
-        data: toDisplay
-      },
-      {
-        data: [100, 0],
-        withDots: false
-      }
-    ]
-  }
-  const frontLabels = [
-    'Left Front',
-    'Right Front',
-  ]
-  const rearLabels = [
-    'Left Rear',
-    'Right Rear'
-  ]
-  const store = useViewModelStore();
-  const viewModel = store.suspensionGraph;
-  const navigation = useNavigation<StackNavigation>();
-  const theme = themeService().theme;
-  const dimensions = withScaledWindow(0.9, 0.3);
-  const style = themeStyles();
+export const SuspensionTravel = React.memo((props: SuspensionTravelProps) => {
+  const theme = useThemeColors();
+  const viewModel = useViewModelStore().suspensionGraph;
 
-  const frontChartData = useMemo<ChartData>(() => {
-    return {
-      labels: frontLabels,
-      datasets: getDataSets([viewModel.leftFront, viewModel.rightFront])
+  // Memoize getData functions to prevent recreation
+  const avgData = useCallback(() => [
+    {
+      points: viewModel.avgTravel.map((point) => point.front),
+      color: theme.colors.text.primary.onPrimary,
+      label: 'Front Avg Travel'
+    },
+    {
+      points: viewModel.avgTravel.map((point) => point.rear),
+      color: theme.colors.text.secondary.onPrimary,
+      label: 'Rear Avg Travel'
     }
-  }, [viewModel.leftFront, viewModel.rightFront]);
+  ], [viewModel.avgTravel, theme.colors.text.primary.onPrimary, theme.colors.text.secondary.onPrimary]);
 
-  const rearChartData = useMemo<ChartData>(() => {
-    return {
-      labels: rearLabels,
-      datasets: getDataSets([viewModel.leftRear, viewModel.rightRear])
+  const leftFrontData = useCallback(() => [
+    {
+      points: viewModel.leftFrontWindow,
+      color: theme.colors.text.primary.onPrimary,
+      label: 'Left Front Travel'
     }
-  }, [viewModel.leftRear, viewModel.rightRear]);
+  ], [viewModel.leftFrontWindow, theme.colors.text.primary.onPrimary]);
+
+  const rightFrontData = useCallback(() => [
+    {
+      points: viewModel.rightFrontWindow,
+      color: theme.colors.text.primary.onPrimary,
+      label: 'Right Front Travel'
+    }
+  ], [viewModel.rightFrontWindow, theme.colors.text.primary.onPrimary]);
+
+  const leftRearData = useCallback(() => [
+    {
+      points: viewModel.leftRearWindow,
+      color: theme.colors.text.primary.onPrimary,
+      label: 'Left Rear Travel'
+    }
+  ], [viewModel.leftRearWindow, theme.colors.text.primary.onPrimary]);
+
+  const rightRearData = useCallback(() => [
+    {
+      points: viewModel.rightRearWindow,
+      color: theme.colors.text.primary.onPrimary,
+      label: 'Right Rear Travel'
+    }
+  ], [viewModel.rightRearWindow, theme.colors.text.primary.onPrimary]);
 
   return (
-    <AppBarContainer
-      title="Suspension Travel">
-      <AvgSuspensionTravel key={'avgSuspensionTravel'} />
-      <AvgSuspensionGraph />
-      <AvgSuspensionGraph />
-      <AvgSuspensionGraph />
-      <AvgSuspensionGraph />
-      {/* <Paper style={style.content}>
-        <BarChart
-          style={{
-            marginBottom: 0,
-            paddingBottom: 0
-          }}
-          flatColor
-          fromZero
-          fromNumber={65}
-          withInnerLines={false}
-          data={frontChartData}
-          height={dimensions.height}
-          width={dimensions.width}
-          yAxisLabel=""
-          xAxisLabel=""
-          yAxisSuffix=""
-          chartConfig={{
-            color: (opacity, index) => {
-              return index === 2 ? '' : theme.colors.text.primary.onPrimary
-            },
-            backgroundGradientFromOpacity: 0,
-            backgroundGradientToOpacity: 0,
-            width: 400,
-          }} />
-      </Paper>
-      <Paper style={style.content}>
-        <BarChart
-          style={{
-            marginBottom: 0,
-            paddingBottom: 0
-          }}
-          flatColor
-          fromZero
-          withInnerLines={false}
-          data={rearChartData}
-          height={dimensions.height}
-          width={dimensions.width}
-          yAxisLabel=""
-          xAxisLabel=""
-          yAxisSuffix=""
-          fromNumber={65}
-          chartConfig={{
-            color: (opacity, index) => {
-              return theme.colors.text.primary.onPrimary
-            },
-            backgroundGradientFromOpacity: 0,
-            backgroundGradientToOpacity: 0,
-          }} />
-      </Paper> */}
+    <AppBarContainer title="Suspension Travel">
+      <ScrollView>
+        <AvgSuspensionGraph getData={avgData} />
+        <AvgSuspensionGraph getData={leftFrontData} />
+        <AvgSuspensionGraph getData={rightFrontData} />
+        <AvgSuspensionGraph getData={leftRearData} />
+        <AvgSuspensionGraph getData={rightRearData} />
+      </ScrollView>
     </AppBarContainer>
-  )
-}
-
-function themeStyles() {
-  return invokeWithTheme((theme) => StyleSheet.create({
-    content: {
-      width: '95%',
-      justifyContent: 'center',
-      alignItems: 'center',
-      alignSelf: 'center',
-      paddingBottom: 0,
-      marginBottom: theme.sizes.borderRadius
-    }
-  }));
-}
+  );
+});

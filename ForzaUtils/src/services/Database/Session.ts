@@ -3,6 +3,7 @@ import { ITelemetryData } from "ForzaTelemetryApi";
 import { ISession, ISessionInfo, SESSION_DB_NAME_PREFIX, DB_FILE_EXT, MASTER_DB_NAME } from "./DatabaseInterfaces";
 import { ILogger, Logger } from '../../context/Logger';
 import { FileSystem } from 'react-native-file-access';
+import { delay } from '../../types/types';
 
 /**
  * Structure of the packet data in the database
@@ -52,6 +53,7 @@ export class Session implements ISession {
   async* readPacket(offset?: number): AsyncGenerator<ITelemetryData | null, void, number> {
     this.currentReadOffset = offset !== undefined ? offset : this.currentReadOffset;
     while (this.currentReadOffset < this.info.length) {
+      await delay(20);
       const found = await this.executeQuery(
         `SELECT * FROM packets WHERE id = ?`,
         [this.currentReadOffset++]
@@ -60,12 +62,9 @@ export class Session implements ISession {
         const casted = found.rows[0] as any as IPacketData;
         if (casted.json && casted.json.length > 0) {
           yield JSON.parse(casted.json);
-        } else {
-          // Skip invalid/empty JSON, but don't yield null here
-        }
+        } 
       } 
     }
-    // Generator ends naturally when loop exits (no more packets)
   }
 
   async addPacket(packet: ITelemetryData): Promise<void> {

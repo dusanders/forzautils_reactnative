@@ -5,7 +5,6 @@ import { ISessionInfo, ISession } from "../services/Database/DatabaseInterfaces"
 import { ITelemetryData } from "ForzaTelemetryApi";
 import EventEmitter, { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 import { Semaphore } from "../types/Semaphore";
-import { useNetworkContext } from "./Network";
 
 
 export enum ReplayState {
@@ -56,7 +55,6 @@ export function RecorderProvider(props: RecorderProviderProps) {
   const logger = useLogger();
   const dbService = useRef(DatabaseService.getInstance());
   const eventEmitter = useRef<EventEmitter>(new EventEmitter());
-  const controlSemaphore = useRef<Semaphore>(new Semaphore(1));
   const currentFile = useRef<ISession>(undefined);
   const fileReadStream = useRef<AsyncGenerator<ITelemetryData | null, void, number>>();
   const [replayState, setReplayState] = useState<ReplayState>(ReplayState.PAUSED);
@@ -103,42 +101,33 @@ export function RecorderProvider(props: RecorderProviderProps) {
   }, []);
 
   const closeRecording = async () => {
-    await controlSemaphore.current.acquire();
     if (currentFile.current) {
       currentFile.current.close();
       currentFile.current = undefined;
     }
     setReplayState(ReplayState.PAUSED);
-    controlSemaphore.current.release();
   };
 
   const resume = async () => {
-    await controlSemaphore.current.acquire();
     if (currentFile.current) {
       setReplayState(ReplayState.PLAYING);
       replayPosition.current = currentFile.current.currentReadOffset;
     }
-    controlSemaphore.current.release();
   };
 
   const restart = async () => {
-    await controlSemaphore.current.acquire();
     if (currentFile.current) {
       loadReplay(currentFile.current.info);
     }
-    controlSemaphore.current.release();
   };
 
   const pause = async () => {
-    await controlSemaphore.current.acquire();
     if (currentFile.current) {
       setReplayState(ReplayState.PAUSED);
     }
-    controlSemaphore.current.release();
   };
 
   const closeReplay = async () => {
-    await controlSemaphore.current.acquire();
     if (currentFile.current) {
       currentFile.current.close();
       currentFile.current = undefined;
@@ -147,11 +136,9 @@ export function RecorderProvider(props: RecorderProviderProps) {
     eventEmitter.current.removeAllListeners(PACKET_EVENT);
     replayPosition.current = 0;
     setReplayLength(0);
-    controlSemaphore.current.release();
   };
 
   const play = async () => {
-    await controlSemaphore.current.acquire();
     if (replayInterval) {
       clearInterval(replayInterval);
     }
@@ -161,7 +148,6 @@ export function RecorderProvider(props: RecorderProviderProps) {
           fileReadStream.current = currentFile.current.readPacket(0);
         }
         const packet = await fileReadStream.current?.next();
-        logger.debug(tag, `Reader is done: ${packet?.done}`);
         if (!packet?.done) {
           replayPosition.current = currentFile.current.currentReadOffset;
           eventEmitter.current.emit(PACKET_EVENT, packet?.value, replayPosition.current);
@@ -171,7 +157,6 @@ export function RecorderProvider(props: RecorderProviderProps) {
         }
       }
     }, replayDelay);
-    controlSemaphore.current.release();
   }
 
   useEffect(() => {

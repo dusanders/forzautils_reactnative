@@ -1,18 +1,39 @@
 import React, { useMemo } from 'react';
-import { useViewModelStore } from '../../context/viewModels/ViewModelStore';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { CardContainer } from '../CardContainer';
 import { invokeWithTheme, themeService } from '../../hooks/ThemeState';
 import { LineChart } from 'react-native-chart-kit';
 
+export interface SuspensionData {
+  points: number[];
+  color: string;
+  label: string;
+}
 export interface AvgSuspensionGraphProps {
-
+  data?: SuspensionData[];
+  getData(): SuspensionData[];
 }
 
 export function AvgSuspensionGraph(props: AvgSuspensionGraphProps) {
   const styles = themeStyles();
-  const viewModel = useViewModelStore().suspensionGraph;
   const theme = themeService().theme;
+  
+  // Memoize the raw data to avoid recomputing on every render
+  const rawData = useMemo(() => props.getData(), [props.getData]);
+  
+  // Memoize the chart data structure
+  const chartData = useMemo(() => ({
+    labels: [],
+    datasets: rawData.map((dataset) => ({
+      data: dataset.points,
+      color: (opacity = 1) => dataset.color,
+      strokeWidth: 1,
+    })),
+  }), [rawData]);
+  
+  // Memoize labelData for reactivity
+  const labelData = useMemo(() => rawData, [rawData]);
+  
 
   return (
     <CardContainer
@@ -20,7 +41,10 @@ export function AvgSuspensionGraph(props: AvgSuspensionGraphProps) {
       style={styles.card}>
       <LineChart
         chartConfig={{
-          backgroundColor: theme.colors.card.borderColor,
+          backgroundColor: theme.colors.background.primary,
+          backgroundGradientFrom: theme.colors.background.primary,
+          backgroundGradientTo: theme.colors.background.primary,
+          decimalPlaces: 2,
           propsForBackgroundLines: {
             stroke: 0
           },
@@ -38,52 +62,32 @@ export function AvgSuspensionGraph(props: AvgSuspensionGraphProps) {
         withShadow={false}
         width={Dimensions.get('window').width * 0.98} // from react-native
         height={160}
-        style={{
-          borderRadius: theme.sizes.borderRadius,
-          paddingHorizontal: 0,
-          marginLeft: 0
-        }}
-        data={{
-          labels: [],
-          datasets: [
-            {
-              data: viewModel.avgTravel.map((point) => point.front),
-              color: (opacity = 1) => theme.colors.text.primary.onPrimary,
-              strokeWidth: 1,
-            },
-            {
-              data: viewModel.avgTravel.map((point) => point.rear),
-              color: (opacity = 1) => theme.colors.text.secondary.onPrimary,
-              strokeWidth: 1,
-            },
-          ],
-        }}
+        style={styles.chart}
+        data={chartData}  // Use the memoized data
       />
       <View style={styles.labelRow}>
-        <View style={styles.labelView}>
-          <View style={{
-            ...styles.labelIcon,
-            backgroundColor: theme.colors.text.primary.onPrimary
-          }} />
-          <Text style={styles.labelText}>
-            Front Avg Travel
-          </Text>
-        </View>
-        <View style={styles.labelView}>
-          <View style={{
-            ...styles.labelIcon,
-            backgroundColor: theme.colors.text.secondary.onPrimary
-          }} />
-          <Text style={styles.labelText}>
-            Rear Avg Travel
-          </Text>
-        </View>
+        {labelData.map((dataset) => (
+          <View style={styles.labelView} key={dataset.label}>
+            <View style={{
+              ...styles.labelIcon,
+              backgroundColor: dataset.color
+            }} />
+            <Text style={styles.labelText}>
+              {dataset.label}
+            </Text>
+          </View>
+        ))}
       </View>
     </CardContainer>
   );
 }
 function themeStyles() {
   return invokeWithTheme((theme) => StyleSheet.create({
+    chart: {
+      height: 160,
+      width: Dimensions.get('window').width * 0.98,
+      borderRadius: theme.sizes.borderRadius,
+    },
     card: {
       height: 180,
       width: '100%',
