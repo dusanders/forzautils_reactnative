@@ -3,7 +3,7 @@ import { ColorValue, StyleSheet, View } from "react-native";
 import { ProgressChart } from "react-native-chart-kit";
 import { ThemeText } from "../../components/ThemeText";
 import { Row } from "../../components/Row";
-import { GlobalStyles } from "../../constants/Themes";
+import { GlobalStyles } from "../../types/Themes";
 
 export interface BrakeThrottleChartProps {
   throttle: number;

@@ -1,5 +1,5 @@
 import { Drivetrain } from "ForzaTelemetryApi";
-import { AxleData } from "../../../constants/types";
+import { AxleData } from "../../../types/types";
 import { ITuningCalculator, CalculatorParams, CalculatorResult, hzBase, EngineLayout, hzHighHeight, hzLowHeight } from "./Calculators";
 
 export class GrokCalculator implements ITuningCalculator {

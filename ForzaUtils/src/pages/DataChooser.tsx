@@ -1,30 +1,28 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useEffect } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import { AppRoutes, StackNavigation } from "../constants/types";
+import { AppRoutes, StackNavigation } from "../types/types";
 import { TextCard } from "../components/TextCard";
 import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
 import { TrackMap } from "../components/TrackMap";
-import { AvgSuspensionTravel } from "../components/Graphs/AvgSuspensionTravel";
-import { AvgTireTemps } from "../components/Graphs/AvgTireTemp";
 import { useLogger } from "../context/Logger";
 import { ReplayState, useReplayControls } from "../context/Recorder";
 import { invokeWithTheme } from "../hooks/ThemeState";
-import { SlipAngle } from "../components/Graphs/SlipAngle";
 import { ThemeText } from "../components/ThemeText";
 import { ThemeSwitch } from "../components/ThemeSwitch";
+import { useNetworkContext } from "../context/Network";
 
 export interface DataChooserProps {
 
 }
 
 export function DataChooser(props: DataChooserProps) {
-  const tag = 'DataChooser.tsx';
+  const tag = "DataChooser.tsx";
   const styles = themeStyles();
   const logger = useLogger();
   const navigation = useNavigation<StackNavigation>();
   const replay = useReplayControls();
-  logger.debug(tag, 'Rendering DataChooser');
+  const forza = useNetworkContext();
 
   const CardButton = useMemo(() => ({ title, body, onPress }: { title: string, body: string, onPress: () => void }) => {
     return (
@@ -68,24 +66,40 @@ export function DataChooser(props: DataChooserProps) {
     } else {
       replay.closeRecording();
     }
-  }, [replay]);
+  }, [replay.replayState]);
 
-  const getFlyoutOptions = useCallback(() => (
-    replay.replayState === ReplayState.RECORDING || replay.replayState === ReplayState.IDLE
-      ? [{
-          id: 'record-button',
-          onPress: () => {},
-          renderItem: () => (
-            <>
-              <ThemeText variant='primary' onBackground='onSecondary'>Record</ThemeText>
-              <ThemeSwitch
-                value={replay.replayState === ReplayState.RECORDING}
-                onChange={() => setRecording()} />
-            </>
-          )
-        }]
-      : []
-  ), [replay.replayState, setRecording]);
+  useEffect(() => {
+    logger.log(tag, `ForzaUtils isDEBUG mode: ${forza.isDEBUG}`);
+  }, [forza.isDEBUG]);
+  logger.log(tag, `Rendering DataChooser.tsx`);
+
+  const getFlyoutOptions = useCallback(() => ([{
+    id: 'record-button',
+    onPress: () => { },
+    renderItem: () => (
+      <View style={{ flexDirection: 'column' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <ThemeText variant='primary' onBackground='onSecondary'>Record</ThemeText>
+          <ThemeSwitch
+            value={replay.replayState === ReplayState.RECORDING}
+            onChange={() => setRecording()} />
+        </View>
+        <View style={{ flexDirection: 'row', marginTop: 8, alignItems: 'center' }}>
+          <ThemeText variant='primary' onBackground='onSecondary'>Debug Mode</ThemeText>
+          <ThemeSwitch
+            value={forza.isDEBUG}
+            onChange={() => {
+              if (forza.isDEBUG) {
+                forza.STOP_DEBUG();
+              } else {
+                forza.DEBUG();
+              }
+            }} />
+        </View>
+      </View>
+    )
+  }]
+  ), [replay.replayState, setRecording, forza.isDEBUG]);
 
   return (
     <AppBarContainer

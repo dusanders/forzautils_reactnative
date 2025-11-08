@@ -1,10 +1,10 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React from "react";
-import { AppRoutes, RootStackParamList } from "../../constants/types";
+import { AppRoutes, RootStackParamList } from "../../types/types";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { Dropdown } from "../../components/Dropdown";
 import { themeService } from "../../hooks/ThemeState";
-import { ThemeType } from "../../constants/Themes";
+import { ThemeType } from "../../types/Themes";
 import { CalculatorTypes } from "../../context/viewModels/Tuning/Calculators";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 

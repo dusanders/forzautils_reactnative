@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ICache } from "../constants/types";
+import { ICache } from "../types/types";
 
 export interface ICacheStore {
   getItem<T extends ICache<T>>(key: string): Promise<T | null>;

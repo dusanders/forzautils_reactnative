@@ -1,7 +1,8 @@
-import { useEffect, useMemo } from "react";
-import { TireData } from "ForzaTelemetryApi";
-import { packetService } from "../../hooks/PacketState";
-import { AxleData, useDataWindow } from "../../constants/types";
+import { useEffect, useMemo, useState } from "react";
+import { ITelemetryData, TireData } from "ForzaTelemetryApi";
+import { AxleData, useDataWindow } from "../../types/types";
+import { useNetworkContext } from "../Network";
+import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 
 
 export interface IGripViewModel {
@@ -16,7 +17,8 @@ export interface IGripViewModel {
 }
 
 export function useGripViewModel(): IGripViewModel {
-  const forza = packetService().packet;
+  const network = useNetworkContext();
+  const [forza, setForza] = useState<ITelemetryData | null>(null);
   const windowSize = 50;
   const slipAngleWindow = useDataWindow<AxleData<number>>(
     windowSize,
@@ -51,7 +53,7 @@ export function useGripViewModel(): IGripViewModel {
   }, [forza?.tireSlipRatio]);
 
   useEffect(() => {
-    if(!forza || !forza.isRaceOn) {
+    if (!forza || !forza.isRaceOn) {
       return;
     }
     const data: TireData = {
@@ -65,6 +67,18 @@ export function useGripViewModel(): IGripViewModel {
       rear: (data.leftRear + data.rightRear) / 2,
     });
   }, [forza?.tireSlipAngle]);
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (network) {
+      packetSub = network.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [network]);
 
   return {
     steering: steering,

@@ -6,7 +6,7 @@ import { Container } from "../Container";
 import { AppBarSettingsButtonParams, AppSettingsButton } from "./AppSettingsButton";
 import { invokeWithTheme } from "../../hooks/ThemeState";
 import { useNavigation } from "@react-navigation/native";
-import { AppRoutes, StackNavigation } from "../../constants/types";
+import { AppRoutes, StackNavigation } from "../../types/types";
 
 export const AppBarTestID = {
   root: 'app-bar-root',

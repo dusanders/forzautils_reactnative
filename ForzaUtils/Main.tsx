@@ -7,21 +7,24 @@ import { CacheProvider } from "./src/context/Cache";
 import { RecorderProvider } from "./src/context/Recorder";
 import { Provider } from "react-redux";
 import { AppStore } from "./src/redux/AppStore";
+import { WifiProvider } from "./src/context/Wifi";
 
 function Main() {
   return (
     <Provider store={AppStore}>
-      <CacheProvider>
-        <PermissionsWatcher>
-          <RecorderProvider>
-            <NetworkWatcher>
-              <ViewModelStore_Hoc>
-                <App />
-              </ViewModelStore_Hoc>
-            </NetworkWatcher>
-          </RecorderProvider>
-        </PermissionsWatcher>
-      </CacheProvider>
+      <WifiProvider>
+        <CacheProvider>
+          <PermissionsWatcher>
+            <RecorderProvider>
+              <NetworkWatcher>
+                <ViewModelStore_Hoc>
+                  <App />
+                </ViewModelStore_Hoc>
+              </NetworkWatcher>
+            </RecorderProvider>
+          </PermissionsWatcher>
+        </CacheProvider>
+      </WifiProvider>
     </Provider>
   )
 }

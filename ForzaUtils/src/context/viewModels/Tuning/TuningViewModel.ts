@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useCache } from "../../Cache";
 import { useLogger } from "../../Logger";
 import { CalculatorParams, CalculatorResult, CalculatorTypes, EngineLayout, hzBase, ITuningCalculator } from "./Calculators";
-import { AxleData, ICache } from "../../../constants/types";
+import { AxleData, ICache } from "../../../types/types";
 import { GrokCalculator } from "./GrokCalc";
 import { SonnetCalculator } from "./Sonnet_37";
 import { Grok2Calculator } from "./Grok2";

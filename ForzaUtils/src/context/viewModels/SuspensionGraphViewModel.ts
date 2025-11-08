@@ -1,6 +1,9 @@
-import { useEffect, useMemo } from "react";
-import { AxleData, useDataWindow } from "../../constants/types";
+import { useEffect, useMemo, useState } from "react";
 import { packetService } from "../../hooks/PacketState";
+import { AxleData, useDataWindow } from "../../types/types";
+import { ITelemetryData } from "ForzaTelemetryApi/dist/TelemetryData";
+import { useNetworkContext } from "../Network";
+import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 
 export interface ISuspensionGraphViewModel {
   leftFront: number;
@@ -97,7 +100,9 @@ const debugData = [
 export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
   const windowSize = 50;
-  const forza = packetService().packet;
+  const network = useNetworkContext();
+  const [forza, setForza] = useState<ITelemetryData | null>(null);
+
   const avgTravelWindow = useDataWindow<AxleData<number>>(
     windowSize,
     (data) => Math.min(data.front, data.rear),
@@ -133,6 +138,18 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
     forza?.normalizedSuspensionTravel?.rightRear || 0,
     [forza?.normalizedSuspensionTravel?.rightRear]
   );
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (network) {
+      packetSub = network.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [network]);
 
   return {
     leftFront: leftFront,

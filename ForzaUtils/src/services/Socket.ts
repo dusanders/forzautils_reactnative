@@ -2,23 +2,28 @@ import { ForzaTelemetryApi, getRandomTelemetryData, ITelemetryData } from "Forza
 import UdpSockets from "react-native-udp";
 import UdpSocket from "react-native-udp/lib/types/UdpSocket";
 import { ILogger } from "../context/Logger";
-import { Upd_rinfo } from "../constants/types";
+import { Upd_rinfo } from "../types/types";
+import EventEmitter, { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 
-export interface ISocketCallback {
-  onError(error: Error): void;
-  onClose(ev: Error | unknown): void;
-  onPacket(packet: ITelemetryData): void;
+export enum SocketEventType {
+  ERROR = "error",
+  CLOSE = "close",
+  PACKET = "packet"
 }
 
 export interface ISocket {
+  onErrorEvent(fn: (error: Error) => void): EmitterSubscription;
+  onCloseEvent(fn: (ev: Error | unknown) => void): EmitterSubscription;
+  onPacketEvent(fn: (packet: ITelemetryData) => void): EmitterSubscription;
   DEBUG(): void;
   STOP_DEBUG(): void;
-  bind(port: number, callbacks: ISocketCallback): Promise<number>;
+  bind(port: number): Promise<number>;
   close(): void;
 }
 
 export class Socket implements ISocket {
   private static instance: Socket | undefined;
+  private static DEBUG_INTERVAL_MS = 20;
   static getInstance(logger: ILogger) {
     if (!Socket.instance) {
       Socket.instance = new Socket(logger);
@@ -27,24 +32,32 @@ export class Socket implements ISocket {
   }
   private tag = "Socket.tsx";
   private udpSocket?: UdpSocket;
-  private callbacks?: ISocketCallback;
+  private eventEmitter: EventEmitter = new EventEmitter();
   private logger: ILogger;
   private debugInterval?: NodeJS.Timeout;
+  private doDebug = false;
 
   constructor(logger: ILogger) {
     this.logger = logger
   }
 
-  bind(port: number, callbacks: ISocketCallback): Promise<number> {
+  onErrorEvent(fn: (error: Error) => void): EmitterSubscription {
+    return this.eventEmitter.addListener(SocketEventType.ERROR, fn);
+  }
+  onCloseEvent(fn: (ev: Error | unknown) => void): EmitterSubscription {
+    return this.eventEmitter.addListener(SocketEventType.CLOSE, fn);
+  }
+  onPacketEvent(fn: (packet: ITelemetryData) => void): EmitterSubscription {
+    return this.eventEmitter.addListener(SocketEventType.PACKET, fn);
+  }
+
+  bind(port: number): Promise<number> {
     return new Promise((resolve, reject) => {
       // If we already have a socket...
       if (this.udpSocket) {
-        // update the callbacks and return the current use port
-        this.callbacks = callbacks;
         return resolve(this.udpSocket?.address().port || 0);
       }
       
-      this.callbacks = callbacks;
       const bindErrorHandler = (e: Error | any) => {
         this.udpSocket = undefined;
         reject(new Error(`Failed to bind: ${e?.message}`));
@@ -83,19 +96,24 @@ export class Socket implements ISocket {
     this.udpSocket = undefined;
   }
   DEBUG(): void {
-    this.debugInterval = setInterval(() => {
+    this.doDebug = true;
+    this.debugInterval = setTimeout(() => {
       const randomPacket = getRandomTelemetryData();
-      this.callbacks?.onPacket(randomPacket);
-    }, 100);
+      this.eventEmitter.emit(SocketEventType.PACKET, randomPacket);
+      if (this.doDebug) {
+        this.DEBUG();
+      }
+    }, Socket.DEBUG_INTERVAL_MS);
   }
   STOP_DEBUG(): void {
-    if(this.debugInterval) {
-      clearInterval(this.debugInterval);
+    this.doDebug = false;
+    if (this.debugInterval) {
+      clearTimeout(this.debugInterval);
       this.debugInterval = undefined;
     }
   }
   private errorHandler(ev: Error | any) {
-    this.callbacks?.onError(ev);
+    this.eventEmitter.emit(SocketEventType.ERROR, ev);
     try {
       this.udpSocket?.close();
       this.udpSocket = undefined
@@ -105,12 +123,12 @@ export class Socket implements ISocket {
     }
   }
   private closeHandler(ev: Error | any) {
-    this.callbacks?.onClose(ev);
+    this.eventEmitter.emit(SocketEventType.CLOSE, ev);
     this.udpSocket = undefined;
     this.logger.error(this.tag, `Socket closed: ${ev?.message}`);
   }
   private dataHandler(data: Buffer, rinfo: Upd_rinfo) {
     const forzaPacket = ForzaTelemetryApi.parseData(rinfo.size, data);
-    this.callbacks?.onPacket(forzaPacket);
+    this.eventEmitter.emit(SocketEventType.PACKET, forzaPacket);
   }
 }

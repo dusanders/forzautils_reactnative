@@ -1,7 +1,7 @@
 import React from "react";
 import { Dimensions, FlatList, ScrollView, StyleSheet, View } from "react-native";
 import { LabelText, ThemeText, TitleText } from "../components/ThemeText";
-import { AppRoutes, StackNavigation } from "../constants/types";
+import { AppRoutes, StackNavigation } from "../types/types";
 import { TextCard } from "../components/TextCard";
 import { ThemeButton } from "../components/ThemeButton";
 import { ThemeIcon } from "../components/ThemeIcon";
@@ -9,8 +9,8 @@ import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { Row } from "../components/Row";
 import { useNavigation } from "@react-navigation/native";
 import { CircleCheckIcon } from "../components/CircleCheckIcon";
-import { wifiService } from "../hooks/WifiState";
-import { localeService } from "../hooks/LocaleState";
+import { useWifi } from "../context/Wifi";
+import { useNetworkContext } from "../context/Network";
 
 export interface WifiInfoProps {
   // None
@@ -18,10 +18,10 @@ export interface WifiInfoProps {
 
 export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps> {
   const tag = "WifiInfo.tsx";
-  const wifiVm = wifiService();
+  const wifi = useWifi();
+  const network = useNetworkContext();
   const styles = themeStyles();
   const navigation = useNavigation<StackNavigation>();
-  const localeVM = localeService();
 
   return (
     <AppBarContainer hideBack>
@@ -65,13 +65,13 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
               allcapsLabel
               allcapsTitle
               centerContent
-              title={wifiVm.wifi.ip || '-'}
+              title={wifi.ipString || '-'}
               body="IP Address" />
             <TextCard
               allcapsLabel
               allcapsTitle
               centerContent
-              title={`${wifiVm.wifi.port || '-'}`}
+              title={`${network.port || '-'}`}
               body="Port" />
           </Row>
           <Row>
@@ -79,7 +79,7 @@ export function WifiInfo(props: WifiInfoProps): React.ReactElement<WifiInfoProps
               allcapsLabel
               allcapsTitle
               centerContent
-              title={wifiVm.wifi.isUdpListening ? 'Listening' : 'Error'}
+              title={network.isUDPListening ? 'Listening' : 'Error'}
               body="Forza Data" />
             <TextCard
               allcapsLabel

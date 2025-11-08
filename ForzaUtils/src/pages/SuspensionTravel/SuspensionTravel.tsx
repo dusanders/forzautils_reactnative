@@ -6,7 +6,7 @@ import { ChartData, Dataset } from "react-native-chart-kit/dist/HelperTypes";
 import { Paper } from "../../components/Paper";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigation } from "../../constants/types";
+import { StackNavigation } from "../../types/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
 import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
 import { AvgSuspensionTravel } from "../../components/Graphs/AvgSuspensionTravel";

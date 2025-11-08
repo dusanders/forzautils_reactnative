@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
-import { BackgroundVariantType, IThemeElements } from "../constants/Themes";
+import { BackgroundVariantType, IThemeElements } from "../types/Themes";
 import { invokeWithTheme } from "../hooks/ThemeState";
 
 export type ContainerFlex = 'row' | 'column';

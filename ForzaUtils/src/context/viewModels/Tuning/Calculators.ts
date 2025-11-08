@@ -1,5 +1,5 @@
 import { Drivetrain } from "ForzaTelemetryApi";
-import { AxleData } from "../../../constants/types";
+import { AxleData } from "../../../types/types";
 
 export enum CalculatorTypes {
   GROK = "Grok",

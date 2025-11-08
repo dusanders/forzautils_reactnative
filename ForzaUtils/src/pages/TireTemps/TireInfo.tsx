@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
+import { IThemeElements } from "../../types/Themes";
 import { ThemeText } from "../../components/ThemeText";
 import { CardContainer } from "../../components/CardContainer";
 import { themeService } from "../../hooks/ThemeState";

@@ -1,17 +1,22 @@
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useLogger } from './Logger';
-import { addEventListener, NetInfoState, NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
 import { Splash } from '../pages/Splash';
-import { LISTEN_PORT } from '../constants/types';
+import { LISTEN_PORT } from '../types/types';
 import { ITelemetryData } from 'ForzaTelemetryApi';
-import { ISocketCallback, Socket } from '../services/Socket';
-import { wifiService } from '../hooks/WifiState';
-import { packetService } from '../hooks/PacketState';
+import { Socket } from '../services/Socket';
 import { ReplayState, useReplay, useReplayControls } from './Recorder';
+import EventEmitter, { EmitterSubscription } from 'react-native/Libraries/vendor/emitter/EventEmitter';
+import { useWifi } from './Wifi';
+import { packetService } from '../hooks/PacketState';
 
 //#region Definitions
 
 export interface INetworkContext {
+  isUDPListening: boolean;
+  port: number;
+  isDEBUG: boolean;
+  lastPacket?: ITelemetryData;
+  onPacket(fn: (packet: ITelemetryData) => void): EmitterSubscription;
   /**
    * Start a debug stream of randomly generated telemetry packets
    */
@@ -44,6 +49,7 @@ export interface NetworkWatcherProps {
 
 //#endregion
 
+const PACKET_EVENT = 'packet';
 /**
  * Network watcher component
  * @param props Network watcher props
@@ -52,139 +58,102 @@ export interface NetworkWatcherProps {
 export function NetworkWatcher(props: NetworkWatcherProps) {
   const tag = "NetworkWatcher.tsx";
   const logger = useLogger();
-  const wifiVm = wifiService();
-  const packetVm = packetService();
-  const replay = useReplayControls();
+  const replay = useReplay();
+  const wifi = useWifi();
+  const [isUDPListening, setIsUDPListening] = useState(false);
+  const [port, setPort] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const [isDEBUG, setIsDEBUG] = useState(false);
+  const eventEmitter = useRef<EventEmitter>(new EventEmitter());
   const throttledPacket = useRef<ITelemetryData>(undefined);
-  const animationFrameId = useRef<number | undefined>(undefined);
+  const closeSocketEventSub = useRef<EmitterSubscription>(undefined);
+  const errorSocketEventSub = useRef<EmitterSubscription>(undefined);
+  const packetSocketEventSub = useRef<EmitterSubscription>(undefined);
+  const socketRef = useRef<Socket>(undefined);
 
-  /**
-   * Handler for the Socket service instance
-   */
-  const socketCallbacks = useMemo<ISocketCallback>(() => ({
-    onClose: (ev) => {
-      logger.debug(tag, `socket did close ${(ev as Error)?.message}`);
-      wifiVm.setWifi({
-        ...wifiVm.wifi,
-        port: 0
-      })
-    },
-    onError: (ev) => {
-      logger.error(tag, `Socket error: ${ev?.message}`);
-      wifiVm.setWifi({
-        ...wifiVm.wifi,
-        port: 0
-      });
-    },
-    onPacket: (packet) => {
-      if (replay.replayState !== ReplayState.PLAYING) {
-        throttledPacket.current = packet;
-      }
-    }
-  }), [replay, replay.replayState]);
-
-  /**
-   * Close the animation frame request
-   */
-  const closeAnimationFrame = () => {
-    logger.log(tag, `closing animationFrame: ${animationFrameId.current}`);
-    if (animationFrameId.current) {
-      cancelAnimationFrame(animationFrameId.current);
-      animationFrameId.current = undefined;
-    }
-  }
-
-  /**
-   * Update the packet state with the latest throttled packet
-   * This is called at a regular interval to avoid flooding the UI
-   */
-  const updatePacketState = async () => {
-    if (replay.replayState !== ReplayState.PLAYING) {
-      if (throttledPacket.current) {
-        packetVm.setPacket(throttledPacket.current);
-      }
-    }
-    animationFrameId.current = requestAnimationFrame(() => { updatePacketState() });
-  }
-
-  /**
-   * Gather and update the Wifi state
-   */
-  useEffect(() => {
-    let netInfoSub: NetInfoSubscription = addEventListener((state: NetInfoState) => {
-      if (!state || state.type !== NetInfoStateType.wifi) {
-        wifiVm.resetState();
-      } else if (state.type === NetInfoStateType.wifi && state.isConnected) {
-        wifiVm.setWifi({
-          isConnected: true,
-          ip: state.details?.ipAddress || '',
-        })
-      }
+  const onNewPacket = (packet: ITelemetryData) => {
+    logger.log(tag, `New packet received - Lap: ${packet?.lapNumber}, RaceOn: ${packet?.isRaceOn}`);
+    throttledPacket.current = packet;
+    eventEmitter.current.emit(PACKET_EVENT, packet);
+    replay.recordPacket(packet).catch((e) => {
+      logger.error(tag, `Error recording packet: ${e?.message}`);
     });
-    return () => {
-      if (netInfoSub) {
-        netInfoSub();
-      }
-      Socket.getInstance(logger).close();
-      closeAnimationFrame();
-    }
-  }, []);
-
-  /**
-   * Throttle the packet data to avoid flooding the UI
-   */
-  useEffect(() => {
-    if (wifiVm.wifi.isUdpListening) {
-      logger.debug(tag, `Starting packet flush interval`);
-      updatePacketState();
-    } else {
-      logger.debug(tag, `Stopping packet flush interval`);
-      closeAnimationFrame();
-    }
-  }, [wifiVm.wifi.isUdpListening]);
+  };
 
   /**
    * Handle Wifi connection state changes
    */
   useEffect(() => {
-    let socket: Socket | undefined;
     const tryConnect = async () => {
-      socket = Socket.getInstance(logger);
-      let listeningPort = await socket.bind(LISTEN_PORT, socketCallbacks);
-      wifiVm.setWifi({
-        isUdpListening: listeningPort > 0,
-        port: listeningPort,
-      });
+      let listeningPort = await socketRef.current?.bind(LISTEN_PORT);
+      setIsUDPListening(listeningPort !== undefined && listeningPort > 0);
+      setPort(listeningPort || 0);
       setLoaded(true);
     }
-    if (wifiVm.wifi.isConnected) {
+    if (wifi.isWifi) {
+      socketRef.current = Socket.getInstance(logger);
+      closeSocketEventSub.current = socketRef.current.onCloseEvent((ev) => {
+        logger.debug(tag, `socket did close ${(ev as Error)?.message}`);
+        setIsUDPListening(false);
+        setPort(0);
+      })
+      errorSocketEventSub.current = socketRef.current.onErrorEvent((ev) => {
+        logger.error(tag, `Socket error: ${ev?.message}`);
+        setIsUDPListening(false);
+        setPort(0);
+      });
+      packetSocketEventSub.current = socketRef.current.onPacketEvent((packet) => {
+        onNewPacket(packet);
+      });
       logger.debug(tag, `Wifi connected!`);
       tryConnect();
     } else {
       logger.debug(tag, `Wifi disconnected!`);
-      wifiVm.resetState();
-      socket?.close()
+      setPort(0);
+      setIsUDPListening(false);
+      socketRef.current?.close();
+      socketRef.current = undefined;
     }
-  }, [wifiVm.wifi.isConnected]);
+    return () => {
+      closeSocketEventSub.current?.remove();
+      errorSocketEventSub.current?.remove();
+      packetSocketEventSub.current?.remove();
+      socketRef.current = undefined;
+    }
+  }, [wifi.isWifi]);
 
   useEffect(() => {
-    if (replay.replayState === ReplayState.PLAYING) {
-      animationFrameId.current = requestAnimationFrame(() => { updatePacketState() });
+    if (isDEBUG && replay.replayState === ReplayState.PLAYING) {
+      logger.log(tag, `Disabling DEBUG mode due to playback state`);
+      setIsDEBUG(false);
+      Socket.getInstance(logger).STOP_DEBUG();
     }
-  }, [replay.replayState, packetVm]);
+  }, [replay.replayState]);
+
+  logger.log(tag, `Rendering NetworkWatcher.tsx - isUDPListening: ${isUDPListening}, port: ${port}, isDEBUG: ${isDEBUG}`);
 
   return (
     <NetworkContext.Provider value={{
+      isUDPListening: isUDPListening,
+      port: port,
+      isDEBUG: isDEBUG,
+      lastPacket: throttledPacket.current,
+      onPacket: (fn: (packet: ITelemetryData) => void): EmitterSubscription => {
+        return eventEmitter.current.addListener(PACKET_EVENT, fn);
+      },
       DEBUG: () => {
+        logger.log(tag, 'Starting DEBUG mode');
+        setIsDEBUG(true);
         Socket.getInstance(logger).DEBUG();
       },
       STOP_DEBUG: () => {
+        logger.log(tag, 'Stopping DEBUG mode');
+        setIsDEBUG(false);
         Socket.getInstance(logger).STOP_DEBUG();
       }
     }}>
-      {loaded && props.children}
       {!loaded && (<Splash />)}
+      {loaded && props.children}
     </NetworkContext.Provider>
   );
 }

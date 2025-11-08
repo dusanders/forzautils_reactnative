@@ -2,7 +2,6 @@ import { Action, combineReducers, configureStore, Middleware, UnknownAction } fr
 import { ILocaleState } from "../hooks/LocaleState";
 import { IPermissionState } from "../hooks/PermissionState";
 import { IThemeState } from "../hooks/ThemeState";
-import { IWifiState, wifiReducer, wifiSlice } from "./WifiStore";
 import { permissionReducer } from "./PermissionStore";
 import { themeReducer } from "./ThemeStore";
 import { localeReducer, localeSlice } from "./LocaleStore";
@@ -26,12 +25,10 @@ const testMw: Middleware<{}, RootState> = (store) => (next) => (action) => {
 
 export interface AppStoreState {
   permissions: IPermissionState;
-  wifi: IWifiState;
   theme: IThemeState;
   locale: ILocaleState;
 }
 const rootReducer = combineReducers({
-  wifi: wifiReducer,
   permissions: permissionReducer,
   theme: themeReducer,
   locale: localeReducer,

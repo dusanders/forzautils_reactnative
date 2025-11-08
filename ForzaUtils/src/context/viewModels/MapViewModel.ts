@@ -1,7 +1,9 @@
-import { DirectionalData } from "ForzaTelemetryApi";
+import { DirectionalData, ITelemetryData } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
 import { useLogger } from "../Logger";
 import { packetService } from "../../hooks/PacketState";
+import { useNetworkContext } from "../Network";
+import { EmitterSubscription } from "react-native";
 
 export interface PlayerPosition {
   x: number;
@@ -48,7 +50,8 @@ const initialViewBox: SvgViewBoxMeasures = {
 export function useMapViewModel(): IMapViewModel {
   const tag = 'MapViewModel';
   const logger = useLogger();
-  const forza = packetService().packet;
+  const network = useNetworkContext();
+  const [forza, setForza] = useState<ITelemetryData | null>(null);
   const [trackId, setTrackId] = useState(0);
   const [svg, setSvg] = useState('');
   const [viewBox, setViewBox] = useState<SvgViewBoxMeasures>(initialViewBox);
@@ -57,6 +60,19 @@ export function useMapViewModel(): IMapViewModel {
   const isValidNumber = (value: number) => {
     return typeof value === 'number' && !isNaN(value) && isFinite(value);
   }
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (network) {
+      packetSub = network.onPacket((packet) => {
+        logger.log(tag, `New packet received in MapViewModel - Lap: ${packet?.lapNumber}, RaceOn: ${packet?.isRaceOn}`);
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [network]);
 
   useEffect(() => {
     let newMinY = Math.min(viewBox.minY, (position?.y || -1));

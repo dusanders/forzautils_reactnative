@@ -1,5 +1,5 @@
 import { ColorSchemeName } from "react-native";
-import { DarkColors, IThemeElements, LightColors, ThemeType } from "../constants/Themes";
+import { DarkColors, IThemeElements, LightColors, ThemeType } from "../types/Themes";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "./AppStore";

@@ -4,11 +4,11 @@ import { Assets } from "../../assets";
 import { Paper } from "../../components/Paper";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { ThemeText } from "../../components/ThemeText";
-import { randomKey } from "../../constants/types";
+import { randomKey } from "../../types/types";
 import { HpTqCurves } from "./HpTqCurves";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigation } from "../../constants/types";
+import { StackNavigation } from "../../types/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
 import { invokeWithTheme } from "../../hooks/ThemeState";
 

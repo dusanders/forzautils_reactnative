@@ -3,7 +3,7 @@ import {
   View,
 } from 'react-native';
 
-import { AppRoutes, RootStackParamList } from './src/constants/types';
+import { AppRoutes, RootStackParamList } from './src/types/types';
 import { WifiInfo } from './src/pages/WifiInfo';
 import { DataChooser } from './src/pages/DataChooser';
 import { HptqGraph } from './src/pages/HpTqGraph/HpTqGraph';

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLogger } from "../Logger";
-import { delay } from "../../constants/types";
+import { delay } from "../../types/types";
 import { ForzaTelemetryApi, ITelemetryData } from "ForzaTelemetryApi";
 import { packetService } from "../../hooks/PacketState";
+import { useNetworkContext } from "../Network";
+import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 
 export interface IHpTqGraphViewModel {
   gears: GearData[];
@@ -121,7 +123,8 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   }
   const tag = 'HpTqGraphViewModel';
   const logger = useLogger();
-  const forza = packetService().packet;
+  const network = useNetworkContext();
+  const [forza, setForza] = useState<ITelemetryData | null>(null);
   const [gears, setGears] = useState<GearData[]>([]);
 
 
@@ -199,6 +202,18 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
       rpm: roundToNearestRpmRange(packet.rpmData.current)
     }
   }
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (network) {
+      packetSub = network.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [network]);
 
   useEffect(() => {
     if (!ignorePacket()) {

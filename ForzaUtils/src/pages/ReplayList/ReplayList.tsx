@@ -6,7 +6,7 @@ import { ThemeText } from "../../components/ThemeText";
 import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
 import { useReplay } from "../../context/Recorder";
 import { useLogger } from "../../context/Logger";
-import { AppRoutes, RootStackParamList } from "../../constants/types";
+import { AppRoutes, RootStackParamList } from "../../types/types";
 import { DeleteDialog } from "./DeleteDialog";
 import { invokeWithTheme } from "../../hooks/ThemeState";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";

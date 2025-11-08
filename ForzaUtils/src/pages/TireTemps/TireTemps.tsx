@@ -5,7 +5,7 @@ import { Row } from "../../components/Row";
 import { TireInfo } from "./TireInfo";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigation } from "../../constants/types";
+import { StackNavigation } from "../../types/types";
 import { AvgTireTemps } from "../../components/Graphs/AvgTireTemp";
 
 export interface TireTempsProps {

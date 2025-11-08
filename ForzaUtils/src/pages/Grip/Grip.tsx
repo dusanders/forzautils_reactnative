@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigation } from "../../constants/types";
+import { StackNavigation } from "../../types/types";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { BrakeThrottleChart, BrakeThrottleChartProps } from "./BrakeThrottleChart";
 import { SteeringChart } from "./SteeringChart";

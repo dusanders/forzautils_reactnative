@@ -1,6 +1,9 @@
-import { useEffect, useMemo } from "react";
-import { AxleData, useDataWindow } from "../../constants/types";
+import { useEffect, useMemo, useState } from "react";
+import { AxleData, useDataWindow } from "../../types/types";
 import { packetService } from "../../hooks/PacketState";
+import { useNetworkContext } from "../Network";
+import { ITelemetryData } from "ForzaTelemetryApi";
+import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 
 export interface ITireTempViewModel {
   leftFront: number;
@@ -39,7 +42,9 @@ const debugData: AxleData<number>[] = [
 export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 50;
-  const forza = packetService().packet;
+  const network = useNetworkContext();
+  const [forza, setForza] = useState<ITelemetryData | null>(null);
+
   const avgTempWindow = useDataWindow<AxleData<number>>(
     windowSize,
     (data) => Math.min(data.front, data.rear),
@@ -48,7 +53,7 @@ export function useTireTempsViewModel(): ITireTempViewModel {
   );
 
   useEffect(() => {
-    if(!forza || !forza.isRaceOn) {
+    if (!forza || !forza.isRaceOn) {
       return
     }
     if (forza?.tireTemp) {
@@ -81,6 +86,18 @@ export function useTireTempsViewModel(): ITireTempViewModel {
     Number(forza?.tireTemp?.rightRear?.toFixed(2)) || 0,
     [forza?.tireTemp.rightRear]
   );
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (network) {
+      packetSub = network.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [network]);
 
   return {
     leftFront: leftFront,

@@ -1,5 +1,5 @@
 import React from "react";
-import { TextOnBackgroundVariant, TextVariantType } from "../constants/Themes";
+import { TextOnBackgroundVariant, TextVariantType } from "../types/Themes";
 import { StyleProp, Text, TextStyle } from "react-native";
 import { Assets } from "../assets";
 import { themeService } from "../hooks/ThemeState";

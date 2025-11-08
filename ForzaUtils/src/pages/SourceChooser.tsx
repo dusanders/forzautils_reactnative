@@ -3,7 +3,7 @@ import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { StyleSheet, View } from "react-native";
 import { TextCard } from "../components/TextCard";
 import { useNavigation } from "@react-navigation/native";
-import { AppRoutes, StackNavigation } from "../constants/types";
+import { AppRoutes, StackNavigation } from "../types/types";
 import { Row } from "../components/Row";
 import { ThemeText } from "../components/ThemeText";
 import { useLogger } from "../context/Logger";

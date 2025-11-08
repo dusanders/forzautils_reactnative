@@ -1,5 +1,5 @@
-import { IThemeElements, DarkColors, LightColors, ForestTheme, ClaudesTheme, ThemeType } from "../constants/Themes";
 import { atom, useAtomValue, useSetAtom } from "jotai";
+import { ThemeType, IThemeElements, LightColors, DarkColors, ForestTheme, ClaudesTheme } from "../types/Themes";
 
 function getThemeByType(themeType: ThemeType): IThemeElements {
   switch (themeType) {

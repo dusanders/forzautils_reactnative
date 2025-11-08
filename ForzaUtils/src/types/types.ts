@@ -1,8 +1,6 @@
-import { RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ReplayRouteParams } from "../pages/ReplayList/ReplayList";
-import { SettingsProps } from "../pages/Settings/Settings";
 
 /**
  * Add type for generic axle data
