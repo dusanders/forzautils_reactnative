@@ -15,30 +15,7 @@ export interface ITireTempViewModel {
   avgTempWindowMax: number;
   avgTemps: AxleData<number>[];
 }
-const debugData: AxleData<number>[] = [
-  { front: 180, rear: 180 },
-  { front: 180, rear: 180 },
-  { front: 180, rear: 180 },
-  { front: 180, rear: 180 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 198, rear: 195 },
-  { front: 196, rear: 194 },
-  { front: 195, rear: 192 },
-  { front: 198, rear: 193 },
-  { front: 201, rear: 198 },
-  { front: 208, rear: 205 },
-  { front: 210, rear: 207 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 198, rear: 195 },
-  { front: 196, rear: 194 },
-  { front: 195, rear: 192 },
-]
+
 export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 50;

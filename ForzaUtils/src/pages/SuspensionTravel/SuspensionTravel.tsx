@@ -10,6 +10,7 @@ import { StackNavigation } from "../../types/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
 import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
 import { AvgSuspensionTravel } from "../../components/Graphs/AvgSuspensionTravel";
+import { AvgSuspensionGraph } from "../../components/Graphs/AvgSuspensionGraph";
 
 export interface SuspensionTravelProps {
   // Nothing
@@ -60,6 +61,10 @@ export function SuspensionTravel(props: SuspensionTravelProps) {
     <AppBarContainer
       title="Suspension Travel">
       <AvgSuspensionTravel key={'avgSuspensionTravel'} />
+      <AvgSuspensionGraph />
+      <AvgSuspensionGraph />
+      <AvgSuspensionGraph />
+      <AvgSuspensionGraph />
       {/* <Paper style={style.content}>
         <BarChart
           style={{

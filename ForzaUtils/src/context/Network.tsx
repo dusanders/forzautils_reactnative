@@ -71,7 +71,6 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
   const socketRef = useRef<Socket>(undefined);
 
   const onNewPacket = (packet: ITelemetryData) => {
-    logger.log(tag, `New packet received - Lap: ${packet?.lapNumber}, RaceOn: ${packet?.isRaceOn}`);
     throttledPacket.current = packet;
     eventEmitter.current.emit(PACKET_EVENT, packet);
     replay.recordPacket(packet).catch((e) => {

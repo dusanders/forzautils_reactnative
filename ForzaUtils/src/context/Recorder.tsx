@@ -58,6 +58,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
   const eventEmitter = useRef<EventEmitter>(new EventEmitter());
   const controlSemaphore = useRef<Semaphore>(new Semaphore(1));
   const currentFile = useRef<ISession>(undefined);
+  const fileReadStream = useRef<AsyncGenerator<ITelemetryData | null, void, number>>();
   const [replayState, setReplayState] = useState<ReplayState>(ReplayState.PAUSED);
   const [replayDelay, setReplayDelay] = useState<number>(20); // 20 ms
   const replayPosition = useRef<number>(0);
@@ -74,6 +75,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
     }
     let session = await dbService.current.generateSession();
     currentFile.current = session;
+    fileReadStream.current = currentFile.current.readPacket();
     setReplayState(ReplayState.RECORDING);
     return session;
   }, []);
@@ -89,6 +91,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
       return;
     }
     currentFile.current = file;
+    fileReadStream.current = currentFile.current.readPacket();
     setReplayState(ReplayState.PAUSED);
     replayPosition.current = 0;
     setReplayLength(file.info.length);
@@ -154,10 +157,14 @@ export function RecorderProvider(props: RecorderProviderProps) {
     }
     replayInterval = setInterval(async () => {
       if (currentFile.current) {
-        const packet = (await currentFile.current.readPacket()) || undefined;
-        if (packet) {
+        if(currentFile.current.currentReadOffset >= currentFile.current.info.length) {
+          fileReadStream.current = currentFile.current.readPacket(0);
+        }
+        const packet = await fileReadStream.current?.next();
+        logger.debug(tag, `Reader is done: ${packet?.done}`);
+        if (!packet?.done) {
           replayPosition.current = currentFile.current.currentReadOffset;
-          eventEmitter.current.emit(PACKET_EVENT, packet, replayPosition.current);
+          eventEmitter.current.emit(PACKET_EVENT, packet?.value, replayPosition.current);
         } else {
           logger.log(tag, `No more packets to read, stopping replay`);
           setReplayState(ReplayState.PAUSED);

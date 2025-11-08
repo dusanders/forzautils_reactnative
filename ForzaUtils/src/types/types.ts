@@ -1,6 +1,7 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { ReplayRouteParams } from "../pages/ReplayList/ReplayList";
+import { Logger } from "../context/Logger";
 
 /**
  * Add type for generic axle data
@@ -143,6 +144,7 @@ export function useDataWindow<T>(size: number,
   const clear = () => {
     setData([]);
   }
+
   return {
     size,
     min: min,
