@@ -1,18 +1,14 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "../components/ThemeText";
 import { Container } from "../components/Container";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
 
 export interface WifiErrorProps {
 
 }
 
 export function WifiError(props: WifiErrorProps) {
-  const theme = useSelector(getTheme);
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
 
   return (
     <Container style={styles.root}>
@@ -32,7 +28,7 @@ export function WifiError(props: WifiErrorProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
+function themeStyles() {
   return StyleSheet.create({
     root: {
       height: '100%',

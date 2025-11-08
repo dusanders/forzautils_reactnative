@@ -1,9 +1,7 @@
 import React from "react";
 import { StyleProp, StyleSheet, TextInput, View, ViewStyle } from "react-native";
-import { IThemeElements } from "../constants/Themes";
 import { LabelText } from "./ThemeText";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 export interface CardInputProps {
   value: string;
@@ -13,8 +11,7 @@ export interface CardInputProps {
   style?: StyleProp<ViewStyle>;
 }
 export function CardInput(props: CardInputProps) {
-  const theme = useSelector(getTheme);
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
 
   return (
     <View style={[styles.root, props.style]}>
@@ -22,7 +19,7 @@ export function CardInput(props: CardInputProps) {
         value={props.value}
         onChangeText={(text) => props.onChange(text)}
         placeholder={props.placeholder || ""}
-        placeholderTextColor={theme.colors.text.secondary.onSecondary}
+        placeholderTextColor={invokeWithTheme(theme => theme.colors.text.secondary.onSecondary)}
         style={styles.input}
         keyboardType={'numeric'}
         autoCapitalize="none"
@@ -34,8 +31,8 @@ export function CardInput(props: CardInputProps) {
     </View>
   )
 }
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       padding: theme.sizes.paper.padding,
       marginTop: theme.sizes.paper.spacingY / 2,
@@ -60,5 +57,5 @@ function themeStyles(theme: IThemeElements) {
     label: {
       textAlign: 'center',
     }
-  })
+  }));
 }

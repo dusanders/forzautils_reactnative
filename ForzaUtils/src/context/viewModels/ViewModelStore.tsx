@@ -4,7 +4,7 @@ import { ISuspensionGraphViewModel, useSuspensionGraphViewModel } from "./Suspen
 import { ITireTempViewModel, useTireTempsViewModel } from "./TireTempViewModel";
 import { IGripViewModel, useGripViewModel } from "./GripViewModel";
 import { IMapViewModel, useMapViewModel } from "./MapViewModel";
-import { ITuningViewModel, useTuningViewModel } from "./TuningViewModel";
+import { ITuningViewModel, useTuningViewModel } from "./Tuning/TuningViewModel";
 
 export interface IViewModelStore {
   hpTqGraph: IHpTqGraphViewModel;

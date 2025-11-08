@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
 import { ThemeText } from "../ThemeText";
 import { ThemeIcon } from "../ThemeIcon";
 import { Container } from "../Container";
-import { ThemeSwitch } from "../ThemeSwitch";
 import { AppBarSettingsButtonParams, AppSettingsButton } from "./AppSettingsButton";
-import { useSelector } from "react-redux";
-import { getTheme, getThemeType, useSetTheme } from "../../redux/ThemeStore";
+import { invokeWithTheme } from "../../hooks/ThemeState";
+import { useNavigation } from "@react-navigation/native";
+import { AppRoutes, StackNavigation } from "../../types/types";
 
 export const AppBarTestID = {
   root: 'app-bar-root',
@@ -24,15 +23,12 @@ export interface AppBarProps {
   hideSettings?: boolean;
   hideBack?: boolean;
   injectElements?: AppBarSettingsButtonParams[];
-  onBack?: () => void;
 }
 
 export function AppBar(props: AppBarProps) {
+  const navigation = useNavigation<StackNavigation>();
   const [showSettings, setShowSettings] = useState(false);
-  const theme = useSelector(getTheme);
-  const themeType = useSelector(getThemeType);
-  const setTheme = useSetTheme();
-  const style = themeStyles(theme);
+  const style = themeStyles();
   let doShowSettingsButton = true;
   if (props.hideSettings != undefined) {
     doShowSettingsButton = !props.hideSettings
@@ -41,7 +37,7 @@ export function AppBar(props: AppBarProps) {
   if (props.hideBack != undefined) {
     doShowBackButton = !props.hideBack
   }
-  
+
   return (
     <>
       {showSettings && (
@@ -65,12 +61,9 @@ export function AppBar(props: AppBarProps) {
           <TouchableOpacity testID={AppBarTestID.backIconView}
             style={style.backIconView}
             onPress={() => {
-              if (props.onBack) {
-                props.onBack()
-              }
+              navigation.goBack();
             }}>
-            <ThemeIcon name={'chevron-left'}
-              size={theme.sizes.icon} />
+            <ThemeIcon name={'chevron-left'}/>
           </TouchableOpacity>
         )}
 
@@ -80,10 +73,14 @@ export function AppBar(props: AppBarProps) {
           <TouchableOpacity testID={AppBarTestID.settingIconView}
             style={style.settingIconView}
             onPress={() => {
-              setShowSettings(!showSettings)
+              if (!props.injectElements) {
+                navigation.push(AppRoutes.SETTINGS);
+              }
+              else {
+                setShowSettings(!showSettings)
+              }
             }}>
-            <ThemeIcon name={'settings'}
-              size={theme.sizes.icon} />
+            <ThemeIcon name={'settings'}/>
           </TouchableOpacity>
         )}
 
@@ -96,17 +93,19 @@ export function AppBar(props: AppBarProps) {
               testID={AppBarTestID.settingsFlyoutContent}
               style={style.settingsFlyoutContent}>
               <View style={style.themeButtonView}>
-                <ThemeText
-                  variant={'primary'}
-                  onBackground={'onSecondary'}>
-                  Dark Mode
-                </ThemeText>
-                <ThemeSwitch
-                  onPalette={'secondary'}
-                  onValueChange={(val) => {
-                    setTheme(val ? 'dark' : 'light');
+                <AppSettingsButton
+                  onPress={() => {
+                    navigation.push(AppRoutes.SETTINGS);
+                    setShowSettings(false);
                   }}
-                  value={themeType === 'dark'} />
+                  testID={'app-bar-settings-button'}>
+                  <ThemeText
+                    allcaps
+                    variant={'primary'}
+                    onBackground={'onSecondary'}>
+                    Go to Settings
+                  </ThemeText>
+                </AppSettingsButton>
               </View>
               {props.injectElements && (
                 <View style={{
@@ -131,8 +130,8 @@ export function AppBar(props: AppBarProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       position: 'absolute',
       top: 0,
@@ -192,5 +191,5 @@ function themeStyles(theme: IThemeElements) {
       position: 'absolute',
       textTransform: 'uppercase',
     }
-  })
+  }));
 }

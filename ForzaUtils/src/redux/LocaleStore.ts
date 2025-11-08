@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Strings_enUS } from "../locale/enUS";
 import { IStringDefinitions, ISupportLocale } from "../locale/strings";
 import { useDispatch } from "react-redux";
-import { AppStoreState } from "./AppStore";
+import { AppStoreState, useAppSelector } from "./AppStore";
 import { Strings_fr } from "../locale/fr";
 
 export interface ILocaleState {
@@ -10,18 +10,12 @@ export interface ILocaleState {
   strings: IStringDefinitions;
 }
 
-const initialState: ILocaleState = {
-  type: ISupportLocale.enUS,
-  strings: Strings_enUS
-}
-
-export interface ILocaleActions {
-  setLocale: (state: ILocaleState, action: { payload: { current: ISupportLocale } }) => void;
-}
-
-const localeSlice = createSlice({
+export const localeSlice = createSlice({
   name: 'locale',
-  initialState: initialState,
+  initialState: {
+    type: ISupportLocale.enUS,
+    strings: Strings_enUS
+  } as ILocaleState,
   reducers: {
     setLocale: (state, action: PayloadAction<ISupportLocale>) => {
       state.type = action.payload;
@@ -30,15 +24,22 @@ const localeSlice = createSlice({
         case ISupportLocale.fr:
           state.strings = Strings_fr
       }
-    }
+    },
+  },
+  selectors: {
+    getLocale: (localeState: ILocaleState) => localeState.type,
+    getStrings: (localeState: ILocaleState) => localeState.strings,
   }
 });
-
-export const { setLocale } = localeSlice.actions;
 export const localeReducer = localeSlice.reducer;
-export const useSetLocale = () => {
+
+export function useLocaleViewModel() {
   const dispatch = useDispatch();
-  return (locale: ISupportLocale) => dispatch(setLocale(locale));
+  const locale = useAppSelector(localeSlice.selectors.getLocale);
+  const strings = useAppSelector(localeSlice.selectors.getStrings);
+  return {
+    locale,
+    strings,
+    setLocale: (type: ISupportLocale) => dispatch(localeSlice.actions.setLocale(type))
+  }
 }
-export const getLocale = (state: AppStoreState) => state.locale.type;
-export const getStrings = (state: AppStoreState) => state.locale.strings;

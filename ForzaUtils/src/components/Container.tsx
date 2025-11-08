@@ -1,8 +1,7 @@
 import React from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
-import { BackgroundVariantType, IThemeElements } from "../constants/Themes";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
+import { BackgroundVariantType, IThemeElements } from "../types/Themes";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 export type ContainerFlex = 'row' | 'column';
 export type ContainerFill = 'parent' | 'width' | 'height';
@@ -14,30 +13,29 @@ export interface ContainerProps extends ViewProps {
 }
 
 export function Container(props: ContainerProps) {
-  const theme = useSelector(getTheme);
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   let baseStyle = styles.rootPrimary;
-  switch(props.variant) {
-    case 'secondary': 
+  switch (props.variant) {
+    case 'secondary':
       baseStyle = styles.rootSecondary;
       break;
   }
-  switch(props.fill) {
+  switch (props.fill) {
     case 'height':
-      baseStyle = {...baseStyle, ...styles.fillHeight};
+      baseStyle = { ...baseStyle, ...styles.fillHeight };
       break;
     case 'width':
-      baseStyle = {...baseStyle, ...styles.fillWidth};
+      baseStyle = { ...baseStyle, ...styles.fillWidth };
       break;
     case 'parent':
-      baseStyle = {...baseStyle, ...styles.fillHeight, ...styles.fillWidth};
+      baseStyle = { ...baseStyle, ...styles.fillHeight, ...styles.fillWidth };
   }
-  switch(props.flex) {
+  switch (props.flex) {
     case 'column':
-      baseStyle = {...baseStyle, ...styles.flexColumn};
+      baseStyle = { ...baseStyle, ...styles.flexColumn };
       break;
     case 'row':
-      baseStyle = {...baseStyle, ...styles.flexRow};
+      baseStyle = { ...baseStyle, ...styles.flexRow };
       break;
   }
   return (
@@ -47,8 +45,8 @@ export function Container(props: ContainerProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     rootPrimary: {
       backgroundColor: theme.colors.background.primary,
       padding: 10,
@@ -72,5 +70,5 @@ function themeStyles(theme: IThemeElements) {
     fillHeight: {
       height: '100%'
     }
-  })
+  }));
 }

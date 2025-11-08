@@ -3,8 +3,7 @@ import LineChart, { LineChartData } from "react-native-chart-kit/dist/line-chart
 import { Paper } from "../../components/Paper";
 import { ThemeText } from "../../components/ThemeText";
 import { DataEvent } from "../../context/viewModels/HpTqGraphViewModel";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 
 
 export interface HpTqCurvesProps {
@@ -14,7 +13,6 @@ export interface HpTqCurvesProps {
 }
 
 export const HpTqCurves = memo((props: HpTqCurvesProps) => {
-  const theme = useSelector(getTheme);
   const sorted = props.data.sort((a, b) => a.rpm - b.rpm);
 
   const lineData: LineChartData = {
@@ -22,11 +20,11 @@ export const HpTqCurves = memo((props: HpTqCurvesProps) => {
     datasets: [
       {
         data: sorted.map((i) => i.hp),
-        color: () => theme.colors.text.primary.onPrimary,
+        color: () => invokeWithTheme((theme) => theme.colors.text.primary.onPrimary),
       },
       {
         data: sorted.map((i) => i.tq),
-        color: () => theme.colors.text.secondary.onPrimary
+        color: () => invokeWithTheme((theme) => theme.colors.text.secondary.onPrimary)
       }
     ],
     legend: ['Torque', 'Horsepower'],
@@ -53,12 +51,12 @@ export const HpTqCurves = memo((props: HpTqCurvesProps) => {
               : ''
         }}
         chartConfig={{
-          labelColor: () => theme.colors.text.primary.onPrimary,
+          labelColor: () => invokeWithTheme((theme) => theme.colors.text.primary.onPrimary),
           color: (opacity) => {
             if (opacity == 1) {
-              return theme.colors.text.primary.onSecondary
+              return invokeWithTheme((theme) => theme.colors.text.primary.onSecondary)
             }
-            return theme.colors.text.secondary.onSecondary
+            return invokeWithTheme((theme) => theme.colors.text.secondary.onSecondary)
           },
           backgroundGradientFromOpacity: 0,
           backgroundGradientToOpacity: 0,

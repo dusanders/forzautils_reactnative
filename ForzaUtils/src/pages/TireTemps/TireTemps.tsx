@@ -1,22 +1,19 @@
 import React, { useMemo } from "react";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
-import { IThemeElements } from "../../constants/Themes";
 import { StyleSheet } from "react-native";
 import { Row } from "../../components/Row";
 import { TireInfo } from "./TireInfo";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigation } from "../../constants/types";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { StackNavigation } from "../../types/types";
+import { AvgTireTemps } from "../../components/Graphs/AvgTireTemp";
 
 export interface TireTempsProps {
   // Nothing
 }
 
 export function TireTemps(props: TireTempsProps) {
-  const theme = useSelector(getTheme);
-  const style = themeStyles(theme);
+  const style = themeStyles();
   const navigation = useNavigation<StackNavigation>();
   const store = useViewModelStore();
   const viewModel = store.tireTemps;
@@ -34,11 +31,9 @@ export function TireTemps(props: TireTempsProps) {
 
   return (
     <AppBarContainer
-      title="Tire Temps"
-      onBack={() => {
-        navigation.goBack()
-      }}>
-      <Row style={style.halfHeight}>
+      title="Tire Temps">
+        <AvgTireTemps key={'avgTireTemps'} />
+      {/* <Row style={style.halfHeight}>
         <TireInfo temp={temps[0]}
           title="Left Front" />
         <TireInfo temp={temps[1]}
@@ -49,12 +44,12 @@ export function TireTemps(props: TireTempsProps) {
           title="Left Rear" />
         <TireInfo temp={temps[3]}
           title="Right Rear" />
-      </Row>
+      </Row> */}
     </AppBarContainer>
   )
 }
 
-function themeStyles(theme: IThemeElements) {
+function themeStyles() {
   return StyleSheet.create({
     halfWidth: {
       width: '50%'

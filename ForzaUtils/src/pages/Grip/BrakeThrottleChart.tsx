@@ -3,9 +3,7 @@ import { ColorValue, StyleSheet, View } from "react-native";
 import { ProgressChart } from "react-native-chart-kit";
 import { ThemeText } from "../../components/ThemeText";
 import { Row } from "../../components/Row";
-import { GlobalStyles, IThemeElements } from "../../constants/Themes";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { GlobalStyles } from "../../types/Themes";
 
 export interface BrakeThrottleChartProps {
   throttle: number;
@@ -41,8 +39,7 @@ function LabeledDot(props: LabeledDotProps) {
   )
 }
 export const BrakeThrottleChart = memo((props: BrakeThrottleChartProps) => {
-  const theme = useSelector(getTheme);
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   return (
     <View style={[GlobalStyles.centerContent]}>
       <Row style={styles.brakeThrottleRow}>
@@ -76,7 +73,7 @@ export const BrakeThrottleChart = memo((props: BrakeThrottleChartProps) => {
   )
 });
 
-function themeStyles(theme: IThemeElements) {
+function themeStyles() {
   return StyleSheet.create({
     brakeThrottleRow: {
       width: '100%',

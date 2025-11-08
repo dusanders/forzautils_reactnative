@@ -1,31 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
-import { useNavigation } from "@react-navigation/native";
 import { Row } from "../../components/Row";
 import { ThemeText } from "../../components/ThemeText";
-import { IThemeElements } from "../../constants/Themes";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
 import { ISessionInfo } from "../../services/Database/DatabaseInterfaces";
-import { useReplay } from "../../context/Replay";
+import { useReplay } from "../../context/Recorder";
 import { useLogger } from "../../context/Logger";
-import { useNetworkContext } from "../../context/Network";
-import { StackNavigation } from "../../constants/types";
+import { AppRoutes, RootStackParamList } from "../../types/types";
 import { DeleteDialog } from "./DeleteDialog";
+import { invokeWithTheme } from "../../hooks/ThemeState";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-export interface ReplayListProps {
-
+export interface ReplayRouteParams  {
+  listId: string; // Optional listId for filtering sessions
 }
-
-export function ReplayList(props: ReplayListProps) {
+type ReplayScreenProps = NativeStackScreenProps<RootStackParamList, AppRoutes.REPLAY_LIST>;
+export function ReplayList(props: ReplayScreenProps) {
   const tag = 'ReplayList';
+  const {route, navigation} = props;
   const logger = useLogger();
-  const navigation = useNavigation<StackNavigation>();
   const replay = useReplay();
-  const network = useNetworkContext();
-  const theme = useSelector(getTheme);
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const [sessions, setSessions] = useState<ISessionInfo[]>([]);
   const [toDelete, setToDelete] = useState<ISessionInfo | undefined>(undefined);
 
@@ -39,10 +34,7 @@ export function ReplayList(props: ReplayListProps) {
   }, []);
 
   return (
-    <AppBarContainer
-      onBack={() => {
-        navigation.goBack();
-      }}>
+    <AppBarContainer>
       <View style={styles.root}>
         {Boolean(toDelete) && (
           <DeleteDialog
@@ -87,8 +79,7 @@ export function ReplayList(props: ReplayListProps) {
                 }}
                 onPress={async () => {
                   logger.log(tag, `Setting replay: ${info.item.name}`);
-                  const session = await replay.getOrCreate(info.item);
-                  network.setReplaySession(session);
+                  replay.loadReplay(info.item);
                   navigation.goBack();
                 }}>
                 <Row>
@@ -113,8 +104,8 @@ export function ReplayList(props: ReplayListProps) {
     </AppBarContainer>
   )
 }
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     listRow: {
       flexGrow: 1
     },
@@ -161,5 +152,5 @@ function themeStyles(theme: IThemeElements) {
       color: theme.colors.text.secondary.onPrimary,
       textAlign: 'center',
     }
-  });
+  }));
 }

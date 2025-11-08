@@ -1,51 +1,54 @@
-import React, {  } from "react";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import React, { useMemo } from "react";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { StyleSheet } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
-import { BaseLineGraph } from "./BaseLineGraph";
+import { MemoBaseLineGraph } from "./BaseLineGraph";
 import { CardContainer } from "../CardContainer";
+import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
 
 export interface IAvgSuspensionTravelProps {
 }
 
 export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
-  const theme = useSelector(getTheme);
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const viewModel = useViewModelStore().suspensionGraph;
+  const theme = themeService().theme;
+  const graphData = useMemo(() => {
+    return [
+      {
+        data: viewModel.avgTravel.map((point) => point.front),
+        label: 'Front Avg Travel',
+        color: theme.colors.text.primary.onPrimary
+      },
+      {
+        data: viewModel.avgTravel.map((point) => point.rear),
+        label: 'Rear Avg Travel',
+        color: theme.colors.text.secondary.onPrimary
+      }
+    ];
+  }, [viewModel.avgTravel]);
 
   return (
     <CardContainer
       centerContent
       style={styles.card}>
-      <BaseLineGraph
+      <MemoBaseLineGraph
         title={'Suspension Travel'}
         dataLength={viewModel.windowSize}
-        data={[
-          {
-            data: viewModel.avgTravel.map((point) => point.front),
-            label: 'Front Avg Travel',
-            color: theme.colors.text.primary.onPrimary
-          },
-          {
-            data: viewModel.avgTravel.map((point) => point.rear),
-            label: 'Rear Avg Travel',
-            color: theme.colors.text.secondary.onPrimary
-          }
-        ]} />
-
+        data={graphData}
+        minY={viewModel.avgTravelMin}
+        maxY={viewModel.avgTravelMax}
+      />
     </CardContainer>
   );
 }
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     card: {
       height: 180,
       width: '100%',
       padding: 0,
-      paddingTop: 24,
-      paddingBottom: 24,
+      paddingTop: 8,
+      paddingBottom: 8,
     },
-  })
+  }));
 }

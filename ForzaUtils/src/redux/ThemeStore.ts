@@ -1,16 +1,15 @@
 import { ColorSchemeName } from "react-native";
-import { DarkColors, IThemeElements, LightColors } from "../constants/Themes";
+import { DarkColors, IThemeElements, LightColors, ThemeType } from "../types/Themes";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { useDispatch, useSelector } from "react-redux";
-import { AppStoreState } from "./AppStore";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "./AppStore";
 
-export type ThemeType = ColorSchemeName;
 export interface IThemeState {
   current: ThemeType;
   theme: IThemeElements;
 }
 const initialState: IThemeState = {
-  current: 'dark',
+  current: ThemeType.DARK,
   theme: DarkColors,
 };
 export interface IThemeActions {
@@ -28,15 +27,29 @@ const themeSlice = createSlice({
         ? DarkColors
         : LightColors;
     },
+    setThemeType: (state, action: PayloadAction<ThemeType>) => {
+      state.current = action.payload;
+      state.theme = state.current === 'dark'
+        ? DarkColors
+        : LightColors;
+    }
+  },
+  selectors:{
+    getTheme: (state: IThemeState) => state.theme,
+    getThemeType: (state: IThemeState) => state.current,
   }
 });
 
-export const { setTheme } = themeSlice.actions;
-
 export const themeReducer = themeSlice.reducer;
-export const useSetTheme = () => {
+
+export function useReduxTheme() {
   const dispatch = useDispatch();
-  return (theme: ThemeType) => dispatch(setTheme(theme));
+  const theme = useAppSelector(themeSlice.selectors.getTheme);
+  const themeType = useAppSelector(themeSlice.selectors.getThemeType);
+  return {
+    theme,
+    themeType,
+    setTheme: (theme: ThemeType) => dispatch(themeSlice.actions.setTheme(theme)),
+    setThemeType: (theme: ThemeType) => dispatch(themeSlice.actions.setThemeType(theme)),
+  }
 }
-export const getTheme  = (state: AppStoreState) => state.theme.theme;
-export const getThemeType = (state: AppStoreState) => state.theme.current;

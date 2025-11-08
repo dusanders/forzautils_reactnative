@@ -3,13 +3,11 @@ import { AppBarContainer } from "../components/AppBar/AppBarContainer";
 import { StyleSheet, View } from "react-native";
 import { TextCard } from "../components/TextCard";
 import { useNavigation } from "@react-navigation/native";
-import { AppRoutes, StackNavigation } from "../constants/types";
+import { AppRoutes, StackNavigation } from "../types/types";
 import { Row } from "../components/Row";
-import { IThemeElements } from "../constants/Themes";
 import { ThemeText } from "../components/ThemeText";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
 import { useLogger } from "../context/Logger";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 export interface SourceChooserProps {
   // None
@@ -19,14 +17,10 @@ export function SourceChooser(props: SourceChooserProps) {
   const tag = 'SourceChooser.tsx';
   const navigation = useNavigation<StackNavigation>();
   const logger = useLogger();
-  const theme = useSelector(getTheme);
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
 
   return (
-    <AppBarContainer
-      onBack={() => {
-        navigation.goBack();
-      }}>
+    <AppBarContainer>
       <View style={styles.root}>
         <Row style={styles.cardRow}>
           <View style={{
@@ -78,7 +72,7 @@ export function SourceChooser(props: SourceChooserProps) {
             title={'Replay'}
             body="View a previously recorded session"
             onPress={() => {
-              navigation.navigate(AppRoutes.REPLAY_LIST);
+              navigation.push(AppRoutes.REPLAY_LIST, { listId: 'fromSourceChooser' });
             }} />
         </Row>
       </View>
@@ -86,8 +80,8 @@ export function SourceChooser(props: SourceChooserProps) {
   );
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       height: '100%',
       width: '100%',
@@ -114,5 +108,5 @@ function themeStyles(theme: IThemeElements) {
       color: theme.colors.text.secondary.onPrimary,
       textAlign: 'center',
     }
-  });
+  }));
 }

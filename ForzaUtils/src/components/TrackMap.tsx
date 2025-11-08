@@ -4,8 +4,7 @@ import Svg, { Circle, Path } from "react-native-svg";
 import { useViewModelStore } from "../context/viewModels/ViewModelStore";
 import { ThemeText } from "./ThemeText";
 import { Paper } from "./Paper";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 export interface TrackMapProps {
   style?: StyleProp<ViewStyle>;
@@ -15,7 +14,6 @@ export function TrackMap(props: TrackMapProps) {
   const isValidNumber = (value: number) => {
     return typeof value === 'number' && !isNaN(value) && isFinite(value);
   }
-  const theme = useSelector(getTheme);
   const viewModel = useViewModelStore().map;
   const minSvgX = isValidNumber(viewModel.viewBox.minX)
     ? viewModel.viewBox.minX
@@ -40,14 +38,14 @@ export function TrackMap(props: TrackMapProps) {
           ${totalSvgHeight + (totalSvgHeight * 0.3)}`}>
         <Path
           d={viewModel.svgPath}
-          stroke={theme.colors.text.secondary.onPrimary}
+          stroke={invokeWithTheme((theme) => theme.colors.text.secondary.onPrimary)}
           strokeWidth={Math.max(totalSvgWidth, totalSvgHeight) * 0.015}
           fill={'transparent'} />
         <Circle
           cx={viewModel.playerPosition?.x}
           cy={viewModel.playerPosition?.y}
           r={Math.max(totalSvgWidth, totalSvgHeight) * 0.035}
-          fill={theme.colors.text.primary.onPrimary} />
+          fill={invokeWithTheme((theme) => theme.colors.text.primary.onPrimary)} />
       </Svg>
     </Paper>
   )

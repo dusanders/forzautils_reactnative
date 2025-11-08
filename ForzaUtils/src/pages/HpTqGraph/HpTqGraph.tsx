@@ -1,18 +1,16 @@
 import React, {  } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
-import { IThemeElements } from "../../constants/Themes";
 import { Assets } from "../../assets";
 import { Paper } from "../../components/Paper";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { ThemeText } from "../../components/ThemeText";
-import { randomKey } from "../../constants/types";
+import { randomKey } from "../../types/types";
 import { HpTqCurves } from "./HpTqCurves";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigation } from "../../constants/types";
+import { StackNavigation } from "../../types/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 
 export interface HpTqGraphProps {
   // Nothing
@@ -20,8 +18,7 @@ export interface HpTqGraphProps {
 
 export function HptqGraph(props: HpTqGraphProps) {
   const navigation = useNavigation<StackNavigation>();
-  const theme = useSelector(getTheme);
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   const store = useViewModelStore().hpTqGraph;
   const windowMeasure = withScaledWindow(0.9, 1);
 
@@ -35,9 +32,6 @@ export function HptqGraph(props: HpTqGraphProps) {
 
   return (
     <AppBarContainer title="Hp / Tq Graph"
-      onBack={() => {
-        navigation.goBack()
-      }}
       injectElements={[
         {
           id: randomKey(),
@@ -96,8 +90,8 @@ export function HptqGraph(props: HpTqGraphProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     waitBodyText: {
       width: '70%',
       textAlign: 'center',
@@ -126,5 +120,5 @@ function themeStyles(theme: IThemeElements) {
       color: theme.colors.text.primary.onPrimary,
       fontFamily: Assets.SupportedFonts.Regular
     }
-  })
+  }));
 }

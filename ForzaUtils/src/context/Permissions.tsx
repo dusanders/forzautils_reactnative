@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Permission, PERMISSIONS, requestMultiple } from "react-native-permissions";
-import { useSelector } from "react-redux";
 import { PermissionError } from "../pages/PermissionError";
 import { AppState, AppStateStatus, Platform } from "react-native";
-import { setPermissionState } from "../redux/PermissionStore";
 import { Splash } from "../pages/Splash";
-import { AppStoreState } from "../redux/AppStore";
+import { permissionService } from "../hooks/PermissionState";
+import { usePermissionViewModel } from "../redux/PermissionStore";
 
 export interface PermissionsWatchProps {
   children?: any;
@@ -21,12 +20,12 @@ const iosPermissionList: Permission[] = [
 
 export function PermissionsWatcher(props: PermissionsWatchProps) {
   const tag = "PermissionsWatch.tsx";
-  const permissionState = useSelector((state: AppStoreState) => state.permissions);
+  const permissionVM = permissionService();
+  const permissionViewModel = usePermissionViewModel();
   const [loaded, setLoaded] = useState(false);
 
   const ensurePermissions = async () => {
-    console.log(`ensuring permissions...`);
-    if(permissionState.isGranted == 'blocked') {
+    if (permissionVM.permission == 'blocked') {
       setLoaded(true);
       return;
     }
@@ -36,7 +35,6 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
         permList = iosPermissionList
     };
     const systemPermissions = await requestMultiple(permList);
-    console.log(`done checking ${JSON.stringify(systemPermissions)}`);
     let allAllowed = false;
     let allBlocked = false;
     let allDenied = false;
@@ -47,17 +45,18 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
     });
     if (allAllowed) {
       setLoaded(true);
-      setPermissionState({ isGranted: 'granted' });
+      permissionViewModel.setPermissionState({ isGranted: 'granted' });
+      permissionVM.setPermission({ isGranted: 'granted' });
     } else {
       setLoaded(true);
-      setPermissionState({ isGranted: 'blocked' });
+      permissionViewModel.setPermissionState({ isGranted: 'blocked' });
+      permissionVM.setPermission({ isGranted: 'blocked' });
     }
   }
 
   // didMount initial logic
   useEffect(() => {
     const stateHandler = async (state: AppStateStatus) => {
-      console.log(`APP CHANGE: ${state}`);
       if (state === 'active') {
         await ensurePermissions();
       }
@@ -72,12 +71,13 @@ export function PermissionsWatcher(props: PermissionsWatchProps) {
   }, []);
 
   if (!loaded) return (<Splash />);
-  if (permissionState.isGranted != undefined) return props.children;
+  if (permissionVM.permission != undefined) return props.children;
   return (
     <PermissionError
       onIgnore={() => {
         setLoaded(true);
-        setPermissionState({ isGranted: 'granted' });
+        permissionViewModel.setPermissionState({ isGranted: 'granted' });
+        permissionVM.setPermission({ isGranted: 'granted' });
       }}
       onOpenSettings={async () => {
         await ensurePermissions();

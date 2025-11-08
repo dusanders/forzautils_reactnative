@@ -1,22 +1,20 @@
 import React, { useMemo } from "react";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigation } from "../../constants/types";
+import { StackNavigation } from "../../types/types";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { BrakeThrottleChart, BrakeThrottleChartProps } from "./BrakeThrottleChart";
 import { SteeringChart } from "./SteeringChart";
 import { TireSlip } from "./TireSlip";
 import { ScrollView } from "react-native";
 import { TireData } from "ForzaTelemetryApi";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { SlipAngle } from "../../components/Graphs/SlipAngle";
 
 export interface GripProps {
   // Nothing
 }
 
 export function Grip(props: GripProps) {
-  const theme = useSelector(getTheme);
   const navigation = useNavigation<StackNavigation>();
   const viewModel = useViewModelStore().grip;
   const brakeThrottle = useMemo<BrakeThrottleChartProps>(() => {
@@ -36,7 +34,6 @@ export function Grip(props: GripProps) {
 
   return (
     <AppBarContainer
-      onBack={() => { navigation.pop() }}
       title="Grip">
       <ScrollView
         style={{ paddingBottom: 24 }}>
@@ -45,11 +42,7 @@ export function Grip(props: GripProps) {
           throttle={brakeThrottle.throttle} />
         <SteeringChart
           steeringAngle={steering} />
-        <TireSlip
-          leftFront={tireSlipData.leftFront}
-          rightFront={tireSlipData.rightFront}
-          leftRear={tireSlipData.leftRear}
-          rightRear={tireSlipData.rightRear} />
+        <SlipAngle key={'slipAngle'} />
       </ScrollView>
     </AppBarContainer>
   )

@@ -1,51 +1,39 @@
-import { useEffect, useMemo } from "react";
-import { useDataWindow } from "../../constants/types";
-import { useSelector } from "react-redux";
-import { getForzaPacket } from "../../redux/WifiStore";
+import { useEffect, useMemo, useState } from "react";
+import { AxleData, useDataWindow } from "../../types/types";
+import { useNetworkContext } from "../Network";
+import { ITelemetryData } from "ForzaTelemetryApi";
+import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
+import { useReplay } from "../Recorder";
 
-export interface AverageTempData {
-  front: number;
-  rear: number;
-}
 export interface ITireTempViewModel {
   leftFront: number;
   rightFront: number;
   leftRear: number;
   rightRear: number;
   avgTempWindowSize: number;
-  avgTemps: AverageTempData[];
+  avgTempWindowMin: number;
+  avgTempWindowMax: number;
+  avgTemps: AxleData<number>[];
 }
-const debugData: AverageTempData[] = [
-  { front: 180, rear: 180 },
-  { front: 180, rear: 180 },
-  { front: 180, rear: 180 },
-  { front: 180, rear: 180 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 198, rear: 195 },
-  { front: 196, rear: 194 },
-  { front: 195, rear: 192 },
-  { front: 198, rear: 193 },
-  { front: 201, rear: 198 },
-  { front: 208, rear: 205 },
-  { front: 210, rear: 207 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 212, rear: 210 },
-  { front: 198, rear: 195 },
-  { front: 196, rear: 194 },
-  { front: 195, rear: 192 },
-]
+
 export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 50;
-  const forza = useSelector(getForzaPacket);
-  const avgTempWindow = useDataWindow<AverageTempData>(windowSize);
+  const network = useNetworkContext();
+  const replay = useReplay();
+  const [forza, setForza] = useState<ITelemetryData | null>(null);
+
+  const avgTempWindow = useDataWindow<AxleData<number>>(
+    windowSize,
+    (data) => Math.min(data.front, data.rear),
+    (data) => Math.max(data.front, data.rear),
+    []
+  );
 
   useEffect(() => {
+    if (!forza || !forza.isRaceOn) {
+      return
+    }
     if (forza?.tireTemp) {
       const leftFront = Number(forza.tireTemp.leftFront?.toFixed(2)) || 0;
       const rightFront = Number(forza.tireTemp.rightFront?.toFixed(2)) || 0;
@@ -77,12 +65,38 @@ export function useTireTempsViewModel(): ITireTempViewModel {
     [forza?.tireTemp.rightRear]
   );
 
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (network) {
+      packetSub = network.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [network]);
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (replay) {
+      packetSub = replay.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [replay]);
+
   return {
     leftFront: leftFront,
     rightFront: rightFront,
     leftRear: leftRear,
     rightRear: rightRear,
     avgTempWindowSize: windowSize,
+    avgTempWindowMin: avgTempWindow.min,
+    avgTempWindowMax: avgTempWindow.max,
     avgTemps: avgTempWindow.data,
   }
 }

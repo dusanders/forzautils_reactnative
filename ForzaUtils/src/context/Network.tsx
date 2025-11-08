@@ -1,30 +1,21 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useLogger } from './Logger';
-import { addEventListener, NetInfoState, NetInfoStateType, NetInfoSubscription } from '@react-native-community/netinfo';
-import { getWifiState, useSetPacket, useSetWifiState } from '../redux/WifiStore';
 import { Splash } from '../pages/Splash';
-import { delay, LISTEN_PORT } from '../constants/types';
+import { LISTEN_PORT } from '../types/types';
 import { ITelemetryData } from 'ForzaTelemetryApi';
-import { ISocketCallback, Socket } from '../services/Socket';
-import { useSelector } from 'react-redux';
-import { ISession } from '../services/Database/DatabaseInterfaces';
+import { Socket } from '../services/Socket';
+import { ReplayState, useReplay } from './Recorder';
+import EventEmitter, { EmitterSubscription } from 'react-native/Libraries/vendor/emitter/EventEmitter';
+import { useWifi } from './Wifi';
 
 //#region Definitions
 
 export interface INetworkContext {
-  /**
-   * Current replay session
-   */
-  replay?: ISession;
-  /**
-   * Delay in milliseconds between reading and sending replay packets
-   */
-  replayDelay: number;
-  /**
-   * Time to wait between reading and sending replay packets
-   * @param ms Time delay in MS
-   */
-  setReplayDelay(ms: number): void;
+  isUDPListening: boolean;
+  port: number;
+  isDEBUG: boolean;
+  lastPacket?: ITelemetryData;
+  onPacket(fn: (packet: ITelemetryData) => void): EmitterSubscription;
   /**
    * Start a debug stream of randomly generated telemetry packets
    */
@@ -33,11 +24,6 @@ export interface INetworkContext {
    * Stop the debug stream 
    */
   STOP_DEBUG(): void;
-  /**
-   * Set the replay session 
-   * @param session Session to use for replay packets
-   */
-  setReplaySession(session?: ISession): void;
 }
 
 /**
@@ -62,6 +48,7 @@ export interface NetworkWatcherProps {
 
 //#endregion
 
+const PACKET_EVENT = 'packet';
 /**
  * Network watcher component
  * @param props Network watcher props
@@ -70,199 +57,101 @@ export interface NetworkWatcherProps {
 export function NetworkWatcher(props: NetworkWatcherProps) {
   const tag = "NetworkWatcher.tsx";
   const logger = useLogger();
+  const replay = useReplay();
+  const wifi = useWifi();
+  const [isUDPListening, setIsUDPListening] = useState(false);
   const [port, setPort] = useState(0);
-  const updateReduxWifiState = useSetWifiState();
-  const reduxWifiState = useSelector(getWifiState);
-  const setPacket = useSetPacket();
   const [loaded, setLoaded] = useState(false);
-  const [wifiInfo, setWifiInfo] = useState<NetInfoState | undefined>(undefined);
-  const [isReplay, setIsReplay] = useState(false);
-  const replaySession = useRef<ISession | undefined>(undefined);
+  const [isDEBUG, setIsDEBUG] = useState(false);
+  const eventEmitter = useRef<EventEmitter>(new EventEmitter());
   const throttledPacket = useRef<ITelemetryData>(undefined);
-  const animationFrameId = useRef<number | undefined>(undefined);
-  const replayDelay = useRef<number>(500);
+  const closeSocketEventSub = useRef<EmitterSubscription>(undefined);
+  const errorSocketEventSub = useRef<EmitterSubscription>(undefined);
+  const packetSocketEventSub = useRef<EmitterSubscription>(undefined);
+  const socketRef = useRef<Socket>(undefined);
 
-  /**
-   * Handler for the Socket service instance
-   */
-  const socketCallbacks = useMemo<ISocketCallback>(() => ({
-    onClose: (ev) => {
-      logger.debug(tag, `socket did close ${(ev as Error)?.message}`);
-      setPort(0);
-    },
-    onError: (ev) => {
-      logger.error(tag, `Socket error: ${ev?.message}`);
-      setPort(0);
-    },
-    onPacket: (packet) => {
-      if (!replaySession.current) {
-        throttledPacket.current = packet;
-      }
-    }
-  }), []);
-
-  /**
-   * Handler attached to the network state listener
-   */
-  const netInfoCallback = useCallback((state: NetInfoState) => {
-    setWifiInfo((prevWifiInfo) => {
-      if (state.type !== prevWifiInfo?.type || state.isConnected !== prevWifiInfo?.isConnected) {
-        return state; // Update the state only if it has changed
-      }
-      return prevWifiInfo; // Keep the previous state if nothing has changed
+  const onNewPacket = (packet: ITelemetryData) => {
+    throttledPacket.current = packet;
+    eventEmitter.current.emit(PACKET_EVENT, packet);
+    replay.recordPacket(packet).catch((e) => {
+      logger.error(tag, `Error recording packet: ${e?.message}`);
     });
-    setLoaded(true);
-  }, []);
-
-  /**
-   * Close the animation frame request
-   */
-  const closeAnimationFrame = () => {
-    logger.log(tag, `closing animationFrame: ${animationFrameId.current}`);
-    if (animationFrameId.current) {
-      cancelAnimationFrame(animationFrameId.current);
-      animationFrameId.current = undefined;
-    }
-  }
-
-  /**
-   * Update the packet state with the latest throttled packet
-   * This is called at a regular interval to avoid flooding the UI
-   */
-  const updatePacketState = async () => {
-    if (replaySession.current) {
-      logger.log(tag, `use replay: ${replaySession.current.currentReadOffset} - ${replaySession.current.info.length}`);
-      throttledPacket.current = (await replaySession.current.readPacket()) || undefined;
-      await delay(replayDelay.current);
-    }
-    if (throttledPacket.current) {
-      setPacket(throttledPacket.current);
-    }
-    animationFrameId.current = requestAnimationFrame(updatePacketState);
-  }
-
-  /**
-   * Determine if the device is connected to a Wifi network
-   * @param netInfo Network state object
-   * @returns 
-   */
-  const isWifiConnected = (netInfo: NetInfoState | undefined) => {
-    if (!netInfo) {
-      logger.error(tag, `Failed to get NetInfo! ${JSON.stringify(netInfo)}`);
-      return false
-    };
-    return netInfo.type === NetInfoStateType.wifi
-      && netInfo.isConnected;
-  }
-
-  /**
-   * Gather and update the Wifi state
-   */
-  useEffect(() => {
-    let netInfoSub: NetInfoSubscription = addEventListener(netInfoCallback);
-    return () => {
-      if (netInfoSub) {
-        netInfoSub();
-      }
-      closeAnimationFrame();
-    }
-  }, []);
-
-  /**
-   * Throttle the packet data to avoid flooding the UI
-   */
-  useEffect(() => {
-    if (reduxWifiState.isUdpListening) {
-      logger.debug(tag, `Starting packet flush interval`);
-      animationFrameId.current = requestAnimationFrame(updatePacketState);
-    } else {
-      logger.debug(tag, `Stopping packet flush interval`);
-      closeAnimationFrame();
-    }
-    return () => {
-      logger.log(tag, `effect return on UDP listener!!!`);
-      closeAnimationFrame();
-    }
-  }, [reduxWifiState.isUdpListening]);
+  };
 
   /**
    * Handle Wifi connection state changes
    */
   useEffect(() => {
-    let socket: Socket | undefined;
     const tryConnect = async () => {
-      socket = Socket.getInstance(logger);
-      let listeningPort = await socket.bind(LISTEN_PORT, socketCallbacks);
-      updateReduxWifiState({
-        ip: (wifiInfo?.details as any).ipAddress,
-        port: listeningPort,
-        isConnected: isWifiConnected(wifiInfo),
-        isUdpListening: listeningPort > 0
-      })
+      let listeningPort = await socketRef.current?.bind(LISTEN_PORT);
+      setIsUDPListening(listeningPort !== undefined && listeningPort > 0);
+      setPort(listeningPort || 0);
+      setLoaded(true);
     }
-    if (wifiInfo?.isConnected) {
+    if (wifi.isWifi) {
+      socketRef.current = Socket.getInstance(logger);
+      closeSocketEventSub.current = socketRef.current.onCloseEvent((ev) => {
+        logger.debug(tag, `socket did close ${(ev as Error)?.message}`);
+        setIsUDPListening(false);
+        setPort(0);
+      })
+      errorSocketEventSub.current = socketRef.current.onErrorEvent((ev) => {
+        logger.error(tag, `Socket error: ${ev?.message}`);
+        setIsUDPListening(false);
+        setPort(0);
+      });
+      packetSocketEventSub.current = socketRef.current.onPacketEvent((packet) => {
+        onNewPacket(packet);
+      });
+      logger.debug(tag, `Wifi connected!`);
       tryConnect();
     } else {
       logger.debug(tag, `Wifi disconnected!`);
-      socket?.close()
+      setPort(0);
+      setIsUDPListening(false);
+      socketRef.current?.close();
+      socketRef.current = undefined;
     }
-    setLoaded(true);
     return () => {
-      logger.log(tag, `useEffect returns isConnected!!!`);
-      if (socket) {
-        socket.close();
-      }
-      closeAnimationFrame();
+      closeSocketEventSub.current?.remove();
+      errorSocketEventSub.current?.remove();
+      packetSocketEventSub.current?.remove();
+      socketRef.current = undefined;
     }
-  }, [wifiInfo?.isConnected]);
+  }, [wifi.isWifi]);
 
-  /**
-   * Update wifi state when the network state changes
-   */
   useEffect(() => {
-    if (wifiInfo && wifiInfo.isConnected) {
-      updateReduxWifiState({
-        ip: (wifiInfo.details as any).ipAddress,
-        port: port,
-        isConnected: isWifiConnected(wifiInfo),
-        isUdpListening: port > 0
-      });
+    if (isDEBUG && replay.replayState === ReplayState.PLAYING) {
+      logger.log(tag, `Disabling DEBUG mode due to playback state`);
+      setIsDEBUG(false);
+      Socket.getInstance(logger).STOP_DEBUG();
     }
-  }, [wifiInfo]);
+  }, [replay.replayState]);
 
-  /**
-   * Update replay state
-   */
-  useEffect(() => {
-    logger.log(tag, `setting replay session: ${replaySession.current?.info.name} : ${animationFrameId.current}`);
-    if (isReplay) {
-      // Only start the animation frame if not already started
-      if (!animationFrameId.current) {
-        updatePacketState();
-      }
-    }
-  }, [isReplay]);
+  logger.log(tag, `Rendering NetworkWatcher.tsx - isUDPListening: ${isUDPListening}, port: ${port}, isDEBUG: ${isDEBUG}`);
 
   return (
     <NetworkContext.Provider value={{
-      replay: replaySession.current,
-      replayDelay: replayDelay.current,
-      setReplayDelay: (ms) => {
-        replayDelay.current = ms;
-      },
-      setReplaySession: (session) => {
-        replaySession.current = session;
-        setIsReplay(Boolean(session));
+      isUDPListening: isUDPListening,
+      port: port,
+      isDEBUG: isDEBUG,
+      lastPacket: throttledPacket.current,
+      onPacket: (fn: (packet: ITelemetryData) => void): EmitterSubscription => {
+        return eventEmitter.current.addListener(PACKET_EVENT, fn);
       },
       DEBUG: () => {
+        logger.log(tag, 'Starting DEBUG mode');
+        setIsDEBUG(true);
         Socket.getInstance(logger).DEBUG();
       },
       STOP_DEBUG: () => {
+        logger.log(tag, 'Stopping DEBUG mode');
+        setIsDEBUG(false);
         Socket.getInstance(logger).STOP_DEBUG();
       }
     }}>
-      {loaded && props.children}
       {!loaded && (<Splash />)}
+      {loaded && props.children}
     </NetworkContext.Provider>
   );
 }

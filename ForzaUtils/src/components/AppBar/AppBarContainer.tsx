@@ -1,31 +1,55 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container, ContainerProps } from "../Container";
 import { AppBar, AppBarProps } from "./AppBar";
-import { View } from "react-native";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
+import { StyleSheet, View } from "react-native";
+import { useLogger } from "../../context/Logger";
+import { ReplayBar } from "./ReplayBar";
+import { useNetworkContext } from "../../context/Network";
+import { invokeWithTheme } from "../../hooks/ThemeState";
+import { ReplayState, useReplay } from "../../context/Recorder";
 
 export interface AppBarContainerProps extends ContainerProps, AppBarProps {
-  
+
 }
 
 export function AppBarContainer(props: AppBarContainerProps) {
-  const theme = useSelector(getTheme);
+  const tag = `AppBarContainer.tsx`;
+  const logger = useLogger();
+  const replay = useReplay();
+  const styles = themeStyles(Boolean(replay.replayState));
+
+  const shouldShowReplayBar = () => {
+    return replay.replayState !== ReplayState.IDLE 
+    && replay.replayState !== ReplayState.RECORDING;
+  }
+
   return (
     <Container
       fill={'parent'}
       flex={'column'}
-      style={{
-        borderRadius: 0,
-        padding: 0,
-        margin: 0,
-      }}>
+      style={styles.root}>
       <AppBar {...props} />
-      <View style={{
-        paddingTop: theme.sizes.navBar + theme.sizes.borderRadius
-      }}>
+      <View style={styles.contentView}>
         {props.children}
       </View>
+      {shouldShowReplayBar() && (
+          <ReplayBar />
+        )
+      }
     </Container>
   )
+}
+
+function themeStyles(isReplay: boolean = false) {
+  return invokeWithTheme((theme) => StyleSheet.create({
+    root: {
+      borderRadius: 0,
+      padding: 0,
+      margin: 0,
+    },
+    contentView: {
+      paddingTop: theme.sizes.navBar + theme.sizes.borderRadius,
+      paddingBottom: isReplay ? theme.sizes.navBar : 0,
+    }
+  }));
 }

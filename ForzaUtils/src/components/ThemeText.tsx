@@ -1,9 +1,8 @@
 import React from "react";
-import { TextOnBackgroundVariant, TextVariantType } from "../constants/Themes";
+import { TextOnBackgroundVariant, TextVariantType } from "../types/Themes";
 import { StyleProp, Text, TextStyle } from "react-native";
 import { Assets } from "../assets";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
+import { themeService } from "../hooks/ThemeState";
 
 export type FontFamily = 'regular' | 'light' | 'bold';
 export type ThemeFontSize = 'small' | 'regular' | 'large';
@@ -19,7 +18,7 @@ export interface ThemeTextProps {
   testID?: string; // for testing purposes
 }
 export function ThemeText(props: ThemeTextProps) {
-  const theme = useSelector(getTheme);
+  const theme = themeService().theme;
   const doCaps = props.allcaps ?? false;
   let fontFamily = Assets.SupportedFonts.Regular;
   switch (props.fontFamily) {

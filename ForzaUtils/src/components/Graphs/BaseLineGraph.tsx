@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Paper } from "../Paper";
 import { StyleSheet, View } from "react-native";
-import { useSelector } from "react-redux";
-import { IThemeElements } from "../../constants/Themes";
-import { getTheme } from "../../redux/ThemeStore";
 import Svg, { Path, Text } from "react-native-svg";
 import { ThemeText } from "../ThemeText";
+import { invokeWithTheme } from "../../hooks/ThemeState";
 
 export interface IGraphData {
   color: string;
@@ -15,13 +13,10 @@ export interface IGraphData {
 
 export interface BaseLineGraphProps {
   data: IGraphData[];
-  dataLength: number;
-  title?: string;
-}
-
-interface YValueLimits {
   minY: number;
   maxY: number;
+  dataLength: number;
+  title?: string;
 }
 
 export function BaseLineGraph(props: BaseLineGraphProps) {
@@ -30,87 +25,61 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   const widthScalar = props.dataLength;
   const [renderedLayout, setRenderedLayout] = useState({ width: 1, height: 1 });
   const [viewBox, setViewBox] = useState({ minX: -1, minY: 1, width: 1, height: 1 });
-  const theme = useSelector(getTheme);
-  const styles = themeStyles(theme);
-  const [paths, setPaths] = useState<string[]>([]);
-  const [yLimits, setYLimits] = useState<YValueLimits>({
-    minY: Number.MAX_SAFE_INTEGER,
-    maxY: Number.MIN_SAFE_INTEGER
-  });
+  const styles = themeStyles();
 
   const isValidNumber = (value: number) => {
     return typeof value === 'number' && !isNaN(value) && isFinite(value);
   }
 
-  const reRenderData = () => {
-    if (widthScalar === 0) {
-      console.warn(tag, 'widthScalar is 0, cannot render graph');
-      return;
+  // compute SVG paths directly for smoother updates
+  const paths = useMemo(() => {
+    if (props.data.length === 0 || viewBox.height === 0 || viewBox.width === 0) {
+      return [];
     }
-    const height = viewBox.height / 1.5;
+
+    // Use 100% of the viewBox height to provide some vertical padding
+    const height = viewBox.height * 1.0;
     const width = viewBox.width;
-    const deltaY = yLimits.maxY - yLimits.minY;
+
+    // Fix the deltaY calculation (should be maxY - minY)
+    const deltaY = props.maxY - props.minY;
     const deltaX = width / widthScalar;
-    if (!isValidNumber(deltaY) || !isValidNumber(deltaX)) {
-      console.warn(tag, 'Invalid deltaY or deltaX', { deltaY, deltaX });
-      return;
+
+    if (!isValidNumber(deltaY) || !isValidNumber(deltaX) || deltaY === 0) {
+      return [];
     }
-    const newPaths = props.data.map((data) => {
-      return data.data.map((value, index) => {
+
+    // Calculate vertical offset to center the graph
+    const verticalOffset = viewBox.height * 0.02; // 2% padding from top
+
+    return props.data.map((graph) =>
+      graph.data.map((value, index) => {
         const xMove = (index + 1) * deltaX;
-        const yMove = height - ((value - yLimits.minY) / deltaY) * height; // Map minY to the top and maxY to the bottom
+
+        // Adjust yMove calculation to properly scale and center vertically
+        const normalizedValue = (value - props.minY) / deltaY; // 0 to 1
+        const yMove = verticalOffset + (height * (1 - normalizedValue)); // Invert and offset
+
         if (!isValidNumber(yMove) || !isValidNumber(xMove)) {
           return '';
         }
-
-        if (index === 0) {
-          return `M${24},${yMove}`;
-        }
-        return ` L${xMove},${yMove}`;
-      }).join(' ');
-    });
-    setPaths(newPaths);
-  }
+        return index === 0 ? `M${0},${yMove}` : ` L${xMove},${yMove}`;
+      }).join(' ')
+    );
+  }, [props.data, viewBox, props.minY, props.maxY]);
 
   useEffect(() => {
-    if (!props.data.length || viewBox.height == 0 || viewBox.width === 0) {
-      return;
-    }
-    reRenderData();
-  }, [yLimits, viewBox]);
-
-  useEffect(() => {
-    if (!props.data.length || viewBox.height == 0 || viewBox.width === 0) {
-      return;
-    }
-    const minY = Math.min(
-      ...props.data.map((graph) => Math.min(...graph.data)),
-      yLimits.minY);
-    const maxY = Math.max(
-      ...props.data.map((graph) => Math.max(...graph.data)),
-      yLimits.maxY);
-    if (!isValidNumber(minY) || !isValidNumber(maxY)) {
-      return;
-    }
-    if (minY !== yLimits.minY || maxY !== yLimits.maxY) {
-      setYLimits({
-        minY,
-        maxY
-      });
-    } else {
-      reRenderData();
-    }
-  }, [props.data, viewBox]);
-
-
-  useEffect(() => {
-    const minX = -4;
-    const minY = -4;
+    // Set up viewBox with proper dimensions
+    const minX = 0;
+    const minY = 0;
     const width = renderedLayout.width;
-    const height = renderedLayout.height - 12;
+    // Don't subtract as much from the height to allow more vertical space
+    const height = renderedLayout.height - 4;
+
     if (!isValidNumber(width) || !isValidNumber(height)) {
       return;
     }
+
     setViewBox({
       minX,
       minY,
@@ -120,8 +89,7 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
   }, [renderedLayout]);
 
   return (
-    <View
-      style={styles.root}>
+    <View style={styles.root}>
       {props.title && (
         <ThemeText style={styles.titleText}>
           {props.title}
@@ -131,25 +99,24 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
         <Svg
           viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`}
           onLayout={(ev) => {
-            console.log(ev.nativeEvent.layout);
             setRenderedLayout({
               width: ev.nativeEvent.layout.width,
               height: ev.nativeEvent.layout.height
             })
           }}>
-          {(isValidNumber(yLimits.minY) && isValidNumber(yLimits.maxY)) && (
+          {(isValidNumber(props.minY) && isValidNumber(props.maxY)) && (
             <>
               <Text
                 fontSize={fontSize}
-                y={0 + (fontSize / 1.4)}
-                fill={theme.colors.text.primary.onPrimary}>
-                {yLimits.maxY.toFixed(2)}
+                y={viewBox.height * 0.05 + (fontSize / 1.4)} // Position near the top with padding
+                fill={invokeWithTheme(theme => theme.colors.text.primary.onPrimary)}>
+                {props.maxY === Number.MIN_SAFE_INTEGER ? 0 : props.maxY.toFixed(2)}
               </Text>
               <Text
                 fontSize={fontSize}
-                y={viewBox.height - (fontSize / 1.4)}
-                fill={theme.colors.text.primary.onPrimary}>
-                {yLimits.minY.toFixed(2)}
+                y={viewBox.height * 0.95} // Position near the bottom with padding
+                fill={invokeWithTheme(theme => theme.colors.text.primary.onPrimary)}>
+                {props.minY === Number.MAX_SAFE_INTEGER ? 0 : props.minY.toFixed(2)}
               </Text>
             </>
           )}
@@ -179,10 +146,10 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     </View>
   )
 }
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     titleText: {
-      paddingTop: 5,
       paddingBottom: 5,
       color: theme.colors.text.primary.onPrimary
     },
@@ -193,15 +160,13 @@ function themeStyles(theme: IThemeElements) {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingTop: 12,
-      paddingBottom: 12
     },
     paper: {
       width: '95%',
-      marginBottom: 5,
       padding: 0,
-      paddingBottom: 4,
-      paddingTop: 4
+      flex: 1, // Add flex to fill available space
+      display: 'flex',
+      justifyContent: 'center' // Center content vertically
     },
     labelView: {
       display: 'flex',
@@ -215,7 +180,8 @@ function themeStyles(theme: IThemeElements) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-evenly',
-      paddingBottom: 5
+      margin: 0,
+      padding: 0
     },
     labelIcon: {
       width: 12,
@@ -226,5 +192,7 @@ function themeStyles(theme: IThemeElements) {
     labelText: {
       color: theme.colors.text.primary.onPrimary
     }
-  })
+  }));
 }
+
+export const MemoBaseLineGraph = React.memo(BaseLineGraph);

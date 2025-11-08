@@ -1,8 +1,9 @@
-import { DirectionalData } from "ForzaTelemetryApi";
+import { DirectionalData, ITelemetryData } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { getForzaPacket } from "../../redux/WifiStore";
 import { useLogger } from "../Logger";
+import { useNetworkContext } from "../Network";
+import { EmitterSubscription } from "react-native";
+import { useReplay } from "../Recorder";
 
 export interface PlayerPosition {
   x: number;
@@ -49,7 +50,9 @@ const initialViewBox: SvgViewBoxMeasures = {
 export function useMapViewModel(): IMapViewModel {
   const tag = 'MapViewModel';
   const logger = useLogger();
-  const forza = useSelector(getForzaPacket);
+  const network = useNetworkContext();
+  const replay = useReplay();
+  const [forza, setForza] = useState<ITelemetryData | null>(null);
   const [trackId, setTrackId] = useState(0);
   const [svg, setSvg] = useState('');
   const [viewBox, setViewBox] = useState<SvgViewBoxMeasures>(initialViewBox);
@@ -58,6 +61,30 @@ export function useMapViewModel(): IMapViewModel {
   const isValidNumber = (value: number) => {
     return typeof value === 'number' && !isNaN(value) && isFinite(value);
   }
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (replay) {
+      packetSub = replay.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [replay]);
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (network) {
+      packetSub = network.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [network]);
 
   useEffect(() => {
     let newMinY = Math.min(viewBox.minY, (position?.y || -1));

@@ -1,10 +1,9 @@
 import React from 'react';
 import {
-  useColorScheme,
   View,
 } from 'react-native';
 
-import { AppRoutes, RootStackParamList } from './src/constants/types';
+import { AppRoutes, RootStackParamList } from './src/types/types';
 import { WifiInfo } from './src/pages/WifiInfo';
 import { DataChooser } from './src/pages/DataChooser';
 import { HptqGraph } from './src/pages/HpTqGraph/HpTqGraph';
@@ -17,6 +16,7 @@ import { Grip } from './src/pages/Grip/Grip';
 import { SourceChooser } from './src/pages/SourceChooser';
 import { TuningPage } from './src/pages/Tuning/Tuning';
 import { ReplayList } from './src/pages/ReplayList/ReplayList';
+import { Settings } from './src/pages/Settings/Settings';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -69,7 +69,11 @@ function App(): React.JSX.Element {
               component={TuningPage} />
             <Stack.Screen
               name={AppRoutes.REPLAY_LIST}
-              component={ReplayList} />
+              component={ReplayList}
+              initialParams={{listId: 'none'}} />
+            <Stack.Screen
+              name={AppRoutes.SETTINGS}
+              component={Settings} />
           </Stack.Navigator>
         </SafeStack>
       </NavigationContainer>

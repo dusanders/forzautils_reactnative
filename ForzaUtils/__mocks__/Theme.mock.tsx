@@ -1,4 +1,4 @@
-import { IThemeElements } from "../src/constants/Themes"
+import { IThemeElements } from "../src/types/Themes"
 
 const defaultPaper: IThemeElements['sizes']['paper'] = {
   padding: 20,

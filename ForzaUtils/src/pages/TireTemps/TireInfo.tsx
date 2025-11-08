@@ -1,11 +1,9 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { TextCard } from "../../components/TextCard";
-import { IThemeElements } from "../../constants/Themes";
+import { IThemeElements } from "../../types/Themes";
 import { ThemeText } from "../../components/ThemeText";
-import { useSelector } from "react-redux";
-import { getTheme } from "../../redux/ThemeStore";
 import { CardContainer } from "../../components/CardContainer";
+import { themeService } from "../../hooks/ThemeState";
 
 export interface TireInfoProps {
   temp: number;
@@ -13,14 +11,14 @@ export interface TireInfoProps {
 }
 
 export function TireInfo(props: TireInfoProps) {
-  const theme = useSelector(getTheme);
-  const style = themeStyles(theme);
+  const theme = themeService().theme;
+  const style = themeStyles();
 
   const colorForTemp = (temp: number) => {
-    if(temp < 210) {
+    if (temp < 210) {
       return theme.colors.text.primary.onPrimary
     }
-    if(temp < 240) {
+    if (temp < 240) {
       return theme.colors.text.warning.onPrimary
     }
     return theme.colors.text.error.onPrimary
@@ -42,12 +40,12 @@ export function TireInfo(props: TireInfoProps) {
     )
   }
   const DataCard = (props: { children: any }) => (
-    <CardContainer 
-    centerContent
-    style={{
-      ...style.halfWidth,
-      ...style.centerContent
-    }}>
+    <CardContainer
+      centerContent
+      style={{
+        ...style.halfWidth,
+        ...style.centerContent
+      }}>
       {props.children}
     </CardContainer>
   )
@@ -64,7 +62,7 @@ export function TireInfo(props: TireInfoProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
+function themeStyles() {
   return StyleSheet.create({
     halfWidth: {
       width: '50%'

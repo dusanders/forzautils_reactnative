@@ -3,6 +3,7 @@ import { ITelemetryData } from "ForzaTelemetryApi";
 import { ISession, ISessionInfo, SESSION_DB_NAME_PREFIX, DB_FILE_EXT, MASTER_DB_NAME } from "./DatabaseInterfaces";
 import { ILogger, Logger } from '../../context/Logger';
 import { FileSystem } from 'react-native-file-access';
+import { delay } from '../../types/types';
 
 /**
  * Structure of the packet data in the database
@@ -30,7 +31,7 @@ export class Session implements ISession {
   static fromInfo(info: ISessionInfo): ISession {
     return (new Session(info).initialize());
   }
-  
+
   private tag: string;
   private db?: DB;
   private masterDb?: DB;
@@ -44,23 +45,26 @@ export class Session implements ISession {
   }
 
   async delete() {
-    if(this.db?.getDbPath()) {
+    if (this.db?.getDbPath()) {
       await FileSystem.unlink(this.db.getDbPath());
     }
   }
 
-  async readPacket(offset?: number): Promise<ITelemetryData | null> {
-    let readOffset = offset || this.currentReadOffset;
-    this.currentReadOffset = readOffset;
-    const found = await this.executeQuery(
-      `SELECT * FROM packets WHERE id = ?`,
-      [this.currentReadOffset++]
-    );
-    const casted = (found!.rows[0] as any) as IPacketData;
-    if (casted.json.length > 0) {
-      return JSON.parse(casted.json);
+  async* readPacket(offset?: number): AsyncGenerator<ITelemetryData | null, void, number> {
+    this.currentReadOffset = offset !== undefined ? offset : this.currentReadOffset;
+    while (this.currentReadOffset < this.info.length) {
+      await delay(20);
+      const found = await this.executeQuery(
+        `SELECT * FROM packets WHERE id = ?`,
+        [this.currentReadOffset++]
+      );
+      if (found && found.rows.length > 0) {
+        const casted = found.rows[0] as any as IPacketData;
+        if (casted.json && casted.json.length > 0) {
+          yield JSON.parse(casted.json);
+        } 
+      } 
     }
-    return null;
   }
 
   async addPacket(packet: ITelemetryData): Promise<void> {
@@ -122,7 +126,7 @@ export class Session implements ISession {
       return await this.db?.execute(query, params);
     } catch (error) {
       console.error('Database query error:', error);
-      throw error;
+      return undefined;
     }
   }
 }

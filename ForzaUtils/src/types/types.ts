@@ -1,5 +1,18 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
+import { ReplayRouteParams } from "../pages/ReplayList/ReplayList";
+import { Logger } from "../context/Logger";
+
+/**
+ * Add type for generic axle data
+ * @template T Type of data for the axle
+ * @property front Data for the front axle
+ * @property rear Data for the rear axle
+ */
+export interface AxleData<T> {
+  front: T;
+  rear: T;
+}
 
 /**
  * Add Type for react-native-udp 'rinfo' object
@@ -33,7 +46,8 @@ export type RootStackParamList = {
   [AppRoutes.GRIP]: undefined;
   [AppRoutes.SOURCE_CHOOSER]: undefined;
   [AppRoutes.TUNING_CALCULATOR]: undefined;
-  [AppRoutes.REPLAY_LIST]: undefined;
+  [AppRoutes.REPLAY_LIST]: ReplayRouteParams;
+  [AppRoutes.SETTINGS]: undefined;
 }
 
 /**
@@ -59,7 +73,8 @@ export enum AppRoutes {
   GRIP = 'grip',
   SOURCE_CHOOSER = 'source_chooser',
   TUNING_CALCULATOR = 'tuning_calculator',
-  REPLAY_LIST = 'replay_list'
+  REPLAY_LIST = 'replay_list',
+  SETTINGS = 'settings',
 }
 
 /**
@@ -98,14 +113,27 @@ export function randomKey(): string {
 
 export interface DataWindow<T> {
   size: number;
+  min: number;
+  max: number;
   data: T[];
   add: (data: T) => void;
   clear: () => void;
 }
 
-export function useDataWindow<T>(size: number, initialValues?: T[]): DataWindow<T> {
+export function useDataWindow<T>(size: number,
+  parseMin: (data: T) => number,
+  parseMax: (data: T) => number,
+  initialValues?: T[]): DataWindow<T> {
   const [data, setData] = useState<T[]>(initialValues ? initialValues : []);
+  const [min, setMin] = useState(Number.MAX_SAFE_INTEGER);
+  const [max, setMax] = useState(Number.MIN_SAFE_INTEGER);
   const add = (data: T) => {
+    if (data) {
+      const minValue = parseMin(data);
+      const maxValue = parseMax(data);
+      if (minValue < min) setMin(minValue);
+      if (maxValue > max) setMax(maxValue);
+    }
     setData((prev) => {
       if (prev.length >= size) {
         return [...prev.slice(1), data];
@@ -116,10 +144,20 @@ export function useDataWindow<T>(size: number, initialValues?: T[]): DataWindow<
   const clear = () => {
     setData([]);
   }
+
   return {
     size,
+    min: min,
+    max: max,
     data,
     add,
     clear,
   }
 }
+
+
+type NonFunctionProperties<T> = {
+  [K in keyof T]: T[K] extends Function ? never : K;
+}[keyof T];
+
+export type ICache<T> = Pick<T, NonFunctionProperties<T>>;

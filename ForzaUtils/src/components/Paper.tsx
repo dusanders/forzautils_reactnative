@@ -1,9 +1,7 @@
 import React from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
-import { IThemeElements } from "../constants/Themes";
 import { ContainerProps } from "./Container";
-import { useSelector } from "react-redux";
-import { getTheme } from "../redux/ThemeStore";
+import { invokeWithTheme } from "../hooks/ThemeState";
 
 
 export interface PaperProps extends ContainerProps {
@@ -11,13 +9,12 @@ export interface PaperProps extends ContainerProps {
 }
 
 export function Paper(props: PaperProps) {
-  const theme = useSelector(getTheme);
-  const styles = themeStyles(theme);
+  const styles = themeStyles();
   let variantStyle: StyleProp<ViewStyle> = {
-    backgroundColor: theme.colors.background.onPrimary
+    backgroundColor: invokeWithTheme(theme => theme.colors.background.onPrimary)
   }
   if (props.variant) {
-    variantStyle.backgroundColor = theme.colors.background[props.variant]
+    variantStyle.backgroundColor = invokeWithTheme(theme => theme.colors.background[props.variant!])
   }
 
   let centerContentStyle: StyleProp<ViewStyle> = {};
@@ -41,8 +38,8 @@ export function Paper(props: PaperProps) {
   )
 }
 
-function themeStyles(theme: IThemeElements) {
-  return StyleSheet.create({
+function themeStyles() {
+  return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       padding: theme.sizes.borderRadius,
       borderRadius: theme.sizes.borderRadius,
@@ -50,5 +47,5 @@ function themeStyles(theme: IThemeElements) {
       width: '100%',
       overflow: 'hidden'
     },
-  })
+  }));
 }
