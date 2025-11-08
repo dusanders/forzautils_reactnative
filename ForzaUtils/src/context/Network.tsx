@@ -4,10 +4,9 @@ import { Splash } from '../pages/Splash';
 import { LISTEN_PORT } from '../types/types';
 import { ITelemetryData } from 'ForzaTelemetryApi';
 import { Socket } from '../services/Socket';
-import { ReplayState, useReplay, useReplayControls } from './Recorder';
+import { ReplayState, useReplay } from './Recorder';
 import EventEmitter, { EmitterSubscription } from 'react-native/Libraries/vendor/emitter/EventEmitter';
 import { useWifi } from './Wifi';
-import { packetService } from '../hooks/PacketState';
 
 //#region Definitions
 

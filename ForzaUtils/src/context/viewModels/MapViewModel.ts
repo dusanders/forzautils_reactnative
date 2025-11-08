@@ -1,7 +1,6 @@
 import { DirectionalData, ITelemetryData } from "ForzaTelemetryApi";
 import { useEffect, useState } from "react";
 import { useLogger } from "../Logger";
-import { packetService } from "../../hooks/PacketState";
 import { useNetworkContext } from "../Network";
 import { EmitterSubscription } from "react-native";
 

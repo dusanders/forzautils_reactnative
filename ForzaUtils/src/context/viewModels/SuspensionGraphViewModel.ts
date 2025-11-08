@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { packetService } from "../../hooks/PacketState";
 import { AxleData, useDataWindow } from "../../types/types";
 import { ITelemetryData } from "ForzaTelemetryApi/dist/TelemetryData";
 import { useNetworkContext } from "../Network";

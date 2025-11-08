@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { AxleData, useDataWindow } from "../../types/types";
-import { packetService } from "../../hooks/PacketState";
 import { useNetworkContext } from "../Network";
 import { ITelemetryData } from "ForzaTelemetryApi";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
