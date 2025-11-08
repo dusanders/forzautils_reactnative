@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useLogger } from "../Logger";
 import { useNetworkContext } from "../Network";
 import { EmitterSubscription } from "react-native";
+import { useReplay } from "../Recorder";
 
 export interface PlayerPosition {
   x: number;
@@ -50,6 +51,7 @@ export function useMapViewModel(): IMapViewModel {
   const tag = 'MapViewModel';
   const logger = useLogger();
   const network = useNetworkContext();
+  const replay = useReplay();
   const [forza, setForza] = useState<ITelemetryData | null>(null);
   const [trackId, setTrackId] = useState(0);
   const [svg, setSvg] = useState('');
@@ -62,9 +64,20 @@ export function useMapViewModel(): IMapViewModel {
 
   useEffect(() => {
     let packetSub: EmitterSubscription;
+    if (replay) {
+      packetSub = replay.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [replay]);
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
     if (network) {
       packetSub = network.onPacket((packet) => {
-        logger.log(tag, `New packet received in MapViewModel - Lap: ${packet?.lapNumber}, RaceOn: ${packet?.isRaceOn}`);
         setForza(packet);
       });
     }

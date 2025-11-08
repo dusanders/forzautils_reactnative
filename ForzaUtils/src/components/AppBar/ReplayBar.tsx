@@ -1,10 +1,11 @@
-import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useEffect } from "react";
+import { EmitterSubscription, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useLogger } from "../../context/Logger";
 import { ThemeIcon } from "../ThemeIcon";
 import { ThemeText } from "../ThemeText";
 import { invokeWithTheme } from "../../hooks/ThemeState";
 import { ReplayState, useReplay } from "../../context/Recorder";
+import { ITelemetryData } from "ForzaTelemetryApi";
 
 export interface ReplayBarProps {
 }
@@ -13,13 +14,26 @@ export function ReplayBar(props: ReplayBarProps) {
   const logger = useLogger();
   const replay = useReplay();
   const styles = themeStyles();
+  const [position, setPosition] = React.useState<number>(replay.replayPosition);
+
+  useEffect(() => {
+    let replayListener: EmitterSubscription | undefined = undefined;
+    if (replay) {
+      replayListener = replay.onPacket((packet: ITelemetryData, currentPosition: number) => {
+        setPosition(currentPosition);
+      });
+    }
+    return () => {
+      replayListener?.remove();
+    };
+  }, [replay.replayState]);
 
   return (
     <View style={styles.root}>
       <View>
         <TouchableOpacity
           onPress={() => {
-            if(replay.replayState === ReplayState.PLAYING){
+            if (replay.replayState === ReplayState.PLAYING) {
               replay.pause();
             } else {
               replay.resume();
@@ -31,7 +45,7 @@ export function ReplayBar(props: ReplayBarProps) {
       </View>
       <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         <ThemeText style={styles.replayProgressText}>
-          {replay.replayPosition} / {replay.replayLength}
+          {position} / {replay.replayLength}
         </ThemeText>
         <ThemeText>
           {replay.replayInfo ? replay.replayInfo?.name : 'No Replay'}

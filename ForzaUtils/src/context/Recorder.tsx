@@ -17,7 +17,7 @@ export enum ReplayState {
 
 export interface IRecorder {
   recordPacket(packet: ITelemetryData): Promise<void>;
-  onPacket(fn: (packet: ITelemetryData) => void): EmitterSubscription;
+  onPacket(fn: (packet: ITelemetryData, position: number) => void): EmitterSubscription;
   replayState: ReplayState;
   replayInfo?: ISessionInfo;
   replayDelay: number;
@@ -60,7 +60,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
   const currentFile = useRef<ISession>(undefined);
   const [replayState, setReplayState] = useState<ReplayState>(ReplayState.PAUSED);
   const [replayDelay, setReplayDelay] = useState<number>(20); // 20 ms
-  const [replayPosition, setReplayPosition] = useState<number>(0);
+  const replayPosition = useRef<number>(0);
   const [replayLength, setReplayLength] = useState<number>(0);
 
   const getAllInfos = useCallback(async () => {
@@ -90,7 +90,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
     }
     currentFile.current = file;
     setReplayState(ReplayState.PAUSED);
-    setReplayPosition(0);
+    replayPosition.current = 0;
     setReplayLength(file.info.length);
     logger.log(tag, `Loaded replay: ${file.info.name}`);
   }, [logger]);
@@ -113,7 +113,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
     await controlSemaphore.current.acquire();
     if (currentFile.current) {
       setReplayState(ReplayState.PLAYING);
-      setReplayPosition(currentFile.current.currentReadOffset);
+      replayPosition.current = currentFile.current.currentReadOffset;
     }
     controlSemaphore.current.release();
   };
@@ -142,7 +142,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
     }
     setReplayState(ReplayState.PAUSED);
     eventEmitter.current.removeAllListeners(PACKET_EVENT);
-    setReplayPosition(0);
+    replayPosition.current = 0;
     setReplayLength(0);
     controlSemaphore.current.release();
   };
@@ -153,19 +153,18 @@ export function RecorderProvider(props: RecorderProviderProps) {
       clearInterval(replayInterval);
     }
     replayInterval = setInterval(async () => {
-      await controlSemaphore.current.acquire();
       if (currentFile.current) {
         const packet = (await currentFile.current.readPacket()) || undefined;
         if (packet) {
-          // forzaPacket.setPacket(packet);
-          setReplayPosition(currentFile.current.currentReadOffset);
+          replayPosition.current = currentFile.current.currentReadOffset;
+          eventEmitter.current.emit(PACKET_EVENT, packet, replayPosition.current);
         } else {
           logger.log(tag, `No more packets to read, stopping replay`);
           setReplayState(ReplayState.PAUSED);
         }
       }
-      controlSemaphore.current.release();
     }, replayDelay);
+    controlSemaphore.current.release();
   }
 
   useEffect(() => {
@@ -194,11 +193,11 @@ export function RecorderProvider(props: RecorderProviderProps) {
           await currentFile.current.addPacket(packet);
         }
       },
-      onPacket: (fn: (packet: ITelemetryData) => void): EmitterSubscription => {
+      onPacket: (fn: (packet: ITelemetryData, position: number) => void): EmitterSubscription => {
         return eventEmitter.current.addListener(PACKET_EVENT, fn);
       },
       replayInfo: currentFile.current?.info,
-      replayPosition,
+      replayPosition: replayPosition.current,
       replayLength,
       replayState: currentFile.current ? replayState : ReplayState.IDLE,
       replayDelay,

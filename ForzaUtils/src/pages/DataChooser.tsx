@@ -22,7 +22,7 @@ export function DataChooser(props: DataChooserProps) {
   const logger = useLogger();
   const navigation = useNavigation<StackNavigation>();
   const replay = useReplayControls();
-  const forza = useNetworkContext();
+  const network = useNetworkContext();
 
   const CardButton = useMemo(() => ({ title, body, onPress }: { title: string, body: string, onPress: () => void }) => {
     return (
@@ -68,11 +68,6 @@ export function DataChooser(props: DataChooserProps) {
     }
   }, [replay.replayState]);
 
-  useEffect(() => {
-    logger.log(tag, `ForzaUtils isDEBUG mode: ${forza.isDEBUG}`);
-  }, [forza.isDEBUG]);
-  logger.log(tag, `Rendering DataChooser.tsx`);
-
   const getFlyoutOptions = useCallback(() => ([{
     id: 'record-button',
     onPress: () => { },
@@ -87,19 +82,25 @@ export function DataChooser(props: DataChooserProps) {
         <View style={{ flexDirection: 'row', marginTop: 8, alignItems: 'center' }}>
           <ThemeText variant='primary' onBackground='onSecondary'>Debug Mode</ThemeText>
           <ThemeSwitch
-            value={forza.isDEBUG}
+            value={network.isDEBUG}
             onChange={() => {
-              if (forza.isDEBUG) {
-                forza.STOP_DEBUG();
+              if (network.isDEBUG) {
+                network.STOP_DEBUG();
               } else {
-                forza.DEBUG();
+                network.DEBUG();
               }
             }} />
         </View>
       </View>
     )
   }]
-  ), [replay.replayState, setRecording, forza.isDEBUG]);
+  ), [replay.replayState, network.isDEBUG]);
+
+  useEffect(() => {
+    logger.log(tag, `ForzaUtils isDEBUG mode: ${network.isDEBUG}`);
+  }, [network.isDEBUG]);
+  
+  logger.log(tag, `Rendering DataChooser.tsx`);
 
   return (
     <AppBarContainer

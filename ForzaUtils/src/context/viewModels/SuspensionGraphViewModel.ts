@@ -3,6 +3,7 @@ import { AxleData, useDataWindow } from "../../types/types";
 import { ITelemetryData } from "ForzaTelemetryApi/dist/TelemetryData";
 import { useNetworkContext } from "../Network";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
+import { useReplay } from "../Recorder";
 
 export interface ISuspensionGraphViewModel {
   leftFront: number;
@@ -99,6 +100,7 @@ const debugData = [
 export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
   const tag = 'SuspensionGraphViewModel';
   const windowSize = 50;
+  const replay = useReplay();
   const network = useNetworkContext();
   const [forza, setForza] = useState<ITelemetryData | null>(null);
 
@@ -149,6 +151,18 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
       packetSub?.remove();
     };
   }, [network]);
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (replay) {
+      packetSub = replay.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [replay]);
 
   return {
     leftFront: leftFront,

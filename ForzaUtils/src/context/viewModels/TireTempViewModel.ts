@@ -3,6 +3,7 @@ import { AxleData, useDataWindow } from "../../types/types";
 import { useNetworkContext } from "../Network";
 import { ITelemetryData } from "ForzaTelemetryApi";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
+import { useReplay } from "../Recorder";
 
 export interface ITireTempViewModel {
   leftFront: number;
@@ -42,6 +43,7 @@ export function useTireTempsViewModel(): ITireTempViewModel {
   const tag = `TireTempsViewModel`;
   const windowSize = 50;
   const network = useNetworkContext();
+  const replay = useReplay();
   const [forza, setForza] = useState<ITelemetryData | null>(null);
 
   const avgTempWindow = useDataWindow<AxleData<number>>(
@@ -97,6 +99,18 @@ export function useTireTempsViewModel(): ITireTempViewModel {
       packetSub?.remove();
     };
   }, [network]);
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (replay) {
+      packetSub = replay.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [replay]);
 
   return {
     leftFront: leftFront,

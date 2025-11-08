@@ -4,6 +4,7 @@ import { delay } from "../../types/types";
 import { ForzaTelemetryApi, ITelemetryData } from "ForzaTelemetryApi";
 import { useNetworkContext } from "../Network";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
+import { useReplay } from "../Recorder";
 
 export interface IHpTqGraphViewModel {
   gears: GearData[];
@@ -122,6 +123,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   }
   const tag = 'HpTqGraphViewModel';
   const logger = useLogger();
+  const replay = useReplay();
   const network = useNetworkContext();
   const [forza, setForza] = useState<ITelemetryData | null>(null);
   const [gears, setGears] = useState<GearData[]>([]);
@@ -213,6 +215,18 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
       packetSub?.remove();
     };
   }, [network]);
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (replay) {
+      packetSub = replay.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [replay]);
 
   useEffect(() => {
     if (!ignorePacket()) {

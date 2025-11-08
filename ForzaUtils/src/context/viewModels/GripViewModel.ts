@@ -3,6 +3,7 @@ import { ITelemetryData, TireData } from "ForzaTelemetryApi";
 import { AxleData, useDataWindow } from "../../types/types";
 import { useNetworkContext } from "../Network";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
+import { useReplay } from "../Recorder";
 
 
 export interface IGripViewModel {
@@ -18,6 +19,7 @@ export interface IGripViewModel {
 
 export function useGripViewModel(): IGripViewModel {
   const network = useNetworkContext();
+  const replay = useReplay();
   const [forza, setForza] = useState<ITelemetryData | null>(null);
   const windowSize = 50;
   const slipAngleWindow = useDataWindow<AxleData<number>>(
@@ -79,6 +81,18 @@ export function useGripViewModel(): IGripViewModel {
       packetSub?.remove();
     };
   }, [network]);
+
+  useEffect(() => {
+    let packetSub: EmitterSubscription;
+    if (replay) {
+      packetSub = replay.onPacket((packet) => {
+        setForza(packet);
+      });
+    }
+    return () => {
+      packetSub?.remove();
+    };
+  }, [replay]);
 
   return {
     steering: steering,
