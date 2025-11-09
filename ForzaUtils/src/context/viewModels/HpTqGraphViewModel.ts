@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLogger } from "../Logger";
 import { delay } from "../../types/types";
 import { ForzaTelemetryApi, ITelemetryData } from "ForzaTelemetryApi";
@@ -125,11 +125,15 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
   const logger = useLogger();
   const replay = useReplay();
   const network = useNetworkContext();
+  const isDebug = useRef(network.isDEBUG);
   const [forza, setForza] = useState<ITelemetryData | null>(null);
   const [gears, setGears] = useState<GearData[]>([]);
 
 
   const ignorePacket = () => {
+    if (isDebug.current) {
+      return false;
+    }
     if (!forza ||
       !forza.isRaceOn ||
       forza.throttle < 50 ||
@@ -206,7 +210,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
 
   useEffect(() => {
     let packetSub: EmitterSubscription;
-    if (network) {
+    if (network && !isDebug.current) {
       packetSub = network.onPacket((packet) => {
         setForza(packet);
       });
@@ -241,6 +245,7 @@ export function useHpTqGraphViewModel(): IHpTqGraphViewModel {
       setGears([]);
     },
     DEBUG_StartStream: () => {
+      isDebug.current = true;
       DEBUG_Stream()
     }
   }

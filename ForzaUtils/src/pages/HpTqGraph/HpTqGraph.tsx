@@ -1,16 +1,16 @@
-import React, {  } from "react";
+import React, { useEffect } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import { Assets } from "../../assets";
 import { Paper } from "../../components/Paper";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { ThemeText } from "../../components/ThemeText";
-import { randomKey } from "../../types/types";
 import { HpTqCurves } from "./HpTqCurves";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigation } from "../../types/types";
 import { withScaledWindow } from "../../hooks/withScaledWindow";
 import { invokeWithTheme } from "../../hooks/ThemeState";
+import { useNetworkContext } from "../../context/Network";
 
 export interface HpTqGraphProps {
   // Nothing
@@ -19,8 +19,15 @@ export interface HpTqGraphProps {
 export function HptqGraph(props: HpTqGraphProps) {
   const navigation = useNavigation<StackNavigation>();
   const styles = themeStyles();
+  const network = useNetworkContext();
   const store = useViewModelStore().hpTqGraph;
   const windowMeasure = withScaledWindow(0.9, 1);
+
+  useEffect(() => {
+    if (network.isDEBUG) {
+      store.DEBUG_StartStream();
+    }
+  }, [network.isDEBUG]);
 
   const separator = () => {
     return (
@@ -34,16 +41,19 @@ export function HptqGraph(props: HpTqGraphProps) {
     <AppBarContainer title="Hp / Tq Graph"
       injectElements={[
         {
-          id: randomKey(),
+          id: 'clear-hp-cache',
           onPress: () => {
             store.clearCache();
           },
           renderItem: () => (
-            <ThemeText
-              allcaps
-              fontFamily={'bold'}>
-              Clear Data
-            </ThemeText>
+            <View>
+              <ThemeText
+                allcaps
+                fontFamily={'bold'}
+                variant={'error'}>
+                Clear Data
+              </ThemeText>
+            </View>
           )
         },
       ]}>
@@ -65,7 +75,6 @@ export function HptqGraph(props: HpTqGraphProps) {
           </Paper>
         )}
         {store.gears.length > 0 && (
-
           <FlatList
             ItemSeparatorComponent={separator}
             style={{

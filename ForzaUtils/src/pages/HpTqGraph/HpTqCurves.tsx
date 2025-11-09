@@ -13,6 +13,11 @@ export interface HpTqCurvesProps {
 }
 
 export const HpTqCurves = memo((props: HpTqCurvesProps) => {
+  const labelColor = invokeWithTheme((theme) => theme.colors.text.primary.onPrimary);
+  const primaryColor = invokeWithTheme((theme) => theme.colors.text.primary.onSecondary);
+  const secondaryColor = invokeWithTheme((theme) => theme.colors.text.secondary.onSecondary);
+  const hpColor = invokeWithTheme((theme) => theme.colors.text.primary.onPrimary);
+  const tqColor = invokeWithTheme((theme) => theme.colors.text.secondary.onPrimary);
   const sorted = props.data.sort((a, b) => a.rpm - b.rpm);
 
   const lineData: LineChartData = {
@@ -20,11 +25,11 @@ export const HpTqCurves = memo((props: HpTqCurvesProps) => {
     datasets: [
       {
         data: sorted.map((i) => i.hp),
-        color: () => invokeWithTheme((theme) => theme.colors.text.primary.onPrimary),
+        color: () => hpColor,
       },
       {
         data: sorted.map((i) => i.tq),
-        color: () => invokeWithTheme((theme) => theme.colors.text.secondary.onPrimary)
+        color: () => tqColor
       }
     ],
     legend: ['Torque', 'Horsepower'],
@@ -36,6 +41,7 @@ export const HpTqCurves = memo((props: HpTqCurvesProps) => {
         Gear {props.gear}
       </ThemeText>
       <LineChart
+        bezier
         data={lineData}
         width={props.width || 40}
         height={200}
@@ -51,12 +57,12 @@ export const HpTqCurves = memo((props: HpTqCurvesProps) => {
               : ''
         }}
         chartConfig={{
-          labelColor: () => invokeWithTheme((theme) => theme.colors.text.primary.onPrimary),
+          labelColor: () => labelColor,
           color: (opacity) => {
             if (opacity == 1) {
-              return invokeWithTheme((theme) => theme.colors.text.primary.onSecondary)
+              return primaryColor
             }
-            return invokeWithTheme((theme) => theme.colors.text.secondary.onSecondary)
+            return secondaryColor
           },
           backgroundGradientFromOpacity: 0,
           backgroundGradientToOpacity: 0,
