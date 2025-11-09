@@ -72,6 +72,7 @@ export class Session implements ISession {
       throw new Error(`Failed to add packet - session not initialized`);
     }
     if (this.info.endTime) {
+      this.logger.log(this.tag, `Cannot add packet - session ended at: ${this.info.endTime}`);
       return;
     }
     this.executeQuery(

@@ -1,25 +1,28 @@
 import React from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewProps, ViewStyle } from "react-native";
 import { invokeWithTheme } from "../hooks/ThemeState";
 
-export interface CardContainerProps {
+export interface CardContainerProps extends ViewProps {
   children: React.ReactNode;
   style?: ViewStyle;
   centerContent?: boolean; // Optional prop to center content
 }
 
 export function CardContainer(props: CardContainerProps) {
+  const { style, ...restProps } = props;
   const styles = themeStyles();
   const doCenter = props.centerContent ? styles.center : {};
 
   const styleCombined = {
     ...styles.root,
-    ...props.style,
     ...doCenter,
+    ...style,
   }
+
   return (
     <View
-      style={styleCombined}>
+      style={styleCombined}
+      {...restProps}>
       {props.children}
     </View>
   )

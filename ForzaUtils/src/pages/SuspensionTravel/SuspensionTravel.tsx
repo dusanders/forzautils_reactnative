@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { ScrollView } from "react-native";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { useThemeColors } from "../../hooks/ThemeState";
@@ -14,59 +14,98 @@ export const SuspensionTravel = React.memo((props: SuspensionTravelProps) => {
   const viewModel = useViewModelStore().suspensionGraph;
 
   // Memoize getData functions to prevent recreation
-  const avgData = useCallback(() => [
+  const avgData = useCallback(() => ({
+    points: [
+      viewModel.avgTravel.map((point) => point.front),
+      viewModel.avgTravel.map((point) => point.rear),
+    ],
+    min: viewModel.avgTravelMin,
+    max: viewModel.avgTravelMax,
+  }), [viewModel.avgTravel]);
+  const avgLabelData = useMemo(() => [
     {
-      points: viewModel.avgTravel.map((point) => point.front),
-      color: theme.colors.text.primary.onPrimary,
-      label: 'Front Avg Travel'
+      label: 'Front Avg Travel',
+      color: theme.colors.text.primary.onPrimary
     },
     {
-      points: viewModel.avgTravel.map((point) => point.rear),
-      color: theme.colors.text.secondary.onPrimary,
-      label: 'Rear Avg Travel'
+      label: 'Rear Avg Travel',
+      color: theme.colors.text.secondary.onPrimary
     }
-  ], [viewModel.avgTravel, theme.colors.text.primary.onPrimary, theme.colors.text.secondary.onPrimary]);
+  ], [theme.colors.text.primary.onPrimary, theme.colors.text.secondary.onPrimary]);
 
-  const leftFrontData = useCallback(() => [
+  const leftFrontData = useCallback(() => (
     {
-      points: viewModel.leftFrontWindow,
-      color: theme.colors.text.primary.onPrimary,
-      label: 'Left Front Travel'
+      points: [viewModel.leftFrontWindow.data],
+      min: viewModel.leftFrontWindow.min,
+      max: viewModel.leftFrontWindow.max,
+    }), [viewModel.leftFrontWindow]);
+  const leftFrontLabelData = useMemo(() => [
+    {
+      label: 'Left Front Travel',
+      color: theme.colors.text.primary.onPrimary
     }
-  ], [viewModel.leftFrontWindow, theme.colors.text.primary.onPrimary]);
+  ], [theme.colors.text.primary.onPrimary]);
 
-  const rightFrontData = useCallback(() => [
+  const rightFrontData = useCallback(() => (
     {
-      points: viewModel.rightFrontWindow,
-      color: theme.colors.text.primary.onPrimary,
-      label: 'Right Front Travel'
+      points: [viewModel.rightFrontWindow.data],
+      min: viewModel.rightFrontWindow.min,
+      max: viewModel.rightFrontWindow.max,
     }
-  ], [viewModel.rightFrontWindow, theme.colors.text.primary.onPrimary]);
+  ), [viewModel.rightFrontWindow]);
+  const rightFrontLabelData = useMemo(() => [
+    {
+      label: 'Right Front Travel',
+      color: theme.colors.text.primary.onPrimary
+    }
+  ], [theme.colors.text.primary.onPrimary]);
 
-  const leftRearData = useCallback(() => [
+  const leftRearData = useCallback(() => (
     {
-      points: viewModel.leftRearWindow,
-      color: theme.colors.text.primary.onPrimary,
-      label: 'Left Rear Travel'
+      points: [viewModel.leftRearWindow.data],
+      min: viewModel.leftRearWindow.min,
+      max: viewModel.leftRearWindow.max,
     }
-  ], [viewModel.leftRearWindow, theme.colors.text.primary.onPrimary]);
+  ), [viewModel.leftRearWindow]);
+  const leftRearLabelData = useMemo(() => [
+    {
+      label: 'Left Rear Travel',
+      color: theme.colors.text.primary.onPrimary
+    }
+  ], [theme.colors.text.primary.onPrimary]);
 
-  const rightRearData = useCallback(() => [
+  const rightRearData = useCallback(() => (
     {
-      points: viewModel.rightRearWindow,
-      color: theme.colors.text.primary.onPrimary,
-      label: 'Right Rear Travel'
+      points: [viewModel.rightRearWindow.data],
+      min: viewModel.rightRearWindow.min,
+      max: viewModel.rightRearWindow.max,
     }
-  ], [viewModel.rightRearWindow, theme.colors.text.primary.onPrimary]);
+  ), [viewModel.rightRearWindow]);
+  const rightRearLabelData = useMemo(() => [
+    {
+      label: 'Right Rear Travel',
+      color: theme.colors.text.primary.onPrimary
+    }
+  ], [theme.colors.text.primary.onPrimary]);
 
   return (
     <AppBarContainer title="Suspension Travel">
       <ScrollView>
-        <AvgSuspensionGraph getData={avgData} />
-        <AvgSuspensionGraph getData={leftFrontData} />
-        <AvgSuspensionGraph getData={rightFrontData} />
-        <AvgSuspensionGraph getData={leftRearData} />
-        <AvgSuspensionGraph getData={rightRearData} />
+        <AvgSuspensionGraph
+          getData={avgData}
+          labelData={avgLabelData} />
+        <AvgSuspensionGraph
+          getData={leftFrontData}
+          labelData={leftFrontLabelData} />
+        <AvgSuspensionGraph
+          getData={rightFrontData}
+          labelData={rightFrontLabelData} />
+        <AvgSuspensionGraph
+          getData={leftRearData}
+          labelData={leftRearLabelData} />
+        <AvgSuspensionGraph
+          getData={rightRearData}
+          labelData={rightRearLabelData} />
       </ScrollView>
     </AppBarContainer>
   );

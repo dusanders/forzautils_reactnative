@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { AxleData, useDataWindow } from "../../types/types";
+import { AxleData, DataWindow, useDataWindow } from "../../types/types";
 import { ITelemetryData } from "ForzaTelemetryApi/dist/TelemetryData";
 import { useNetworkContext } from "../Network";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
@@ -11,10 +11,10 @@ export interface ISuspensionGraphViewModel {
   rightFront: number;
   rightRear: number;
   windowSize: number;
-  leftFrontWindow: number[];
-  rightFrontWindow: number[];
-  leftRearWindow: number[];
-  rightRearWindow: number[];
+  leftFrontWindow: DataWindow<number>;
+  rightFrontWindow: DataWindow<number>;
+  leftRearWindow: DataWindow<number>;
+  rightRearWindow: DataWindow<number>;
   avgTravel: AxleData<number>[];
   avgTravelMin: number;
   avgTravelMax: number;
@@ -122,10 +122,10 @@ export function useSuspensionGraphViewModel(): ISuspensionGraphViewModel {
     rightFront: rightFront,
     rightRear: rightRear,
     windowSize: windowSize,
-    leftFrontWindow: frontLeftWindow.data,
-    rightFrontWindow: frontRightWindow.data,
-    leftRearWindow: rearLeftWindow.data,
-    rightRearWindow: rearRightWindow.data,
+    leftFrontWindow: frontLeftWindow,
+    rightFrontWindow: frontRightWindow,
+    leftRearWindow: rearLeftWindow,
+    rightRearWindow: rearRightWindow,
     avgTravel: avgTravelWindow.data,
     avgTravelMin: avgTravelWindow.min,
     avgTravelMax: avgTravelWindow.max

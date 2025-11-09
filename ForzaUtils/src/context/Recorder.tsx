@@ -55,6 +55,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
   const logger = useLogger();
   const dbService = useRef(DatabaseService.getInstance());
   const eventEmitter = useRef<EventEmitter>(new EventEmitter());
+  const currentRecordingFile = useRef<ISession>(undefined);
   const currentFile = useRef<ISession>(undefined);
   const fileReadStream = useRef<AsyncGenerator<ITelemetryData | null, void, number>>();
   const [replayState, setReplayState] = useState<ReplayState>(ReplayState.PAUSED);
@@ -62,23 +63,29 @@ export function RecorderProvider(props: RecorderProviderProps) {
   const replayPosition = useRef<number>(0);
   const [replayLength, setReplayLength] = useState<number>(0);
 
-  const getAllInfos = useCallback(async () => {
+  const addPacketListener = (fn: (packet: ITelemetryData, position: number) => void): EmitterSubscription => {
+    return eventEmitter.current.addListener(PACKET_EVENT, fn);
+  };
+
+  const getAllInfos = async () => {
     const rows = await dbService.current.getAllSessions();
     return rows;
-  }, []);
+  };
 
-  const initRecording = useCallback(async () => {
-    if (currentFile.current) {
-      return currentFile.current;
+  const recordPacket = async (packet: ITelemetryData): Promise<void> => {
+    if (currentRecordingFile.current) {
+      currentRecordingFile.current.addPacket(packet);
     }
+  };
+
+  const openNewRecordingSession = async () => {
     let session = await dbService.current.generateSession();
-    currentFile.current = session;
-    fileReadStream.current = currentFile.current.readPacket();
+    currentRecordingFile.current = session;
     setReplayState(ReplayState.RECORDING);
     return session;
-  }, []);
+  };
 
-  const loadReplay = useCallback(async (session: ISessionInfo) => {
+  const loadReplay = async (session: ISessionInfo) => {
     if (currentFile.current) {
       currentFile.current.close();
       currentFile.current = undefined;
@@ -94,18 +101,18 @@ export function RecorderProvider(props: RecorderProviderProps) {
     replayPosition.current = 0;
     setReplayLength(file.info.length);
     logger.log(tag, `Loaded replay: ${file.info.name}`);
-  }, [logger]);
+  };
 
-  const deleteReplay = useCallback(async (info: ISessionInfo) => {
+  const deleteReplay = async (info: ISessionInfo) => {
     await dbService.current.deleteSession(info.name);
-  }, []);
+  };
 
   const closeRecording = async () => {
-    if (currentFile.current) {
-      currentFile.current.close();
-      currentFile.current = undefined;
+    if (currentRecordingFile.current) {
+      currentRecordingFile.current.close();
+      currentRecordingFile.current = undefined;
     }
-    setReplayState(ReplayState.PAUSED);
+    setReplayState(ReplayState.IDLE);
   };
 
   const resume = async () => {
@@ -144,7 +151,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
     }
     replayInterval = setInterval(async () => {
       if (currentFile.current) {
-        if(currentFile.current.currentReadOffset >= currentFile.current.info.length) {
+        if (currentFile.current.currentReadOffset >= currentFile.current.info.length) {
           fileReadStream.current = currentFile.current.readPacket(0);
         }
         const packet = await fileReadStream.current?.next();
@@ -167,7 +174,6 @@ export function RecorderProvider(props: RecorderProviderProps) {
     getAll();
   }, []);
 
-
   useEffect(() => {
     if (replayState === ReplayState.PLAYING) {
       play();
@@ -180,14 +186,8 @@ export function RecorderProvider(props: RecorderProviderProps) {
   logger.log(tag, `Rendering RecorderProvider.tsx - replayState: ${replayState}, replayPosition: ${replayPosition}, replayLength: ${replayLength}`);
   return (
     <RecorderContext.Provider value={{
-      recordPacket: async (packet: ITelemetryData): Promise<void> => {
-        if (replayState === ReplayState.RECORDING && currentFile.current) {
-          await currentFile.current.addPacket(packet);
-        }
-      },
-      onPacket: (fn: (packet: ITelemetryData, position: number) => void): EmitterSubscription => {
-        return eventEmitter.current.addListener(PACKET_EVENT, fn);
-      },
+      recordPacket,
+      onPacket: addPacketListener,
       replayInfo: currentFile.current?.info,
       replayPosition: replayPosition.current,
       replayLength,
@@ -200,7 +200,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
       loadReplay,
       getAllSessions: getAllInfos,
       delete: deleteReplay,
-      startRecording: initRecording,
+      startRecording: openNewRecordingSession,
       closeRecording,
       closeReplay,
     }}>
@@ -208,7 +208,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
         replayInfo: currentFile.current?.info,
         replayState,
         replayDelay,
-        startRecording: initRecording,
+        startRecording: openNewRecordingSession,
         closeRecording,
       }}>
         {props.children}

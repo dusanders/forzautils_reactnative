@@ -19,7 +19,7 @@ export interface IThemeState {
   current: ThemeType;
   theme: IThemeElements;
 }
-const initialTheme = ThemeType.FOREST;
+const initialTheme = ThemeType.DARK;
 const initialState: IThemeState = {
   current: initialTheme,
   theme: getThemeByType(initialTheme),
