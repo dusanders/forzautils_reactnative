@@ -16,7 +16,7 @@ export interface AxleData<T> {
 /**
  * Add Type for react-native-udp 'rinfo' object
  */
-export interface Upd_rinfo {
+export interface Udp_rinfo {
   address: string,
   port: number,
   family: 'IPv4',

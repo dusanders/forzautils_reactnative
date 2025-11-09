@@ -2,7 +2,7 @@ import { ForzaTelemetryApi, getRandomTelemetryData, ITelemetryData } from "Forza
 import UdpSockets from "react-native-udp";
 import UdpSocket from "react-native-udp/lib/types/UdpSocket";
 import { ILogger } from "../context/Logger";
-import { Upd_rinfo } from "../types/types";
+import { Udp_rinfo } from "../types/types";
 import EventEmitter, { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 
 export enum SocketEventType {
@@ -127,7 +127,7 @@ export class Socket implements ISocket {
     this.udpSocket = undefined;
     this.logger.error(this.tag, `Socket closed: ${ev?.message}`);
   }
-  private dataHandler(data: Buffer, rinfo: Upd_rinfo) {
+  private dataHandler(data: Buffer, rinfo: Udp_rinfo) {
     const forzaPacket = ForzaTelemetryApi.parseData(rinfo.size, data);
     this.eventEmitter.emit(SocketEventType.PACKET, forzaPacket);
   }

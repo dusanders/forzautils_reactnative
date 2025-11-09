@@ -43,7 +43,7 @@ export class DatabaseService implements IDatabaseService {
     if(!rows.rows.length) {
       return null;
     }
-    return Session.fromInfo(rows.rows[0]);
+    return Session.fromInfo(rows.rows[0], this.db);
   }
 
   async generateSession(): Promise<ISession> {
@@ -51,14 +51,14 @@ export class DatabaseService implements IDatabaseService {
       name: `${SESSION_DB_NAME_PREFIX}${Date.now()}`,
       length: 0, // Initialize length to 0 or any default value
       startTime: Date.now(),
-      endTime: 0// Default to 1 hour later
+      endTime: 0
     };
     this.logger.log(this.tag, `generate ${JSON.stringify(session)}`);
     await this.executeQuery(
       'INSERT INTO sessions (name, length, startTime, endtime) VALUES (?, ?, ?, ?)',
       [session.name, session.length, session.startTime, session.endTime]
     );
-    return Session.fromInfo(session);
+    return Session.fromInfo(session, this.db);
   }
   
   async deleteSession(name: string): Promise<void> {

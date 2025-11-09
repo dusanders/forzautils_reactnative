@@ -4,6 +4,7 @@ import { ISession, ISessionInfo, SESSION_DB_NAME_PREFIX, DB_FILE_EXT, MASTER_DB_
 import { ILogger, Logger } from '../../context/Logger';
 import { FileSystem } from 'react-native-file-access';
 import { delay } from '../../types/types';
+import { Semaphore } from '../../types/Semaphore';
 
 /**
  * Structure of the packet data in the database
@@ -28,18 +29,20 @@ export class Session implements ISession {
    * @param info Session metadata
    * @returns 
    */
-  static fromInfo(info: ISessionInfo): ISession {
-    return (new Session(info).initialize());
+  static fromInfo(info: ISessionInfo, masterDB: DB): ISession {
+    return (new Session(info, masterDB).initialize());
   }
 
   private tag: string;
   private db?: DB;
-  private masterDb?: DB;
   private logger: ILogger = Logger();
+  private dbSemaphore = new Semaphore(1);
   info: ISessionInfo;
   currentReadOffset: number = 0;
 
-  constructor(info: ISessionInfo) {
+  constructor(info: ISessionInfo,
+    private masterDb: DB
+  ) {
     this.tag = info.name;
     this.info = info;
   }
@@ -63,7 +66,7 @@ export class Session implements ISession {
         if (casted.json && casted.json.length > 0) {
           yield JSON.parse(casted.json);
         } 
-      } 
+      }
     }
   }
 
@@ -75,10 +78,10 @@ export class Session implements ISession {
       this.logger.log(this.tag, `Cannot add packet - session ended at: ${this.info.endTime}`);
       return;
     }
-    this.executeQuery(
-      `INSERT INTO packets (id, json) VALUES (?,?)`,
-      [this.info.length++, JSON.stringify(packet)]
-    );
+    await this.dbSemaphore.acquire();
+    await this.updateAllTables(packet, this.info.length);
+    this.info.length++;
+    this.dbSemaphore.release();
   }
 
   close(): void {
@@ -96,7 +99,6 @@ export class Session implements ISession {
       [this.info.length, this.info.endTime, this.info.name]
     );
     this.db?.close();
-    this.masterDb?.close();
   }
 
   /**
@@ -107,11 +109,8 @@ export class Session implements ISession {
     this.db = SqliteOpen({
       name: `${SESSION_DB_NAME_PREFIX}${this.info.name}.${DB_FILE_EXT}`
     });
-    this.masterDb = SqliteOpen({
-      name: MASTER_DB_NAME
-    });
     this.logger.log(this.tag, `${this.db.getDbPath()}`);
-    this.executeQuery(`CREATE TABLE IF NOT EXISTS packets (id INT PRIMARY KEY, json VARCHAR)`);
+    this.createTables();
     this.logger.log(this.tag, `initialized with ${JSON.stringify(this.info)}`);
     return this;
   }
@@ -129,5 +128,79 @@ export class Session implements ISession {
       console.error('Database query error:', error);
       return undefined;
     }
+  }
+
+  private async updateAllTables(packet: ITelemetryData, id: number): Promise<void> {
+    await this.executeQuery(
+      `INSERT INTO packets (id, json) VALUES (?,?)`,
+      [id, JSON.stringify(packet)]
+    );
+    await this.executeQuery(
+      `INSERT INTO rpm_data (id, max, idle, current) VALUES (?,?,?,?)`,
+      [id, packet.rpmData.max, packet.rpmData.idle, packet.rpmData.current]
+    );
+    await this.executeQuery(
+      `INSERT INTO acceleration_data (id, x, y, z) VALUES (?,?,?,?)`,
+      [id, packet.acceleration.x, packet.acceleration.y, packet.acceleration.z]
+    );
+    await this.executeQuery(
+      `INSERT INTO velocity_data (id, x, y, z) VALUES (?,?,?,?)`,
+      [id, packet.velocity.x, packet.velocity.y, packet.velocity.z]
+    );
+    await this.executeQuery(
+      `INSERT INTO angular_velocity_data (id, x, y, z) VALUES (?,?,?,?)`,
+      [id, packet.angularVelocity.x, packet.angularVelocity.y, packet.angularVelocity.z]
+    );
+    await this.executeQuery(
+      `INSERT INTO orientation_data (id, yaw, pitch, roll) VALUES (?,?,?,?)`,
+      [id, packet.yaw, packet.pitch, packet.roll]
+    );
+    await this.executeQuery(
+      `INSERT INTO normalized_suspension_travel_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      [id, packet.normalizedSuspensionTravel.leftFront, packet.normalizedSuspensionTravel.leftRear, packet.normalizedSuspensionTravel.rightFront, packet.normalizedSuspensionTravel.rightRear]
+    );
+    await this.executeQuery(
+      `INSERT INTO tire_slip_ratio_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      [id, packet.tireSlipRatio.leftFront, packet.tireSlipRatio.leftRear, packet.tireSlipRatio.rightFront, packet.tireSlipRatio.rightRear]
+    );
+    await this.executeQuery(
+      `INSERT INTO wheel_rotation_speed_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      [id, packet.wheelRotationSpeed.leftFront, packet.wheelRotationSpeed.leftRear, packet.wheelRotationSpeed.rightFront, packet.wheelRotationSpeed.rightRear]
+    );
+    await this.executeQuery(
+      `INSERT INTO wheel_on_rumble_strip_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      [id, packet.wheelOnRumbleStrip.leftFront, packet.wheelOnRumbleStrip.leftRear, packet.wheelOnRumbleStrip.rightFront, packet.wheelOnRumbleStrip.rightRear]
+    );
+    await this.executeQuery(
+      `INSERT INTO wheel_in_puddle_depth_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      [id, packet.wheelInPuddleDepth.leftFront, packet.wheelInPuddleDepth.leftRear, packet.wheelInPuddleDepth.rightFront, packet.wheelInPuddleDepth.rightRear]
+    );
+    await this.executeQuery(
+      `INSERT INTO surface_rumble_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      [id, packet.surfaceRumble.leftFront, packet.surfaceRumble.leftRear, packet.surfaceRumble.rightFront, packet.surfaceRumble.rightRear]
+    );
+    await this.executeQuery(
+      `INSERT INTO slip_angle_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      [id, packet.tireSlipAngle.leftFront, packet.tireSlipAngle.leftRear, packet.tireSlipAngle.rightFront, packet.tireSlipAngle.rightRear]
+    );
+  }
+
+  private async createTables(): Promise<void> {
+    if (!this.db) {
+      throw new Error(`Failed to create tables - session not initialized`);
+    }
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS packets (id INT PRIMARY KEY, json VARCHAR)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS rpm_data (id INT PRIMARY KEY, max FLOAT, idle FLOAT, current FLOAT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS acceleration_data (id INT PRIMARY KEY, x FLOAT, y FLOAT, z FLOAT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS velocity_data (id INT PRIMARY KEY, x FLOAT, y FLOAT, z FLOAT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS angular_velocity_data (id INT PRIMARY KEY, x FLOAT, y FLOAT, z FLOAT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS orientation_data (id INT PRIMARY KEY, yaw FLOAT, pitch FLOAT, roll FLOAT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS normalized_suspension_travel_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS tire_slip_ratio_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS wheel_rotation_speed_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS wheel_on_rumble_strip_data (id INT PRIMARY KEY, leftFront INT, leftRear INT, rightFront INT, rightRear INT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS wheel_in_puddle_depth_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS surface_rumble_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
+    await this.executeQuery(`CREATE TABLE IF NOT EXISTS slip_angle_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
   }
 }

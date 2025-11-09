@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { CardContainer } from "../CardContainer";
-import { BaseLineGraph, MemoBaseLineGraph } from "./BaseLineGraph";
+import { MemoBaseLineGraph } from "./BaseLineGraph";
 import { ScrollView, StyleSheet } from "react-native";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
