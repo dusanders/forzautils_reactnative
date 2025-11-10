@@ -53,21 +53,16 @@ export class Session implements ISession {
     }
   }
 
-  async* readPacket(offset?: number): AsyncGenerator<ITelemetryData | null, void, number> {
-    this.currentReadOffset = offset !== undefined ? offset : this.currentReadOffset;
-    while (this.currentReadOffset < this.info.length) {
-      await delay(20);
-      const found = await this.executeQuery(
-        `SELECT * FROM packets WHERE id = ?`,
-        [this.currentReadOffset++]
-      );
-      if (found && found.rows.length > 0) {
-        const casted = found.rows[0] as any as IPacketData;
-        if (casted.json && casted.json.length > 0) {
-          yield JSON.parse(casted.json);
-        } 
-      }
-    }
+  async readPacket(offset?: number): Promise<ITelemetryData | null> {
+    const target = offset ?? this.currentReadOffset;
+    if (target >= this.info.length) return null;
+
+    const found = await this.executeQuery(`SELECT * FROM packets WHERE id = ?`, [target]);
+    if (!found || found.rows.length === 0) return null;
+
+    this.currentReadOffset = target + 1;
+    const casted = found.rows[0] as unknown as IPacketData;
+    return casted.json ? JSON.parse(casted.json) : null;
   }
 
   async addPacket(packet: ITelemetryData): Promise<void> {

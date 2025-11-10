@@ -21,7 +21,7 @@ export interface AvgSuspensionGraphProps {
   getData(): SuspensionData;
 }
 
-export function AvgSuspensionGraph(props: AvgSuspensionGraphProps) {
+export function LineGraph(props: AvgSuspensionGraphProps) {
   const styles = themeStyles(props.height);
   const theme = themeService().theme;
   const [chartHeight, setChartHeight] = React.useState<number>(props.height || 180);

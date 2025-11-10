@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import Slider from "@react-native-community/slider";
 import { EmitterSubscription, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useLogger } from "../../context/Logger";
 import { ThemeIcon } from "../ThemeIcon";
@@ -15,12 +16,15 @@ export function ReplayBar(props: ReplayBarProps) {
   const replay = useReplay();
   const styles = themeStyles();
   const [position, setPosition] = React.useState<number>(replay.replayPosition);
+  const isSeekingRef = React.useRef(false);
 
   useEffect(() => {
     let replayListener: EmitterSubscription | undefined = undefined;
     if (replay) {
       replayListener = replay.onPacket((packet: ITelemetryData, currentPosition: number) => {
-        setPosition(currentPosition);
+        if (!isSeekingRef.current) {
+          setPosition(currentPosition);
+        }
       });
     }
     return () => {
@@ -43,13 +47,44 @@ export function ReplayBar(props: ReplayBarProps) {
             name={replay.replayState === ReplayState.PLAYING ? 'pause' : 'play-arrow'} />
         </TouchableOpacity>
       </View>
-      <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        <ThemeText style={styles.replayProgressText}>
-          {position} / {replay.replayLength}
-        </ThemeText>
-        <ThemeText>
-          {replay.replayInfo ? replay.replayInfo?.name : 'No Replay'}
-        </ThemeText>
+      <View style={styles.sliderContainer}>
+        <Slider
+          style={styles.slider}
+          minimumValue={0}
+          maximumValue={replay.replayLength || 0}
+          step={1}
+          value={position}
+          onSlidingStart={() => {
+            isSeekingRef.current = true;
+          }}
+          onValueChange={(value) => {
+            setPosition(value);
+          }}
+          onSlidingComplete={(value) => {
+            const target = Math.round(value);
+            isSeekingRef.current = false;
+            logger.log(tag, `Seeking to position ${target}`);
+            replay.seek(target);
+            // if (typeof replay.seek === "function") {
+            //   replay.seek(target);
+            // } else if (typeof replay.seekTo === "function") {
+            //   replay.seekTo(target);
+            // } else if (typeof replay.setReplayPosition === "function") {
+            //   replay.setReplayPosition(target);
+            // } else {
+            //   logger.log(tag, "No seek handler available on replay instance");
+            // }
+            setPosition(target);
+          }}
+        />
+        <View style={styles.replayInfoRow}>
+          <ThemeText style={styles.replayProgressText}>
+            {position} / {replay.replayLength}
+          </ThemeText>
+          <ThemeText>
+            {replay.replayInfo ? replay.replayInfo?.name : 'No Replay'}
+          </ThemeText>
+        </View>
       </View>
       <View>
         <TouchableOpacity
@@ -69,7 +104,7 @@ function themeStyles() {
   return invokeWithTheme((theme) => StyleSheet.create({
     root: {
       width: '100%',
-      height: theme.sizes.navBar,
+      height: 80,
       backgroundColor: theme.colors.background.onPrimary,
       position: 'absolute',
       bottom: 0,
@@ -80,6 +115,19 @@ function themeStyles() {
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: theme.sizes.borderRadius,
+    },
+    sliderContainer: {
+      flex: 1,
+      paddingHorizontal: theme.sizes.borderRadius,
+    },
+    slider: {
+      width: '100%',
+      height: 20,
+    },
+    replayInfoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: theme.sizes.borderRadius / 2,
     },
     replayProgressText: {
       marginRight: theme.sizes.borderRadius,

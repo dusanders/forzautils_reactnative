@@ -115,17 +115,20 @@ export interface DataWindow<T> {
   min: number;
   max: number;
   data: T[];
-  add: (data: T) => void;
-  clear: () => void;
+  add(data: T): void;
+  clear(): void;
+  setData(data: T[]): void;
 }
 
 export function useDataWindow<T>(size: number,
   parseMin: (data: T) => number,
   parseMax: (data: T) => number,
   initialValues?: T[]): DataWindow<T> {
+
   const [data, setData] = useState<T[]>(initialValues ? initialValues : []);
   const [min, setMin] = useState(Number.MAX_SAFE_INTEGER);
   const [max, setMax] = useState(Number.MIN_SAFE_INTEGER);
+
   const add = (data: T) => {
     if (data) {
       const minValue = parseMin(data);
@@ -140,9 +143,24 @@ export function useDataWindow<T>(size: number,
       return [...prev, data];
     });
   };
+
   const clear = () => {
     setData([]);
-  }
+  };
+
+  const setDataOverride = (data: T[]) => {
+    setData(data);
+    let newMin = Number.MAX_SAFE_INTEGER;
+    let newMax = Number.MIN_SAFE_INTEGER;
+    data.forEach((d) => {
+      const minValue = parseMin(d);
+      const maxValue = parseMax(d);
+      if (minValue < newMin) newMin = minValue;
+      if (maxValue > newMax) newMax = maxValue;
+    });
+    setMin(newMin);
+    setMax(newMax);
+  };
 
   return {
     size,
@@ -151,6 +169,7 @@ export function useDataWindow<T>(size: number,
     data,
     add,
     clear,
+    setData: setDataOverride,
   }
 }
 

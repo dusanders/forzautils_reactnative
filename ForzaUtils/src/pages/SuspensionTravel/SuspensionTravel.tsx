@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from "react";
 import { ScrollView } from "react-native";
 import { AppBarContainer } from "../../components/AppBar/AppBarContainer";
 import { useThemeColors } from "../../hooks/ThemeState";
-import { AvgSuspensionGraph } from "../../components/Graphs/AvgSuspensionGraph";
+import { LineGraph } from "../../components/Graphs/LIneGraph";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 
 export interface SuspensionTravelProps {
@@ -91,19 +91,19 @@ export const SuspensionTravel = React.memo((props: SuspensionTravelProps) => {
   return (
     <AppBarContainer title="Suspension Travel">
       <ScrollView>
-        <AvgSuspensionGraph
+        <LineGraph
           getData={avgData}
           labelData={avgLabelData} />
-        <AvgSuspensionGraph
+        <LineGraph
           getData={leftFrontData}
           labelData={leftFrontLabelData} />
-        <AvgSuspensionGraph
+        <LineGraph
           getData={rightFrontData}
           labelData={rightFrontLabelData} />
-        <AvgSuspensionGraph
+        <LineGraph
           getData={leftRearData}
           labelData={leftRearLabelData} />
-        <AvgSuspensionGraph
+        <LineGraph
           getData={rightRearData}
           labelData={rightRearLabelData} />
       </ScrollView>

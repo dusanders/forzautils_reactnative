@@ -35,7 +35,7 @@ export interface ISession {
    * Read a telemetry packet from the session
    * @param offset Optional offset to read from
    */
-  readPacket(offset?: number): AsyncGenerator<ITelemetryData | null, void, number>;
+  readPacket(offset?: number): Promise<ITelemetryData | null>;
   /**
    * Close the session and free resources
    */

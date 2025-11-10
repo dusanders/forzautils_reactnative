@@ -32,6 +32,7 @@ export interface IRecorder {
   closeRecording(): void;
   startRecording(): void;
   delete(info: ISessionInfo): Promise<void>;
+  seek(position: number): void;
 }
 
 export interface RecorderProviderProps {
@@ -57,7 +58,6 @@ export function RecorderProvider(props: RecorderProviderProps) {
   const eventEmitter = useRef<EventEmitter>(new EventEmitter());
   const currentRecordingFile = useRef<ISession>(undefined);
   const currentFile = useRef<ISession>(undefined);
-  const fileReadStream = useRef<AsyncGenerator<ITelemetryData | null, void, number>>();
   const [replayState, setReplayState] = useState<ReplayState>(ReplayState.PAUSED);
   const [replayDelay, setReplayDelay] = useState<number>(20); // 20 ms
   const replayPosition = useRef<number>(0);
@@ -96,7 +96,6 @@ export function RecorderProvider(props: RecorderProviderProps) {
       return;
     }
     currentFile.current = file;
-    fileReadStream.current = currentFile.current.readPacket();
     setReplayState(ReplayState.PAUSED);
     replayPosition.current = 0;
     setReplayLength(file.info.length);
@@ -117,6 +116,9 @@ export function RecorderProvider(props: RecorderProviderProps) {
 
   const resume = async () => {
     if (currentFile.current) {
+      if(replayState === ReplayState.PAUSED && replayPosition.current >= currentFile.current.info.length){
+        currentFile.current.currentReadOffset = 0;
+      }
       setReplayState(ReplayState.PLAYING);
       replayPosition.current = currentFile.current.currentReadOffset;
     }
@@ -151,20 +153,32 @@ export function RecorderProvider(props: RecorderProviderProps) {
     }
     replayInterval = setInterval(async () => {
       if (currentFile.current) {
+        let packet: ITelemetryData | null;
         if (currentFile.current.currentReadOffset >= currentFile.current.info.length) {
-          fileReadStream.current = currentFile.current.readPacket(0);
+          if(replayState !== ReplayState.PAUSED){
+            logger.log(tag, `Reached end of replay at position ${currentFile.current.currentReadOffset}, pausing`);
+            setReplayState(ReplayState.PAUSED);
+            return;
+          }
+          currentFile.current.currentReadOffset = 0;
         }
-        const packet = await fileReadStream.current?.next();
-        if (!packet?.done) {
+        packet = await currentFile.current.readPacket(currentFile.current.currentReadOffset);
+        if (packet) {
           replayPosition.current = currentFile.current.currentReadOffset;
-          eventEmitter.current.emit(PACKET_EVENT, packet?.value, replayPosition.current);
+          eventEmitter.current.emit(PACKET_EVENT, packet, replayPosition.current);
         } else {
           logger.log(tag, `No more packets to read, stopping replay`);
           setReplayState(ReplayState.PAUSED);
         }
       }
     }, replayDelay);
-  }
+  };
+
+  const seek = (position: number) => {
+    if (currentFile.current) {
+      currentFile.current.readPacket(position);
+    }
+  };
 
   useEffect(() => {
     const getAll = async () => {
@@ -183,7 +197,6 @@ export function RecorderProvider(props: RecorderProviderProps) {
     return () => clearInterval(replayInterval);
   }, [currentFile.current, replayDelay, replayState]);
 
-  logger.log(tag, `Rendering RecorderProvider.tsx - replayState: ${replayState}, replayPosition: ${replayPosition}, replayLength: ${replayLength}`);
   return (
     <RecorderContext.Provider value={{
       recordPacket,
@@ -203,6 +216,7 @@ export function RecorderProvider(props: RecorderProviderProps) {
       startRecording: openNewRecordingSession,
       closeRecording,
       closeReplay,
+      seek,
     }}>
       <ReplayControlsContext.Provider value={{
         replayInfo: currentFile.current?.info,

@@ -4,7 +4,7 @@ import { MemoBaseLineGraph } from "./BaseLineGraph";
 import { ScrollView, StyleSheet } from "react-native";
 import { useViewModelStore } from "../../context/viewModels/ViewModelStore";
 import { invokeWithTheme, themeService } from "../../hooks/ThemeState";
-import { AvgSuspensionGraph } from "./AvgSuspensionGraph";
+import { LineGraph } from "./LIneGraph";
 
 export interface AvgTireTempProps {
 }
@@ -41,7 +41,7 @@ export function AvgTireTemps(props: AvgTireTempProps) {
           minY={viewModel.avgTempWindowMin}
           maxY={viewModel.avgTempWindowMax} />
       </CardContainer>
-      <AvgSuspensionGraph
+      <LineGraph
         labelData={[
           {
             label: 'Front Avg Temp',

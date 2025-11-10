@@ -128,8 +128,6 @@ export function NetworkWatcher(props: NetworkWatcherProps) {
     }
   }, [replay.replayState]);
 
-  logger.log(tag, `Rendering NetworkWatcher.tsx - isUDPListening: ${isUDPListening}, port: ${port}, isDEBUG: ${isDEBUG}`);
-
   return (
     <NetworkContext.Provider value={{
       isUDPListening: isUDPListening,
