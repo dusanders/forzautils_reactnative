@@ -6,7 +6,7 @@ import { LineChart } from 'react-native-chart-kit';
 import { AbstractChartConfig } from 'react-native-chart-kit/dist/AbstractChart';
 import { LineChartData } from 'react-native-chart-kit/dist/line-chart/LineChart';
 
-export interface SuspensionData {
+export interface ChartData {
   points: number[][];
   min: number;
   max: number;
@@ -15,13 +15,13 @@ export interface LabelSet {
   label: string;
   color: string;
 }
-export interface AvgSuspensionGraphProps {
+export interface LineGraphProps {
   height?: number;
   labelData: LabelSet[];
-  getData(): SuspensionData;
+  getData(): ChartData;
 }
 
-export function LineGraph(props: AvgSuspensionGraphProps) {
+export function LineGraph(props: LineGraphProps) {
   const styles = themeStyles(props.height);
   const theme = themeService().theme;
   const [chartHeight, setChartHeight] = React.useState<number>(props.height || 180);
@@ -36,26 +36,23 @@ export function LineGraph(props: AvgSuspensionGraphProps) {
     labelColor: (opacity = 1) => theme.colors.text.primary.onPrimary,
   }), [theme]);
 
-  // Memoize the raw data to avoid recomputing on every render
-  const rawData = useMemo(() => props.getData(), [props.getData]);
-
   // Memoize the chart data structure
   const chartData = useMemo(() => {
     const result: LineChartData = {
       labels: [],
-      datasets: rawData.points.map((dataset, index) => ({
+      datasets: props.getData().points.map((dataset, index) => ({
         data: dataset,
         color: (opacity = 1) => props.labelData[index].color,
         strokeWidth: 1,
       })),
     };
     result.datasets.push({
-      data: [rawData.min, rawData.max],
+      data: [props.getData().min, props.getData().max],
       color: (opacity = 0) => 'transparent',
       strokeWidth: 0,
     })
     return result;
-  }, [rawData]);
+  }, [props.getData]);
 
   return (
     <CardContainer

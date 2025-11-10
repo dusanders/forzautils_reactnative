@@ -1,15 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { AxleData, useDataWindow } from "../../types/types";
+import { AxleData, DataWindow, useDataWindow } from "../../types/types";
 import { useNetworkContext } from "../Network";
-import { ITelemetryData } from "ForzaTelemetryApi";
+import { ITelemetryData, TireData } from "ForzaTelemetryApi";
 import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 import { useReplay } from "../Recorder";
 
 export interface ITireTempViewModel {
-  leftFront: number;
-  rightFront: number;
-  leftRear: number;
-  rightRear: number;
+  tireDataWindow: DataWindow<TireData>;
   avgTempWindowSize: number;
   avgTempWindowMin: number;
   avgTempWindowMax: number;
@@ -22,6 +19,13 @@ export function useTireTempsViewModel(): ITireTempViewModel {
   const network = useNetworkContext();
   const replay = useReplay();
   const [forza, setForza] = useState<ITelemetryData | null>(null);
+
+  const tiresWindow = useDataWindow<TireData>(
+    windowSize,
+    (data) => Math.min(data.leftFront, data.rightFront, data.leftRear, data.rightRear),
+    (data) => Math.max(data.leftFront, data.rightFront, data.leftRear, data.rightRear),
+    []
+  );
 
   const avgTempWindow = useDataWindow<AxleData<number>>(
     windowSize,
@@ -45,25 +49,14 @@ export function useTireTempsViewModel(): ITireTempViewModel {
         front: Number(frontAvg.toFixed(2)),
         rear: Number(rearAvg.toFixed(2))
       });
+      tiresWindow.add({
+        leftFront,
+        rightFront,
+        leftRear,
+        rightRear,
+      });
     }
   }, [forza?.tireTemp]);
-
-  const leftFront = useMemo(() =>
-    Number(forza?.tireTemp?.leftFront?.toFixed(2)) || 0,
-    [forza?.tireTemp.leftFront]
-  );
-  const rightFront = useMemo(() =>
-    Number(forza?.tireTemp?.rightFront?.toFixed(2)) || 0,
-    [forza?.tireTemp.rightFront]
-  );
-  const leftRear = useMemo(() =>
-    Number(forza?.tireTemp?.leftRear?.toFixed(2)) || 0,
-    [forza?.tireTemp.leftRear]
-  );
-  const rightRear = useMemo(() =>
-    Number(forza?.tireTemp?.rightRear?.toFixed(2)) || 0,
-    [forza?.tireTemp.rightRear]
-  );
 
   useEffect(() => {
     let packetSub: EmitterSubscription;
@@ -90,10 +83,7 @@ export function useTireTempsViewModel(): ITireTempViewModel {
   }, [replay]);
 
   return {
-    leftFront: leftFront,
-    rightFront: rightFront,
-    leftRear: leftRear,
-    rightRear: rightRear,
+    tireDataWindow: tiresWindow,
     avgTempWindowSize: windowSize,
     avgTempWindowMin: avgTempWindow.min,
     avgTempWindowMax: avgTempWindow.max,

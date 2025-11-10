@@ -1,10 +1,9 @@
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { DatabaseService } from "../services/Database/Database";
 import { useLogger } from "./Logger";
 import { ISessionInfo, ISession } from "../services/Database/DatabaseInterfaces";
 import { ITelemetryData } from "ForzaTelemetryApi";
 import EventEmitter, { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
-import { Semaphore } from "../types/Semaphore";
 
 
 export enum ReplayState {
