@@ -1690,7 +1690,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - Yoga
     - ZIPFoundation
-  - RNCAsyncStorage (2.1.2):
+  - RNCAsyncStorage (2.2.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1732,7 +1732,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNPermissions (5.2.4):
+  - RNPermissions (5.4.4):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1798,7 +1798,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNSVG (15.11.1):
+  - RNSVG (15.10.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1818,9 +1818,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNSVG/common (= 15.11.1)
+    - RNSVG/common (= 15.10.1)
     - Yoga
-  - RNSVG/common (15.11.1):
+  - RNSVG/common (15.10.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2154,11 +2154,11 @@ SPEC CHECKSUMS:
   ReactCodegen: 3a68408bf68d0957abcd13d610f76420005c1d91
   ReactCommon: 5809a8ee421b7219221a475b78180f8f34b5c5ec
   ReactNativeFileAccess: e4a873245e830d7061fd4874c0e786c100d2355f
-  RNCAsyncStorage: 01d008a47892226320734b59f495f3847c3ce0c9
+  RNCAsyncStorage: f27db574d8d0d56438ec4e9ba345872f2d0f29f4
   RNCPicker: c657bd58a82b164a957812f82a0b4bab4245de2e
-  RNPermissions: 1af6c1fa3c16d20f94932e5b755caaca1f35488c
+  RNPermissions: 5571cc28caa2352f901ec20165410387174802cb
   RNScreens: 4c7d5710e955dcf72c14a546e29744f9e591370b
-  RNSVG: c50d29abf38abbf48ebfc50b6258f81099aeabae
+  RNSVG: 588c85abb474f7ee58dd886ed1fe198cc73772b2
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: fcc198acd4a55599b3468cfb6ebc526baff5f06e
   ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
