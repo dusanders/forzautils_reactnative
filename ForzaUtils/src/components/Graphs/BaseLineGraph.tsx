@@ -52,20 +52,29 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     // Calculate vertical offset to center the graph
     const verticalOffset = viewBox.height * 0.02; // 2% padding from top
 
-    return props.data.map((graph) =>
-      graph.data.map((value, index) => {
-        const xMove = (index + 1) * deltaX;
+    return props.data.map((graph) => {
+      // Collect points first
+      const points = graph.data.map((value, index) => {
+        const x = (index + 1) * deltaX;
+        const normalizedValue = (value - props.minY) / deltaY;
+        const y = verticalOffset + (height * (1 - normalizedValue));
+        return { x, y };
+      });
 
-        // Adjust yMove calculation to properly scale and center vertically
-        const normalizedValue = (value - props.minY) / deltaY; // 0 to 1
-        const yMove = verticalOffset + (height * (1 - normalizedValue)); // Invert and offset
+      if (points.length === 0) return '';
 
-        if (!isValidNumber(yMove) || !isValidNumber(xMove)) {
-          return '';
-        }
-        return index === 0 ? `M${0},${yMove}` : ` L${xMove},${yMove}`;
-      }).join(' ')
-    );
+      // Build cubic Bezier path
+      let path = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 1; i < points.length; i++) {
+        const dx = points[i].x - points[i - 1].x;
+        const cx1 = points[i - 1].x + dx / 3;
+        const cy1 = points[i - 1].y;
+        const cx2 = points[i - 1].x + 2 * dx / 3;
+        const cy2 = points[i].y;
+        path += ` C ${cx1} ${cy1} ${cx2} ${cy2} ${points[i].x} ${points[i].y}`;
+      }
+      return path;
+    });
   }, [props.data, viewBox, props.minY, props.maxY]);
 
   useEffect(() => {
