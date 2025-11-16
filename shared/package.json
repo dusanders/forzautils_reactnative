@@ -1,0 +1,16 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "npx tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "ForzaTelemetryApi": "../../ForzaTelemetryAPI_typescript"
+  }
+}

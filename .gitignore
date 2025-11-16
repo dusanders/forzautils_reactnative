@@ -132,3 +132,4 @@ dist
 .vscode/
 *.code-workspace
 .DS_Store
+electron/public/

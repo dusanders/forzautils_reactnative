@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "ForzaUtilsExpo",
+    "slug": "ForzaUtilsExpo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "src/assets/images/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "scheme": "forzautilsexpo",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.ForzaUtilsExpo"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "src/assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.anonymous.ForzaUtilsExpo"
+    },
+    "web": {
+      "favicon": "src/assets/images/favicon.png"
+    },
+    "experiments": {
+      "baseUrl": "./"
+    },
+    "plugins": [
+      "expo-asset",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "src/assets/images/splash-icon.png"
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "src/assets/fonts/SpaceMono-Regular.ttf"
+          ]
+        }
+      ]
+    ]
+  }
+}
