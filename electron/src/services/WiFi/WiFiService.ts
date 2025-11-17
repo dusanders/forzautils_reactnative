@@ -22,6 +22,7 @@ export class WifiServiceProvider {
 
   private async openUDPSocket(port: number): Promise<number> {
     return new Promise<number>((resolve, reject) => {
+      Logger.log(TAG, `Opening UDP Socket on port ${port}`);
       try {
         this.socket = dgram.createSocket('udp4');
         this.socket.once('error', (err) => {
@@ -36,6 +37,7 @@ export class WifiServiceProvider {
           this.socket?.on('message', this.onSocketData.bind(this));
           resolve(this.udpPort);
         });
+        this.socket.bind(port);
       } catch (error) {
         reject(error);
       }

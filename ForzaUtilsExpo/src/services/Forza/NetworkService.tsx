@@ -4,6 +4,7 @@ import { ITelemetryData } from "shared";
 import { EmitterSubscription } from "react-native";
 import { useOnMount } from "@/hooks/useOnMount";
 import { useWifiContext } from "../WiFiInfo/WiFiInfoService";
+import { Logger } from "@/hooks/Logger";
 
 const NetworkContext_React = createContext({} as IForzaService);
 
@@ -32,9 +33,11 @@ export function NetworkProvider(props: NetworkProviderProps) {
   });
 
   useEffect(() => {
+    Logger.log(TAG, `WiFi state changed: isConnected=${wifiService.wifiState.isConnected}`);
     if(wifiService.wifiState.isConnected) {
       if(!service.current.isListening()) {
         service.current.openSocket(9999).then(() => {
+          Logger.log(TAG, `Opened socket on port ${service.current.port}`);
           setPort(service.current.port);
         });
       }
