@@ -8,27 +8,19 @@ export interface IForzaService {
   isDEBUG: boolean;
   lastPacket?: ITelemetryData;
   onPacket(fn: (packet: ITelemetryData) => void): EmitterSubscription;
-  DEBUG(): void;
+  shutdown(): Promise<void>;
+  DEBUG(interval_ms: number): void;
   STOP_DEBUG(): void;
 }
 
-export interface INetworkService {
+export interface INativeUDPService {
   port: number;
+  isListening(): boolean;
   openSocket(port: number): Promise<void>;
   closeSocket(): Promise<void>;
   onSocketClosed(fn: () => void): EmitterSubscription;
   onSocketError(fn: (error: Error) => void): EmitterSubscription;
   onPacket(fn: (packet: ITelemetryData) => void): EmitterSubscription;
-  DEBUG(): void;
+  DEBUG(interval_ms: number): void;
   STOP_DEBUG(): void;
-}
-/**
- * Add Type for react-native-udp 'rinfo' object
- */
-export interface Udp_rinfo {
-  address: string,
-  port: number,
-  family: 'IPv4',
-  size: number,
-  ts: number,
 }

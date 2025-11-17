@@ -8,7 +8,7 @@ import WifiServiceProvider from "./services/WiFiInfo/Provider/Provider";
 import { Logger } from "./hooks/Logger";
 import { WifiContextProvider } from "./services/WiFiInfo/WiFiInfoService";
 import { NetworkProvider } from "./services/Forza/NetworkService";
-import { INetworkService } from "./services/Forza/Network.types";
+import { INativeUDPService } from "./services/Forza/Network.types";
 import SocketService from "./services/Forza/Provider/Provider";
 const SpaceMono = require('./assets/fonts/SpaceMono-Regular.ttf');
 
@@ -22,7 +22,7 @@ export function Preflight(props: PreflightProps) {
   const [loaded] = useFonts({
     SpaceMono: SpaceMono,
   });
-  const networkServiceRef = useRef<INetworkService | null>(null);
+  const networkServiceRef = useRef<INativeUDPService | null>(null);
   const [servicesReady, setServicesReady] = React.useState(false);
 
   const initializeServices = async () => {

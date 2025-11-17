@@ -1,6 +1,6 @@
 import { Logger } from "@/hooks/Logger";
 import React from "react";
-import { IWifiContext, IWiFiInfoService } from "./WiFiInfo.types";
+import { IWifiContext, INativeWifiService } from "./WiFiInfo.types";
 import WifiServiceProvider from "./Provider/Provider";
 import { useOnMount } from "@/hooks/useOnMount";
 
@@ -17,7 +17,7 @@ export interface WifiContextProviderProps {
 }
 
 export function WifiContextProvider(props: WifiContextProviderProps) {
-  const wifiServiceRef = React.useRef<IWiFiInfoService>(WifiServiceProvider.GetInstance());
+  const wifiServiceRef = React.useRef<INativeWifiService>(WifiServiceProvider.GetInstance());
   const [wifiState, setWifiState] = React.useState(wifiServiceRef.current.state);
 
   useOnMount(() => {

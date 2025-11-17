@@ -5,7 +5,7 @@ export interface IWifiContext {
   wifiState: IWiFiInfoState;
 }
 
-export interface IWiFiInfoService {
+export interface INativeWifiService {
   state: IWiFiInfoState;
   fetchWiFiInfo: () => Promise<void>;
   onWiFiInfoChanged: (callback: (state: IWiFiInfoState) => void) => EmitterSubscription;

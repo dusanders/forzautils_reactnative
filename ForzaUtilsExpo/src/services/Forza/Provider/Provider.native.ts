@@ -1,18 +1,29 @@
 import EventEmitter, { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
-import { INetworkService, Udp_rinfo } from "../Network.types";
-import { ForzaTelemetryApi, ITelemetryData } from "shared";
+import { INativeUDPService } from "../Network.types";
+import { ForzaTelemetryApi, getRandomTelemetryData, ITelemetryData } from "shared";
 import UdpSockets from "react-native-udp";
 import UdpSocket from "react-native-udp/lib/types/UdpSocket";
 import { delay } from "@/helpers/misc";
 import { Logger } from "@/hooks/Logger";
 import BaseSocketService from "./BaseSocketService";
 
+/**
+ * Add Type for react-native-udp 'rinfo' object
+ */
+export interface Udp_rinfo {
+  address: string,
+  port: number,
+  family: 'IPv4',
+  size: number,
+  ts: number,
+}
+
 const TAG = "Provider.native.ts[SocketService]";
 
 class SocketService extends BaseSocketService {
   //#region Static Methods and Properties (inherited from BaseSocketService, but Initialize is overridden)
 
-  static async Initialize(): Promise<INetworkService> {
+  static async Initialize(): Promise<INativeUDPService> {
     if (!BaseSocketService.instance) {
       BaseSocketService.instance = new SocketService();
       await (BaseSocketService.instance as SocketService).initialize();
@@ -24,6 +35,8 @@ class SocketService extends BaseSocketService {
 
   private eventEmitter: EventEmitter = new EventEmitter();
   private udpSocket?: UdpSocket;
+  private doDebug = false;
+  private debugInterval?: NodeJS.Timeout;
 
   private constructor() {
     super();
@@ -35,7 +48,17 @@ class SocketService extends BaseSocketService {
   }
 
   async closeSocket(): Promise<void> {
-    this.port = 0;
+    if (this.udpSocket) {
+      this.udpSocket.removeAllListeners();
+      this.udpSocket.close();
+      this.udpSocket = undefined;
+    }
+    this.doDebug = false;
+    if (this.debugInterval) {
+      clearInterval(this.debugInterval);
+    }
+    this.eventEmitter.removeAllListeners();
+    this.port = -1;
   }
 
   onSocketClosed(fn: () => void): EmitterSubscription {
@@ -50,12 +73,26 @@ class SocketService extends BaseSocketService {
     return this.eventEmitter.addListener(BaseSocketService.SocketEvents.PACKET, fn);
   }
 
-  DEBUG(): void {
-    console.log("Debugging...");
+  DEBUG(interval_ms: number): void {
+    if (this.doDebug) {
+      Logger.log(TAG, "DEBUG already running.");
+      return;
+    }
+    this.doDebug = true;
+    Logger.log(TAG, "Started debugging.");
+    this.debugInterval = setInterval(() => {
+      if (!this.doDebug) {
+        clearInterval(this.debugInterval);
+        return;
+      }
+      const sampleData = getRandomTelemetryData();
+      this.eventEmitter.emit(BaseSocketService.SocketEvents.PACKET, sampleData);
+    }, interval_ms);
   }
 
   STOP_DEBUG(): void {
-    console.log("Stopped debugging.");
+    this.doDebug = false;
+    Logger.log(TAG, "Stopped debugging.");
   }
 
   private async initialize() {

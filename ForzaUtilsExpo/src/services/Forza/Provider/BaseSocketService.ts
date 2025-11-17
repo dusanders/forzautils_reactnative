@@ -1,18 +1,18 @@
 import { ITelemetryData } from "ForzaTelemetryApi";
 import { EmitterSubscription } from "react-native";
-import { INetworkService } from "../Network.types";
+import { INativeUDPService } from "../Network.types";
 
-abstract class BaseSocketService implements INetworkService {
+abstract class BaseSocketService implements INativeUDPService {
   protected static instance: BaseSocketService | null = null;
 
-  static async Initialize<T extends BaseSocketService>(this: new () => T): Promise<INetworkService> {
+  static async Initialize<T extends BaseSocketService>(this: new () => T): Promise<INativeUDPService> {
     if (!BaseSocketService.instance) {
       BaseSocketService.instance = new this();
     }
     return BaseSocketService.instance;
   }
 
-  static GetInstance(): INetworkService {
+  static GetInstance(): INativeUDPService {
     if (!BaseSocketService.instance) {
       throw new Error("SocketService not initialized. Call SocketService.Initialize() first.");
     }
@@ -27,12 +27,16 @@ abstract class BaseSocketService implements INetworkService {
 
   port: number = -1;
 
+  isListening(): boolean {
+    return this.port !== -1;
+  }
+  
   abstract openSocket(port: number): Promise<void>;
   abstract closeSocket(): Promise<void>;
   abstract onSocketClosed(fn: () => void): EmitterSubscription;
   abstract onSocketError(fn: (error: Error) => void): EmitterSubscription;
   abstract onPacket(fn: (packet: ITelemetryData) => void): EmitterSubscription;
-  abstract DEBUG(): void;
+  abstract DEBUG(interval_ms: number): void;
   abstract STOP_DEBUG(): void;
 }
 

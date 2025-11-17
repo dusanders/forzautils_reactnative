@@ -1,8 +1,8 @@
 import { IWiFiInfoState } from "shared";
-import { IWiFiInfoService } from "../WiFiInfo.types";
+import { INativeWifiService } from "../WiFiInfo.types";
 import { EmitterSubscription } from "react-native";
 
-export abstract class BaseWiFiInfoProvider implements IWiFiInfoService {
+export abstract class BaseWiFiInfoProvider implements INativeWifiService {
   protected static instance: BaseWiFiInfoProvider | null = null;
 
   static async Initialize<T extends BaseWiFiInfoProvider>(this: new () => T): Promise<BaseWiFiInfoProvider> {

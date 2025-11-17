@@ -1,5 +1,5 @@
 import { createContext, useEffect, useRef, useState } from "react";
-import { IForzaService, INetworkService } from "./Network.types";
+import { IForzaService, INativeUDPService } from "./Network.types";
 import { ITelemetryData } from "shared";
 import { EmitterSubscription } from "react-native";
 import { useOnMount } from "@/hooks/useOnMount";
@@ -9,7 +9,7 @@ const NetworkContext_React = createContext({} as IForzaService);
 
 export interface NetworkProviderProps {
   children?: any;
-  networkService: INetworkService;
+  networkService: INativeUDPService;
 }
 
 const TAG = "NetworkProvider.tsx";
@@ -19,8 +19,8 @@ export function NetworkProvider(props: NetworkProviderProps) {
   const [isDEBUG, setIsDEBUG] = useState<boolean>(false);
   const packetListener = useRef<EmitterSubscription | undefined>(undefined);
   const lastPacket = useRef<ITelemetryData | undefined>(undefined);
-  const service = useRef<INetworkService>(props.networkService);
-  
+  const service = useRef<INativeUDPService>(props.networkService);
+
   useOnMount(() => {
     packetListener.current = service.current.onPacket((packet: ITelemetryData) => {
       lastPacket.current = packet;
@@ -31,15 +31,28 @@ export function NetworkProvider(props: NetworkProviderProps) {
     }
   });
 
+  useEffect(() => {
+    if(wifiService.wifiState.isConnected) {
+      if(!service.current.isListening()) {
+        service.current.openSocket(9999).then(() => {
+          setPort(service.current.port);
+        });
+      }
+    }
+  }, [wifiService.wifiState]);
+
   return (
     <NetworkContext_React.Provider value={{
       port: port,
       isDEBUG: isDEBUG,
       lastPacket: lastPacket.current,
+      shutdown: async () => {
+        await service.current.closeSocket();
+      },
       isUDPListening: () => service.current.port > 0,
       onPacket: (fn) => service.current.onPacket(fn),
-      DEBUG: () => {
-        service.current.DEBUG();
+      DEBUG: (interval_ms) => {
+        service.current.DEBUG(interval_ms);
         setIsDEBUG(true);
       },
       STOP_DEBUG: () => {
@@ -54,7 +67,7 @@ export function NetworkProvider(props: NetworkProviderProps) {
 
 export function useNetworkService() {
   const ctx = createContext(NetworkContext_React);
-  if(!ctx) {
+  if (!ctx) {
     throw new Error("useNetworkService must be used within a NetworkProvider");
   }
   return ctx;

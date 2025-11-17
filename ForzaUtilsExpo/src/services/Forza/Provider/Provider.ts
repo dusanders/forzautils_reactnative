@@ -1,6 +1,6 @@
 import { ITelemetryData } from "ForzaTelemetryApi";
 import { EmitterSubscription } from "react-native";
-import { INetworkService } from "../Network.types";
+import { INativeUDPService } from "../Network.types";
 import BaseSocketService from "./BaseSocketService";
 import { delay } from "@/helpers/misc";
 import { ContextBridge_UDP, ElectronContextBridge } from "shared";
@@ -11,7 +11,7 @@ const apiBridge = (window as any).electronAPI as ElectronContextBridge;
 
 const TAG = "Provider.ts[SocketService]";
 class SocketService extends BaseSocketService {
-  static async Initialize(): Promise<INetworkService> {
+  static async Initialize(): Promise<INativeUDPService> {
     if (!BaseSocketService.instance) {
       BaseSocketService.instance = new SocketService();
       await (BaseSocketService.instance as SocketService).initialize();
