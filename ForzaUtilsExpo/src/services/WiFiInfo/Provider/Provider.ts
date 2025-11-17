@@ -1,13 +1,13 @@
 import { EmitterSubscription } from "react-native";
-import { IWiFiInfoService } from "../WiFiInfo.types";
 import { Logger } from "@/hooks/Logger";
-import { ContextBridge_WiFi, ElectronContextBridge, IWiFiInfoState } from "shared";
+import { ContextBridge_WiFi, ElectronContextBridge, ITelemetryData, IWiFiInfoState } from "shared";
 import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
+import { BaseWiFiInfoProvider } from "./BaseProvider";
 
 const TAG = "WifiServiceProvider_web";
 const apiBridge = (window as any).electronAPI as ElectronContextBridge;
 
-class WifiServiceProvider implements IWiFiInfoService {
+class WifiServiceProvider extends BaseWiFiInfoProvider {
   static Initialize(): Promise<WifiServiceProvider> {
     return new Promise<WifiServiceProvider>((resolve) => {
       if (!WifiServiceProvider.instance) {
@@ -28,7 +28,7 @@ class WifiServiceProvider implements IWiFiInfoService {
     return !!WifiServiceProvider.instance;
   }
 
-  private static instance: WifiServiceProvider;
+  static instance: WifiServiceProvider;
   private static WIFI_INFO_UPDATED_EVENT = 'WiFiInfoUpdated';
 
   state: IWiFiInfoState = {
@@ -41,15 +41,18 @@ class WifiServiceProvider implements IWiFiInfoService {
   private eventEmitter: EventEmitter = new EventEmitter();
 
   private constructor() {
+    super();
     if(!apiBridge || !apiBridge.WiFiRequests) {
       throw new Error("Electron Context Bridge API is not available.");
     }
     Logger.log(TAG, "Initializing WifiServiceProvider");
-    if (!WifiServiceProvider.instance) {
-      WifiServiceProvider.instance = this;
-    }
     this.api = apiBridge.WiFiRequests;
-    return WifiServiceProvider.instance;
+  }
+
+  async shutdown(): Promise<void> {
+    Logger.log(TAG, "Shutting down WifiServiceProvider");
+    this.eventEmitter.removeAllListeners();
+    Logger.log(TAG, "WifiServiceProvider shutdown complete");
   }
 
   async fetchWiFiInfo(): Promise<void> {

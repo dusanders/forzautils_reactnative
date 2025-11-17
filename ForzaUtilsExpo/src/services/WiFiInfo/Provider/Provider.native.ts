@@ -1,30 +1,21 @@
 import { EmitterSubscription } from "react-native";
-import { IWiFiInfoService } from "../WiFiInfo.types";
 import { Logger } from "@/hooks/Logger";
 import { IWiFiInfoState } from "shared";
 import NetInfo, { NetInfoSubscription } from "@react-native-community/netinfo";
 import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
+import { BaseWiFiInfoProvider } from "./BaseProvider";
 
 const TAG = "WifiServiceProvider_native";
-class WifiServiceProvider implements IWiFiInfoService {
+class WifiServiceProvider extends BaseWiFiInfoProvider {
   static async Initialize(): Promise<WifiServiceProvider> {
-    if (!WifiServiceProvider.instance) {
-      WifiServiceProvider.instance = new WifiServiceProvider();
-      await WifiServiceProvider.instance.initialize();
+    if (!BaseWiFiInfoProvider.instance) {
+      BaseWiFiInfoProvider.instance = new WifiServiceProvider();
+      await (BaseWiFiInfoProvider.instance as WifiServiceProvider).initialize();
     }
-    return WifiServiceProvider.instance;
-  }
-  static GetInstance(): WifiServiceProvider {
-    if (!WifiServiceProvider.instance) {
-      throw new Error("WifiServiceProvider not initialized. Call Initialize() first.");
-    }
-    return WifiServiceProvider.instance;
-  }
-  static IsInitialized(): boolean {
-    return !!WifiServiceProvider.instance;
+    return BaseWiFiInfoProvider.instance as WifiServiceProvider;
   }
 
-  private static instance: WifiServiceProvider;
+  static instance: WifiServiceProvider;
   private static WIFI_INFO_UPDATED_EVENT = 'WiFiInfoUpdated';
 
   private netInfoSubscription: NetInfoSubscription | undefined
@@ -37,11 +28,17 @@ class WifiServiceProvider implements IWiFiInfoService {
   };
 
   private constructor() {
+    super();
     Logger.log(TAG, "Initializing WifiServiceProvider");
-    if (!WifiServiceProvider.instance) {
-      WifiServiceProvider.instance = this;
+  }
+
+  async shutdown(): Promise<void> {
+    if (this.netInfoSubscription) {
+      this.netInfoSubscription();
+      this.netInfoSubscription = undefined;
     }
-    return WifiServiceProvider.instance;
+    this.emitter.removeAllListeners();
+    Logger.log(TAG, "WifiServiceProvider shutdown complete");
   }
 
   async fetchWiFiInfo(): Promise<void> {

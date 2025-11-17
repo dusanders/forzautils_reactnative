@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { ElectronContextBridge, IpcActions_WiFi } from 'shared';
+import { ElectronContextBridge, IpcActions_UDP, IpcActions_WiFi, IWiFiInfoState } from 'shared';
+import { ITelemetryData } from 'shared';
 // const {contextBridge, ipcRenderer} = require('electron');
 
 const api: ElectronContextBridge = {
@@ -8,10 +9,38 @@ const api: ElectronContextBridge = {
       const wifiInfo = await ipcRenderer.invoke(IpcActions_WiFi.RequestWiFiInfo);
       return wifiInfo;
     },
-    onWifiInfoUpdated: (callback: (state: any) => void): void => {
-      ipcRenderer.on('WiFiInfoUpdated', (event, state) => {
+    onWifiInfoUpdated: (callback: (state: IWiFiInfoState) => void): void => {
+      ipcRenderer.on(IpcActions_WiFi.WiFiInfoUpdated, (event, state) => {
         console.log("WiFiInfoUpdated event received:", state);
         callback(state);
+      });
+    }
+  },
+  UDPRequests: {
+    openUDPSocket: async (port: number): Promise<number> => {
+      const result = await ipcRenderer.invoke(IpcActions_UDP.OpenUDPSocket, port);
+      return result;
+    },
+    getPort: async (): Promise<number> => {
+      const result = await ipcRenderer.invoke(IpcActions_UDP.GetPort);
+      return result;
+    },
+    closeUDPSocket: async (): Promise<void> => {
+      await ipcRenderer.invoke(IpcActions_UDP.CloseUDPSocket);
+    },
+    onSocketData: (callback: (packet: ITelemetryData) => void): void => {
+      ipcRenderer.on(IpcActions_UDP.SocketData, (event, packet) => {
+        callback(packet);
+      });
+    },
+    onSocketError: (callback: (error: Error) => void): void => {
+      ipcRenderer.on(IpcActions_UDP.SocketError, (event, error) => {
+        callback(error);
+      });
+    },
+    onSocketClosed: (callback: () => void): void => {
+      ipcRenderer.on(IpcActions_UDP.SocketClosed, () => {
+        callback();
       });
     },
   }

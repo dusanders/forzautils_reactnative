@@ -3,8 +3,3 @@ export interface IWiFiInfoState {
   ipAddress: string | null;
   isConnected: boolean;
 }
-
-export interface ISocketState {
-  port: number;
-  isOpen: boolean;
-}
