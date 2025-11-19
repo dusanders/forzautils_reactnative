@@ -1,6 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import { ThemeIcon, ThemeIconNames } from "./ThemeIcon";
-import { invokeWithTheme } from "@/hooks/invokeWithTheme";
+import { IThemeElements } from "@/theme/Themes";
+import { useThemeContext } from "@/theme/ThemeProvider";
 
 
 export interface CircleCheckIconProps {
@@ -8,7 +9,8 @@ export interface CircleCheckIconProps {
 }
 
 export function CircleCheckIcon(props: CircleCheckIconProps) {
-  const style = themeStyles();
+  const theme = useThemeContext();
+  const style = themeStyles(theme.theme);
   return (
     <View style={style.root}>
       <View style={style.circle}></View>
@@ -16,8 +18,8 @@ export function CircleCheckIcon(props: CircleCheckIconProps) {
     </View>
   )
 }
-function themeStyles() {
-  return invokeWithTheme((theme) => StyleSheet.create({
+function themeStyles(theme: IThemeElements) {
+  return StyleSheet.create({
     root: {
       height: 50,
       width: 50,
@@ -34,5 +36,5 @@ function themeStyles() {
       width: '100%',
       opacity: 0.25
     }
-  }));
+  });
 }

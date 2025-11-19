@@ -10,12 +10,14 @@ import { WifiContextProvider } from "./services/WiFiInfo/WiFiInfoService";
 import { NetworkProvider } from "./services/Forza/NetworkService";
 import { INativeUDPService } from "./services/Forza/Network.types";
 import SocketService from "./services/Forza/Provider/Provider";
+import { ThemeType } from "./theme/Themes";
+import { Semaphore } from "./helpers/Semaphore";
 const SpaceMono = require('./assets/fonts/SpaceMono-Regular.ttf');
 
 export interface PreflightProps {
   // No props yet
 }
-
+const initializeSemaphore = new Semaphore(1);
 const TAG = "Preflight.tsx";
 export function Preflight(props: PreflightProps) {
   const colorScheme = useColorScheme();
@@ -26,6 +28,7 @@ export function Preflight(props: PreflightProps) {
   const [servicesReady, setServicesReady] = React.useState(false);
 
   const initializeServices = async () => {
+    await initializeSemaphore.acquire();
     try {
       await WifiServiceProvider.Initialize();
       networkServiceRef.current = await SocketService.Initialize();
@@ -33,24 +36,24 @@ export function Preflight(props: PreflightProps) {
       setServicesReady(true);
     } catch (error) {
       console.error("Error initializing services:", error);
+    } finally {
+      initializeSemaphore.release();
     }
   };
 
-  useEffect(() => {
-    Logger.log(TAG, `Fonts loaded: ${loaded}, Services ready: ${servicesReady}`);
-  }, [loaded, servicesReady]);
-
   useOnMount(() => {
     initializeServices();
+    return () => {
+      networkServiceRef.current?.closeSocket();
+    }
   });
 
   if (!loaded || !servicesReady) {
-    Logger.log(TAG, "Waiting for fonts and services to load...");
     return null;
   }
-  Logger.log(TAG, "Fonts and services loaded, rendering App.");
+  
   return (
-    <ThemeProvider>
+    <ThemeProvider initialTheme={ThemeType.DARK}>
       <WifiContextProvider>
         <NetworkProvider networkService={networkServiceRef.current!}>
           <App />

@@ -1,5 +1,5 @@
-import { invokeWithTheme } from "@/hooks/invokeWithTheme";
-import { BackgroundVariantType } from "@/theme/Themes";
+import { useThemeContext } from "@/theme/ThemeProvider";
+import { BackgroundVariantType, IThemeElements } from "@/theme/Themes";
 import React from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
 
@@ -13,7 +13,8 @@ export interface ContainerProps extends ViewProps {
 }
 
 export function Container(props: ContainerProps) {
-  const styles = themeStyles();
+  const theme = useThemeContext();
+  const styles = themeStyles(theme.theme);
   let baseStyle = styles.rootPrimary;
   switch (props.variant) {
     case 'secondary':
@@ -45,8 +46,8 @@ export function Container(props: ContainerProps) {
   )
 }
 
-function themeStyles() {
-  return invokeWithTheme((theme) => StyleSheet.create({
+function themeStyles(theme: IThemeElements) {
+  return StyleSheet.create({
     rootPrimary: {
       backgroundColor: theme.colors.background.primary,
       padding: 10,
@@ -70,5 +71,5 @@ function themeStyles() {
     fillHeight: {
       height: '100%'
     }
-  }));
+  });
 }

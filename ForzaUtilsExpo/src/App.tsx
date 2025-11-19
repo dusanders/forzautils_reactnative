@@ -8,6 +8,8 @@ import { Explore } from './navigation/screens/Explore';
 import { NotFound } from './navigation/screens/NotFound';
 import { useOnMount } from './hooks/useOnMount';
 import { Logger } from './hooks/Logger';
+import { WiFiInfo } from './navigation/screens/WiFi/WiFiInfo';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -19,23 +21,30 @@ export function App() {
     });
   });
   return (
-    <NavigationContainer>
-      <MainStack.Navigator
-        initialRouteName={AppRoutes.HOME}
-        screenOptions={{ headerShown: false }}>
-        <MainStack.Screen
-          name={AppRoutes.HOME}
-          component={Home} />
-        <MainStack.Screen
-          name={AppRoutes.EXPLORE}
-          component={Explore} />
-        <MainStack.Screen
-          name={AppRoutes.NOT_FOUND}
-          component={NotFound}
-          options={{
-            title: '404'
-          }} />
-      </MainStack.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+        <NavigationContainer>
+          <MainStack.Navigator
+            initialRouteName={AppRoutes.WIFI_INFO}
+            screenOptions={{ headerShown: false }}>
+            <MainStack.Screen
+              name={AppRoutes.HOME}
+              component={Home} />
+            <MainStack.Screen
+              name={AppRoutes.EXPLORE}
+              component={Explore} />
+            <MainStack.Screen
+              name={AppRoutes.NOT_FOUND}
+              component={NotFound}
+              options={{
+                title: '404'
+              }} />
+            <MainStack.Screen
+              name={AppRoutes.WIFI_INFO}
+              component={WiFiInfo} />
+          </MainStack.Navigator>
+        </NavigationContainer>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }

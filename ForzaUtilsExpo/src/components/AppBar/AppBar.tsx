@@ -4,9 +4,10 @@ import { ThemeText } from "../ThemeText";
 import { ThemeIcon, ThemeIconNames } from "../ThemeIcon";
 import { AppBarSettingsButtonParams, AppSettingsButton } from "./AppSettingsButton";
 import { useNavigation } from "@react-navigation/native";
-import { invokeWithTheme } from "@/hooks/invokeWithTheme";
 import { AppRoutes, MainAppNavigation } from "@/navigation/types";
 import { Container } from "../Container";
+import { useThemeContext } from "@/theme/ThemeProvider";
+import { IThemeElements } from "@/theme/Themes";
 
 export const AppBarTestID = {
   root: 'app-bar-root',
@@ -28,7 +29,8 @@ export interface AppBarProps {
 export function AppBar(props: AppBarProps) {
   const navigation = useNavigation<MainAppNavigation>();
   const [showSettings, setShowSettings] = useState(false);
-  const style = themeStyles();
+  const theme = useThemeContext();
+  const style = themeStyles(theme.theme);
   let doShowSettingsButton = true;
   if (props.hideSettings != undefined) {
     doShowSettingsButton = !props.hideSettings
@@ -130,8 +132,8 @@ export function AppBar(props: AppBarProps) {
   )
 }
 
-function themeStyles() {
-  return invokeWithTheme((theme) => StyleSheet.create({
+function themeStyles(theme: IThemeElements) {
+  return StyleSheet.create({
     root: {
       position: 'absolute',
       top: 0,
@@ -191,5 +193,5 @@ function themeStyles() {
       position: 'absolute',
       textTransform: 'uppercase',
     }
-  }));
+  });
 }

@@ -2,12 +2,14 @@ import { Logger } from "../Logger/Logger.js";
 import { ForzaTelemetryApi, IpcActions_UDP, IpcActions_WiFi, IWiFiInfoState } from 'shared';
 import * as SysInfo from 'systeminformation';
 import * as dgram from 'dgram';
+import { Semaphore } from "../../helpers/Semaphore.js";
 
 const TAG = "WiFiServiceProvider";
 export class WifiServiceProvider {
 
   private udpPort: number = -1;
   private socket: dgram.Socket | null = null;
+  private bindSemaphore: Semaphore = new Semaphore(1);
 
   constructor(private window: Electron.BrowserWindow) {
     Logger.log(TAG, "WiFiServiceProvider initialized");
@@ -21,27 +23,16 @@ export class WifiServiceProvider {
   }
 
   private async openUDPSocket(port: number): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      Logger.log(TAG, `Opening UDP Socket on port ${port}`);
-      try {
-        this.socket = dgram.createSocket('udp4');
-        this.socket.once('error', (err) => {
-          Logger.error(TAG, `UDP Socket error: ${err.message}`);
-          this.socket?.close();
-        });
-        this.socket.once('listening', () => {
-          Logger.log(TAG, `UDP Socket listening on port ${this.socket?.address().port}`);
-          this.udpPort = this.socket?.address().port ?? -1;
-          this.socket?.on('error', this.onSocketError.bind(this));
-          this.socket?.on('close', this.onSocketClosed.bind(this));
-          this.socket?.on('message', this.onSocketData.bind(this));
-          resolve(this.udpPort);
-        });
-        this.socket.bind(port);
-      } catch (error) {
-        reject(error);
-      }
-    });
+    await this.bindSemaphore.acquire();
+    try {
+      const openedPort = await this.bind(port);
+      return openedPort;
+    } catch (error) {
+      Logger.error(TAG, `Error opening UDP socket on port ${port}: ${(error as Error).message}`);
+      throw error;
+    } finally {
+      this.bindSemaphore.release();
+    }
   }
 
   private async getPort(): Promise<number> {
@@ -66,13 +57,51 @@ export class WifiServiceProvider {
 
   private onSocketError(error: Error) {
     Logger.error(TAG, `UDP Socket error: ${error.message}`);
+    this.socket?.close();
+    this.socket = null;
+    this.udpPort = -1;
     this.window.webContents.send(IpcActions_UDP.SocketError, error);
   }
 
   private onSocketClosed() {
     Logger.log(TAG, `UDP Socket closed`);
     this.udpPort = -1;
+    this.socket = null;
     this.window.webContents.send(IpcActions_UDP.SocketClosed);
+  }
+
+  private async bind(port: number): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+      if (this.socket) {
+        Logger.log(TAG, `UDP Socket already open on port ${this.udpPort}`);
+        resolve(this.udpPort);
+        return;
+      }
+      Logger.log(TAG, `Opening UDP Socket on port ${port}`);
+      try {
+        this.socket = dgram.createSocket('udp4');
+        this.socket.once('error', (err) => {
+          Logger.error(TAG, `UDP Socket error: ${err.message}`);
+          this.socket?.close();
+          this.socket = null;
+          this.udpPort = -1;
+          reject(err);
+        });
+        this.socket.once('listening', () => {
+          this.udpPort = this.socket?.address().port ?? -1;
+          this.socket?.removeAllListeners('error');
+          this.socket?.removeAllListeners('listening');
+          this.socket?.on('error', this.onSocketError.bind(this));
+          this.socket?.on('close', this.onSocketClosed.bind(this));
+          this.socket?.on('message', this.onSocketData.bind(this));
+          Logger.log(TAG, `UDP Socket listening on port ${this.udpPort}`);
+          resolve(this.udpPort);
+        });
+        this.socket.bind(port);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   private async fetchWiFiInfo() {

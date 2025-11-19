@@ -47,6 +47,10 @@ export function ThemeProvider(props: IThemeProviderProps) {
     }
   }, [currentTheme]);
 
+  if(!theme || !Object.keys(theme).length) {
+    return null; // or a loading indicator
+  }
+
   return (
     <ThemeContext_React.Provider value={{ currentTheme, theme, setTheme }}>
       {props.children}
@@ -56,7 +60,7 @@ export function ThemeProvider(props: IThemeProviderProps) {
 
 export function useThemeContext() {
   const context = useContext(ThemeContext_React);
-  if (!context) {
+  if (!context || !context.theme || !Object.keys(context.theme).length) {
     throw new Error("useThemeContext must be used within a ThemeProvider");
   }
   return context;

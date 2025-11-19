@@ -5,17 +5,19 @@ import { ThemeIcon, ThemeIconNames } from "../ThemeIcon";
 import { ThemeText } from "../ThemeText";
 // import { ReplayState, useReplay } from "../../context/Recorder";
 import { ITelemetryData } from "ForzaTelemetryApi";
-import { invokeWithTheme } from "@/hooks/invokeWithTheme";
 import { Logger } from "@/hooks/Logger";
 import { ReplayState } from "@/services/Recorder/RecorderService";
+import { useThemeContext } from "@/theme/ThemeProvider";
+import { IThemeElements } from "@/theme/Themes";
 
 export interface ReplayBarProps {
 }
 export function ReplayBar(props: ReplayBarProps) {
   const tag = `ReplayBar.tsx`;
+  const theme = useThemeContext();
   // const replay = useReplay();
   const replay = {} as any;
-  const styles = themeStyles();
+  const styles = themeStyles(theme.theme);
   const [position, setPosition] = React.useState<number>(replay.replayPosition);
   const isSeekingRef = React.useRef(false);
 
@@ -101,8 +103,8 @@ export function ReplayBar(props: ReplayBarProps) {
   )
 }
 
-function themeStyles() {
-  return invokeWithTheme((theme) => StyleSheet.create({
+function themeStyles(theme: IThemeElements) {
+  return StyleSheet.create({
     root: {
       width: '100%',
       height: 80,
@@ -133,5 +135,5 @@ function themeStyles() {
     replayProgressText: {
       marginRight: theme.sizes.borderRadius,
     }
-  }));
+  });
 }

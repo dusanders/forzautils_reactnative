@@ -10,9 +10,17 @@ import { NotFound } from './screens/NotFound';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
+import { WiFiInfo } from './screens/WiFi/WiFiInfo';
 
 const HomeTabs = createBottomTabNavigator({
   screens: {
+    WiFiInfo: {
+      screen: WiFiInfo,
+      options: {
+        headerShown: false,
+        tabBarIcon: ({ color }) => <IconSymbol size={28} name={Platform.OS === 'ios' ? 'wifi' : 'wifi'} color={color} />,
+      },
+    },
     Home: {
       screen: Home,
       options: {

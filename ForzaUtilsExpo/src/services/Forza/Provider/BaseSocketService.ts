@@ -4,6 +4,7 @@ import { INativeUDPService } from "../Network.types";
 
 abstract class BaseSocketService implements INativeUDPService {
   protected static instance: BaseSocketService | null = null;
+  static DEFAULT_PORT = 12345;
 
   static async Initialize<T extends BaseSocketService>(this: new () => T): Promise<INativeUDPService> {
     if (!BaseSocketService.instance) {

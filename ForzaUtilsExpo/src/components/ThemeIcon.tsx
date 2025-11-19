@@ -1,7 +1,7 @@
-import { invokeWithTheme } from "@/hooks/invokeWithTheme";
 import React from "react";
 import { MaterialIcons } from '@expo/vector-icons';
 import { StyleProp, ViewStyle } from "react-native";
+import { useThemeContext } from "@/theme/ThemeProvider";
 
 export enum ThemeIconNames {
   SETTINGS = "settings",
@@ -32,11 +32,12 @@ export interface ThemeIconProps  {
 }
 
 export function ThemeIcon(props: ThemeIconProps) {
+  const theme = useThemeContext();
   const { size = 24, colorOverride, style, ...rest } = props;
   return (
     <MaterialIcons name={props.name}
-      color={colorOverride || invokeWithTheme(theme => theme.colors.text.primary.onPrimary)}
-      size={size || invokeWithTheme(theme => theme.sizes.icon)}
+      color={colorOverride || theme.theme.colors.text.primary.onPrimary}
+      size={size || theme.theme.sizes.icon}
       style={[
         {
           textAlign: 'center'

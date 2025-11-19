@@ -1,10 +1,11 @@
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { IForzaService, INativeUDPService } from "./Network.types";
 import { ITelemetryData } from "shared";
 import { EmitterSubscription } from "react-native";
 import { useOnMount } from "@/hooks/useOnMount";
 import { useWifiContext } from "../WiFiInfo/WiFiInfoService";
 import { Logger } from "@/hooks/Logger";
+import SocketService from "./Provider/Provider";
 
 const NetworkContext_React = createContext({} as IForzaService);
 
@@ -34,13 +35,15 @@ export function NetworkProvider(props: NetworkProviderProps) {
 
   useEffect(() => {
     Logger.log(TAG, `WiFi state changed: isConnected=${wifiService.wifiState.isConnected}`);
-    if(wifiService.wifiState.isConnected) {
-      if(!service.current.isListening()) {
-        service.current.openSocket(9999).then(() => {
+    if (wifiService.wifiState.isConnected) {
+      service.current.openSocket(SocketService.DEFAULT_PORT)
+        .then(() => {
           Logger.log(TAG, `Opened socket on port ${service.current.port}`);
           setPort(service.current.port);
+        })
+        .catch((err) => {
+          Logger.error(TAG, `Failed to open socket: ${err}`);
         });
-      }
     }
   }, [wifiService.wifiState]);
 
@@ -52,7 +55,7 @@ export function NetworkProvider(props: NetworkProviderProps) {
       shutdown: async () => {
         await service.current.closeSocket();
       },
-      isUDPListening: () => service.current.port > 0,
+      isUDPListening: () => service.current.isListening(),
       onPacket: (fn) => service.current.onPacket(fn),
       DEBUG: (interval_ms) => {
         service.current.DEBUG(interval_ms);
@@ -69,7 +72,7 @@ export function NetworkProvider(props: NetworkProviderProps) {
 }
 
 export function useNetworkService() {
-  const ctx = createContext(NetworkContext_React);
+  const ctx = useContext(NetworkContext_React);
   if (!ctx) {
     throw new Error("useNetworkService must be used within a NetworkProvider");
   }

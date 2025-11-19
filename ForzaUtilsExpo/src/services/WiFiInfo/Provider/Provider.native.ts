@@ -52,7 +52,6 @@ class WifiServiceProvider extends BaseWiFiInfoProvider {
       this.state.ipAddress = state.details.ipAddress || null;
       this.state.ssid = state.details.ssid || null;
     }
-    Logger.log(TAG, `WiFi Info Fetched: ${JSON.stringify(this.state)}`);
     this.emitter.emit(WifiServiceProvider.WIFI_INFO_UPDATED_EVENT, this.state);
   }
 
@@ -71,7 +70,6 @@ class WifiServiceProvider extends BaseWiFiInfoProvider {
         this.state.ipAddress = state.details.ipAddress || null;
         this.state.ssid = state.details.ssid || null;
       }
-      Logger.log(TAG, `WiFi Info Updated: ${JSON.stringify(this.state)}`);
       this.emitter.emit(WifiServiceProvider.WIFI_INFO_UPDATED_EVENT, this.state);
     });
   }

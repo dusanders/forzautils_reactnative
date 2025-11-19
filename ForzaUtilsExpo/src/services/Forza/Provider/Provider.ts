@@ -6,6 +6,7 @@ import { delay } from "@/helpers/misc";
 import { ContextBridge_UDP, ElectronContextBridge } from "shared";
 import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
 import { Logger } from "@/hooks/Logger";
+import { Semaphore } from "@/helpers/Semaphore";
 
 const apiBridge = (window as any).electronAPI as ElectronContextBridge;
 
@@ -13,33 +14,44 @@ const TAG = "Provider.ts[SocketService]";
 class SocketService extends BaseSocketService {
   static async Initialize(): Promise<INativeUDPService> {
     if (!BaseSocketService.instance) {
+      Logger.log(TAG, "Initializing SocketService instance");
       BaseSocketService.instance = new SocketService();
       await (BaseSocketService.instance as SocketService).initialize();
     }
     return BaseSocketService.instance;
   }
-  
+
   static SocketEvents = {
     SOCKET_CLOSED: "socket_closed",
     SOCKET_ERROR: "socket_error",
     PACKET: "packet"
   }
   static instance: SocketService;
+  static DEFAULT_PORT: number = 5300;
 
   port: number = -1;
   private api: ContextBridge_UDP;
   private eventEmitter: EventEmitter = new EventEmitter();
+  private bindSemaphore: Semaphore = new Semaphore(1);
 
   private constructor() {
     super();
-    if(!apiBridge || !apiBridge.UDPRequests) {
+    if (!apiBridge || !apiBridge.UDPRequests) {
       throw new Error("Electron Context Bridge API is not available.");
     }
     this.api = apiBridge.UDPRequests;
   }
   async openSocket(port: number): Promise<void> {
-    const openedPort = await this.api.openUDPSocket(port);
-    this.port = openedPort;
+    await this.bindSemaphore.acquire();
+    try {
+      const openedPort = await this.api.openUDPSocket(port);
+      this.port = openedPort;
+    } catch (error) {
+      Logger.error(TAG, `Error opening UDP socket on port ${port}: ${(error as Error).message}`);
+      throw error;
+    } finally {
+      this.bindSemaphore.release();
+    }
   }
   async closeSocket(): Promise<void> {
     await this.api.closeUDPSocket();

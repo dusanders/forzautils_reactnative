@@ -27,8 +27,8 @@
 		B283786566A5F76512D68B9A /* Pods-ForzaUtilsExpo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ForzaUtilsExpo.release.xcconfig"; path = "Target Support Files/Pods-ForzaUtilsExpo/Pods-ForzaUtilsExpo.release.xcconfig"; sourceTree = "<group>"; };
 		BA14D59F2B35EBD9A07456A8 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-ForzaUtilsExpo/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		C2A988F461BB4971B67F023F /* SpaceMono-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "SpaceMono-Regular.ttf"; path = "../src/assets/fonts/SpaceMono-Regular.ttf"; sourceTree = "<group>"; };
-		D3D4909D0E7D0A15FFCB59F9 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = ForzaUtilsExpo/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		C2A988F461BB4971B67F023F /* SpaceMono-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SpaceMono-Regular.ttf"; path = "../src/assets/fonts/SpaceMono-Regular.ttf"; sourceTree = "<group>"; };
+		D3D4909D0E7D0A15FFCB59F9 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = ForzaUtilsExpo/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ForzaUtilsExpo/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* ForzaUtilsExpo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ForzaUtilsExpo-Bridging-Header.h"; path = "ForzaUtilsExpo/ForzaUtilsExpo-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -75,7 +75,6 @@
 				C2A988F461BB4971B67F023F /* SpaceMono-Regular.ttf */,
 			);
 			name = Resources;
-			path = "";
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -123,7 +122,6 @@
 				765717351923F0D913B2F6F6 /* Pods-ForzaUtilsExpo.debug.xcconfig */,
 				B283786566A5F76512D68B9A /* Pods-ForzaUtilsExpo.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -352,6 +350,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ForzaUtilsExpo/ForzaUtilsExpo.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6UHQ8TJ6Z2;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -370,7 +369,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.anonymous.ForzaUtilsExpo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dusanders.ForzaUtilsExpo;
 				PRODUCT_NAME = ForzaUtilsExpo;
 				SWIFT_OBJC_BRIDGING_HEADER = "ForzaUtilsExpo/ForzaUtilsExpo-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -388,6 +387,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ForzaUtilsExpo/ForzaUtilsExpo.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6UHQ8TJ6Z2;
 				INFOPLIST_FILE = ForzaUtilsExpo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -401,7 +401,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.anonymous.ForzaUtilsExpo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dusanders.ForzaUtilsExpo;
 				PRODUCT_NAME = ForzaUtilsExpo;
 				SWIFT_OBJC_BRIDGING_HEADER = "ForzaUtilsExpo/ForzaUtilsExpo-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

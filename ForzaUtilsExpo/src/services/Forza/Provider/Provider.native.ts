@@ -6,6 +6,7 @@ import UdpSocket from "react-native-udp/lib/types/UdpSocket";
 import { delay } from "@/helpers/misc";
 import { Logger } from "@/hooks/Logger";
 import BaseSocketService from "./BaseSocketService";
+import { Semaphore } from "@/helpers/Semaphore";
 
 /**
  * Add Type for react-native-udp 'rinfo' object
@@ -37,17 +38,29 @@ class SocketService extends BaseSocketService {
   private udpSocket?: UdpSocket;
   private doDebug = false;
   private debugInterval?: NodeJS.Timeout;
+  private bindSemaphore: Semaphore = new Semaphore(1);
 
   private constructor() {
     super();
+    Logger.log(TAG, "Initializing SocketService instance");
   }
 
   async openSocket(port: number): Promise<void> {
-    const openedPort = await this.bindSocket(port);
-    this.port = openedPort;
+    await this.bindSemaphore.acquire();
+    let boundPort = -1;
+    try {
+      boundPort = await this.bind(port);
+    } catch (e) {
+      throw e;
+    } finally {
+      this.port = boundPort;
+      this.bindSemaphore.release();
+    }
   }
 
   async closeSocket(): Promise<void> {
+    await this.bindSemaphore.acquire();
+    Logger.log(TAG, "Closing socket");
     if (this.udpSocket) {
       this.udpSocket.removeAllListeners();
       this.udpSocket.close();
@@ -59,6 +72,7 @@ class SocketService extends BaseSocketService {
     }
     this.eventEmitter.removeAllListeners();
     this.port = -1;
+    this.bindSemaphore.release();
   }
 
   onSocketClosed(fn: () => void): EmitterSubscription {
@@ -99,44 +113,36 @@ class SocketService extends BaseSocketService {
     await delay(100);
   }
 
-  private bindSocket(port: number): Promise<number> {
+  private bind(port: number): Promise<number> {
     return new Promise((resolve, reject) => {
-      // If we already have a socket...
-      if (this.udpSocket) {
-        Logger.log(TAG, `Socket already bound, returning existing port ${this.udpSocket?.address().port || 0}`);
-        return resolve(this.udpSocket?.address().port || 0);
+      let errorOccurred = false;
+      if (this.udpSocket && this.udpSocket.address().port > 0) {
+        Logger.log(TAG, `Socket already bound, returning existing port ${this.udpSocket.address().port}`);
+        return resolve(this.udpSocket.address().port);
       }
-
-      const bindErrorHandler = (e: Error | any) => {
-        this.udpSocket = undefined;
-        reject(new Error(`Failed to bind: ${e?.message}`));
-      };
-      const bindCloseHandler = (e: Error | any) => {
-        this.udpSocket = undefined;
-        reject(new Error(`Socket closed during bind: ${e?.message}`));
-      };
-      const bindListeningHandler = () => {
-        if (this.udpSocket) {
-          this.udpSocket
-            .removeListener('error', bindErrorHandler)
-            .removeListener('close', bindCloseHandler)
-            .removeListener('listening', bindListeningHandler)
-            .addListener('error', this.errorHandler.bind(this))
-            .addListener('close', this.closeHandler.bind(this))
-            .addListener('message', this.dataHandler.bind(this));
+      try {
+        this.udpSocket = UdpSockets.createSocket(
+          { type: 'udp4', reusePort: true },
+        ).once('error', (error) => {
+          errorOccurred = true;
+          reject(new Error(`Socket error during bind: ${error?.message}`));
+          this.udpSocket?.removeAllListeners();
+          this.udpSocket?.close();
+          this.udpSocket = undefined;
+        }).once('listening', () => {
+          if (errorOccurred) {
+            return;
+          }
+          this.udpSocket?.removeAllListeners('error');
+          this.udpSocket?.addListener('error', this.errorHandler.bind(this));
+          this.udpSocket?.addListener('close', this.closeHandler.bind(this));
+          this.udpSocket?.addListener('message', this.dataHandler.bind(this));
           resolve(port);
-        } else {
-          Logger.log(TAG, `Socket is undefined at listening event`);
-          reject(new Error('Socket instance is undefined on listening event!!'));
-        }
-      };
-
-      this.udpSocket = UdpSockets.createSocket(
-        { type: 'udp4', reusePort: true },
-      ).once('error', bindErrorHandler.bind(this))
-        .once('close', bindCloseHandler.bind(this))
-        .once('listening', bindListeningHandler.bind(this));
-      this.udpSocket.bind(port);
+        });
+        this.udpSocket.bind(port);
+      } catch (e) {
+        return reject(new Error(`Failed to bind socket: ${(e as Error).message}`));
+      }
     });
   }
 

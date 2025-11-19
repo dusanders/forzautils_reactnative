@@ -6,6 +6,7 @@ import { ThemeButton } from "@/components/ThemeButton";
 import { ThemeIcon, ThemeIconNames } from "@/components/ThemeIcon";
 import { TitleText, LabelText, ThemeText } from "@/components/ThemeText";
 import { AppRoutes, MainAppNavigation } from "@/navigation/types";
+import { useNetworkService } from "@/services/Forza/NetworkService";
 import { useWifiContext } from "@/services/WiFiInfo/WiFiInfoService";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
@@ -18,6 +19,7 @@ export interface WiFiInfoProps {
 export function WiFiInfo(props: WiFiInfoProps): React.ReactElement<WiFiInfoProps> {
   const styles = themeStyles();
   const wifi = useWifiContext();
+  const network = useNetworkService();
   const navigation = useNavigation<MainAppNavigation>();
   
   return (
@@ -68,7 +70,7 @@ export function WiFiInfo(props: WiFiInfoProps): React.ReactElement<WiFiInfoProps
               allcapsLabel
               allcapsTitle
               centerContent
-              title={`${'-'}`}
+              title={`${network.port || '-'}`}
               body="Port" />
           </Row>
           <Row>
@@ -76,7 +78,7 @@ export function WiFiInfo(props: WiFiInfoProps): React.ReactElement<WiFiInfoProps
               allcapsLabel
               allcapsTitle
               centerContent
-              title={'Error'}
+              title={`${network.isUDPListening() ? 'Listening' : 'Error'}`}
               body="Forza Data" />
             <TextCard
               allcapsLabel
