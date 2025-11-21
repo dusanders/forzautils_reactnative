@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { ElectronContextBridge, IpcActions_UDP, IpcActions_WiFi, IWiFiInfoState } from 'shared';
+import { ElectronContextBridge, IpcActions_Cache, IpcActions_UDP, IpcActions_WiFi, IWiFiInfoState } from 'shared';
 import { ITelemetryData } from 'shared';
 // const {contextBridge, ipcRenderer} = require('electron');
 
@@ -42,6 +42,18 @@ const api: ElectronContextBridge = {
       ipcRenderer.on(IpcActions_UDP.SocketClosed, () => {
         callback();
       });
+    },
+  },
+  CacheRequests: {
+    setItem: async <T>(key: string, value: T): Promise<void> => {
+      await ipcRenderer.invoke(IpcActions_Cache.SetItem, key, value);
+    },
+    getItem: async <T>(key: string): Promise<T | null> => {
+      const result = await ipcRenderer.invoke(IpcActions_Cache.GetItem, key);
+      return result;
+    },
+    removeItem: async (key: string): Promise<void> => {
+      await ipcRenderer.invoke(IpcActions_Cache.RemoveItem, key);
     },
   }
 }

@@ -1,17 +1,17 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { useColorScheme } from "./hooks/useColorScheme";
 import { useFonts } from "expo-font";
-import { App } from "./App";
 import { useOnMount } from "./hooks/useOnMount";
 import WifiServiceProvider from "./services/WiFiInfo/Provider/Provider";
-import { Logger } from "./hooks/Logger";
 import { WifiContextProvider } from "./services/WiFiInfo/WiFiInfoService";
 import { NetworkProvider } from "./services/Forza/NetworkService";
 import { INativeUDPService } from "./services/Forza/Network.types";
 import SocketService from "./services/Forza/Provider/Provider";
 import { ThemeType } from "./theme/Themes";
 import { Semaphore } from "./helpers/Semaphore";
+import { TuningViewModelProvider } from "./viewModels/Tuning/TuningViewModel";
+import App from "./App";
 const SpaceMono = require('./assets/fonts/SpaceMono-Regular.ttf');
 
 export interface PreflightProps {
@@ -51,12 +51,14 @@ export function Preflight(props: PreflightProps) {
   if (!loaded || !servicesReady) {
     return null;
   }
-  
+
   return (
     <ThemeProvider initialTheme={ThemeType.DARK}>
       <WifiContextProvider>
         <NetworkProvider networkService={networkServiceRef.current!}>
-          <App />
+          <TuningViewModelProvider>
+            <App />
+          </TuningViewModelProvider>
         </NetworkProvider>
       </WifiContextProvider>
     </ThemeProvider>

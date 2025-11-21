@@ -10,11 +10,13 @@ import { useOnMount } from './hooks/useOnMount';
 import { Logger } from './hooks/Logger';
 import { WiFiInfo } from './navigation/screens/WiFi/WiFiInfo';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SourceChooser } from './navigation/screens/SourceChooser/SourceChooser';
+import { Settings } from './navigation/screens/Settings/Settings';
 
 SplashScreen.preventAutoHideAsync();
 
 const TAG = "App.tsx";
-export function App() {
+function App() {
   useOnMount(() => {
     SplashScreen.hideAsync().catch((e) => {
       Logger.error(TAG, `Error hiding splash screen: ${e}`);
@@ -42,9 +44,20 @@ export function App() {
             <MainStack.Screen
               name={AppRoutes.WIFI_INFO}
               component={WiFiInfo} />
+            <MainStack.Screen
+              name={AppRoutes.WIFI_ERROR}
+              component={WiFiInfo} />
+            <MainStack.Screen
+              name={AppRoutes.SOURCE_CHOOSER}
+              component={SourceChooser} />
+            <MainStack.Screen
+              name={AppRoutes.SETTINGS}
+              component={Settings} />
           </MainStack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
     </SafeAreaProvider>
   );
 }
+
+export default App;

@@ -3,9 +3,10 @@ import { ForzaTelemetryApi, IpcActions_UDP, IpcActions_WiFi, IWiFiInfoState } fr
 import * as SysInfo from 'systeminformation';
 import * as dgram from 'dgram';
 import { Semaphore } from "../../helpers/Semaphore.js";
+import { ISupportRendererService } from "../../renderer/renderer.types.js";
 
 const TAG = "WiFiServiceProvider";
-export class WifiServiceProvider {
+export class WifiServiceProvider implements ISupportRendererService {
 
   private udpPort: number = -1;
   private socket: dgram.Socket | null = null;

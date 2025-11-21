@@ -5,6 +5,7 @@ export enum AppRoutes {
   EXPLORE = 'EXPLORE',
   NOT_FOUND = 'NOT_FOUND',
   WIFI_INFO = 'WIFI_INFO',
+  WIFI_ERROR = 'WIFI_ERROR',
   IP_INFO = 'IP_INFO',
   DATA = 'DATA',
   HP_TQ_GRAPH = 'HP_TQ_GRAPH',
@@ -26,6 +27,7 @@ export type RootStackParamList = {
   [AppRoutes.EXPLORE]: undefined;
   [AppRoutes.NOT_FOUND]: undefined;
   [AppRoutes.WIFI_INFO]: undefined;
+  [AppRoutes.WIFI_ERROR]: undefined;
   [AppRoutes.IP_INFO]: undefined;
   [AppRoutes.DATA]: undefined;
   [AppRoutes.HP_TQ_GRAPH]: undefined;

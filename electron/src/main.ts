@@ -2,6 +2,8 @@ import { app, BrowserWindow } from 'electron/main';
 import { ipcMain } from 'electron/main';
 import * as Path from 'path';
 import { WifiServiceProvider } from './services/WiFi/WiFiService.js';
+import { ISupportRendererService } from './renderer/renderer.types.js';
+import { CacheService } from './services/Cache/Cache.js';
 const __dirname = import.meta.dirname;
 
 const RendererChannel = ipcMain;
@@ -29,8 +31,11 @@ const createWindow = () => {
 
 app.whenReady().then(() => {
   const win = createWindow();
-  const wifiServiceProvider = new WifiServiceProvider(win);
-  wifiServiceProvider.attachHandlers(ipcMain);
+  const supportServices: ISupportRendererService[] = [
+    new WifiServiceProvider(win),
+    new CacheService(win)
+  ];
+  supportServices.forEach(service => service.attachHandlers(ipcMain));
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
