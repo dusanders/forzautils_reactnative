@@ -1,9 +1,10 @@
+import { Semaphore } from '@/helpers/Semaphore';
+import { File } from 'expo-file-system';
+import { Logger } from '@/hooks/Logger';
 import { DB, QueryResult, open as SqliteOpen } from '@op-engineering/op-sqlite';
 import { ITelemetryData } from "ForzaTelemetryApi";
-import { ISession, ISessionInfo, SESSION_DB_NAME_PREFIX, DB_FILE_EXT, MASTER_DB_NAME } from "./DatabaseInterfaces";
-import { ILogger, Logger } from '../../context/Logger';
-import { FileSystem } from 'react-native-file-access';
-import { Semaphore } from '../../types/Semaphore';
+import { ISession, SESSION_DB_NAME_PREFIX, DB_FILE_EXT } from '../DatabaseInterfaces';
+import { ISessionInfo } from 'shared';
 
 /**
  * Structure of the packet data in the database
@@ -34,7 +35,6 @@ export class Session implements ISession {
 
   private tag: string;
   private db?: DB;
-  private logger: ILogger = Logger();
   private dbSemaphore = new Semaphore(1);
   info: ISessionInfo;
   currentReadOffset: number = 0;
@@ -48,7 +48,15 @@ export class Session implements ISession {
 
   async delete() {
     if (this.db?.getDbPath()) {
-      await FileSystem.unlink(this.db.getDbPath());
+      const file = new File(this.db.getDbPath());
+      if (file.exists) {
+        file.delete();
+      }
+      try {
+        this.masterDb.execute(`DELETE FROM sessions WHERE name = ?`, [this.info.name]);
+      } catch (error) {
+        Logger.error(this.tag, `Error deleting session from master DB: ${error}`);
+      }
     }
   }
 
@@ -69,7 +77,7 @@ export class Session implements ISession {
       throw new Error(`Failed to add packet - session not initialized`);
     }
     if (this.info.endTime) {
-      this.logger.log(this.tag, `Cannot add packet - session ended at: ${this.info.endTime}`);
+      Logger.log(this.tag, `Cannot add packet - session ended at: ${this.info.endTime}`);
       return;
     }
     await this.dbSemaphore.acquire();
@@ -83,10 +91,10 @@ export class Session implements ISession {
       throw new Error(`Failed to add packet - session not initialized`);
     }
     if (this.info.endTime) {
-      this.logger.log(this.tag, `Session already has end time: ${this.info.endTime}`);
+      Logger.log(this.tag, `Session already has end time: ${this.info.endTime}`);
       return;
     }
-    this.logger.log(this.tag, `closing @ ${this.info.length} - ${this.info.endTime} with master: ${Boolean(this.masterDb)}`);
+    Logger.log(this.tag, `closing @ ${this.info.length} - ${this.info.endTime} with master: ${Boolean(this.masterDb)}`);
     this.info.endTime = Date.now();
     this.masterDb?.executeRaw(
       `UPDATE sessions SET length = ?, endTime = ? WHERE name = ?`,
@@ -103,9 +111,9 @@ export class Session implements ISession {
     this.db = SqliteOpen({
       name: `${SESSION_DB_NAME_PREFIX}${this.info.name}.${DB_FILE_EXT}`
     });
-    this.logger.log(this.tag, `${this.db.getDbPath()}`);
+    Logger.log(this.tag, `${this.db.getDbPath()}`);
     this.createTables();
-    this.logger.log(this.tag, `initialized with ${JSON.stringify(this.info)}`);
+    Logger.log(this.tag, `initialized with ${JSON.stringify(this.info)}`);
     return this;
   }
 
