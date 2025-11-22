@@ -1,7 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { ElectronContextBridge, IpcActions_Cache, IpcActions_UDP, IpcActions_WiFi, IWiFiInfoState } from 'shared';
 import { ITelemetryData } from 'shared';
-// const {contextBridge, ipcRenderer} = require('electron');
 
 const api: ElectronContextBridge = {
   WiFiRequests: {

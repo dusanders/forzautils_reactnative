@@ -2,6 +2,7 @@ import { AppBarContainer } from "@/components/AppBar/AppBarContainer";
 import { Row } from "@/components/Row";
 import { TextCard } from "@/components/TextCard";
 import { ThemeText } from "@/components/ThemeText";
+import { percentOfDeviceHeight } from "@/helpers/misc";
 import { AppRoutes, MainAppNavigation } from "@/navigation/types";
 import { useThemeContext } from "@/theme/ThemeProvider";
 import { IThemeElements } from "@/theme/Themes";
@@ -25,7 +26,6 @@ export function SourceChooser(props: SourceChooserProps) {
       <View style={styles.root}>
         <Row style={styles.cardRow}>
           <View style={{
-            justifyContent: 'center',
             alignItems: 'center',
           }}>
             <ThemeText style={styles.titleText}>
@@ -91,12 +91,12 @@ function themeStyles(theme: IThemeElements) {
     },
     cardRow: {
       justifyContent: 'center',
-      marginTop: '30%',
+      marginTop: percentOfDeviceHeight(10),
       marginBottom: theme.sizes.borderRadius,
     },
     buttonRow: {
       justifyContent: 'center',
-      marginTop: '10%'
+      marginTop: 20
     },
     titleText: {
       fontSize: 24,

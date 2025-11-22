@@ -12,6 +12,7 @@ import { WiFiInfo } from './navigation/screens/WiFi/WiFiInfo';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { SourceChooser } from './navigation/screens/SourceChooser/SourceChooser';
 import { Settings } from './navigation/screens/Settings/Settings';
+import { TuningPage } from './navigation/screens/Tuning/Tuning';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -53,6 +54,9 @@ function App() {
             <MainStack.Screen
               name={AppRoutes.SETTINGS}
               component={Settings} />
+            <MainStack.Screen
+              name={AppRoutes.TUNING_CALCULATOR}
+              component={TuningPage} />
           </MainStack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

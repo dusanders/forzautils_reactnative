@@ -12,6 +12,7 @@ import { ThemeType } from "./theme/Themes";
 import { Semaphore } from "./helpers/Semaphore";
 import { TuningViewModelProvider } from "./viewModels/Tuning/TuningViewModel";
 import App from "./App";
+import { CacheProvider } from "./services/Cache/Cache";
 const SpaceMono = require('./assets/fonts/SpaceMono-Regular.ttf');
 
 export interface PreflightProps {
@@ -53,14 +54,16 @@ export function Preflight(props: PreflightProps) {
   }
 
   return (
-    <ThemeProvider initialTheme={ThemeType.DARK}>
-      <WifiContextProvider>
-        <NetworkProvider networkService={networkServiceRef.current!}>
-          <TuningViewModelProvider>
-            <App />
-          </TuningViewModelProvider>
-        </NetworkProvider>
-      </WifiContextProvider>
-    </ThemeProvider>
+    <CacheProvider>
+      <ThemeProvider initialTheme={ThemeType.DARK}>
+        <WifiContextProvider>
+          <NetworkProvider networkService={networkServiceRef.current!}>
+            <TuningViewModelProvider>
+              <App />
+            </TuningViewModelProvider>
+          </NetworkProvider>
+        </WifiContextProvider>
+      </ThemeProvider>
+    </CacheProvider>
   );
 }

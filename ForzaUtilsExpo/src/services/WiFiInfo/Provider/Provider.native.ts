@@ -2,8 +2,8 @@ import { EmitterSubscription } from "react-native";
 import { Logger } from "@/hooks/Logger";
 import { IWiFiInfoState } from "shared";
 import NetInfo, { NetInfoSubscription } from "@react-native-community/netinfo";
-import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
 import { BaseWiFiInfoProvider } from "./BaseProvider";
+import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
 
 const TAG = "WifiServiceProvider_native";
 class WifiServiceProvider extends BaseWiFiInfoProvider {

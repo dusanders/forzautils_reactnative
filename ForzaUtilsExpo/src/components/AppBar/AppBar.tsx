@@ -143,6 +143,7 @@ function themeStyles(theme: IThemeElements) {
       display: 'flex',
       flexDirection: 'row',
       padding: theme.sizes.borderRadius,
+      zIndex: 9999
     },
     themeButtonView: {
       width: '100%',

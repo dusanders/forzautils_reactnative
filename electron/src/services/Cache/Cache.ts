@@ -3,6 +3,7 @@ import { ISupportRendererService } from "../../renderer/renderer.types.js";
 import { Logger } from "../Logger/Logger.js";
 import * as Path from "path";
 import * as FS from "fs";
+const __dirname = import.meta.dirname;
 
 interface CacheData {
   [key: string]: any;
@@ -11,7 +12,7 @@ interface CacheData {
 const TAG = "CacheService";
 export class CacheService implements ISupportRendererService {
 
-  private static cacheFilePath = Path.join(process.cwd(), 'cache.json');
+  private static cacheFilePath = Path.join(__dirname, '..', '..', 'cache.json');
 
   constructor(private window: Electron.BrowserWindow) {
     Logger.log(TAG, `initialized with cache file at: ${CacheService.cacheFilePath}`);
@@ -26,7 +27,7 @@ export class CacheService implements ISupportRendererService {
   async setItem<T>(key: string, value: T): Promise<void> {
     Logger.log(TAG, `Setting item in cache: ${key}`);
     const data = await this.readCacheFile();
-    data[key] = value;
+    data[key] = JSON.stringify(value);
     await this.writeCacheFile(data);
   }
 
@@ -34,7 +35,7 @@ export class CacheService implements ISupportRendererService {
     Logger.log(TAG, `Getting item from cache: ${key}`);
     const data = await this.readCacheFile();
     if (key in data) {
-      return data[key] as T;
+      return JSON.parse(data[key]) as T;
     }
     return null;
   }

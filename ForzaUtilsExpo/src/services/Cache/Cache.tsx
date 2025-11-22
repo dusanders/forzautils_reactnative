@@ -17,22 +17,11 @@ const CacheContext = React.createContext<ICacheContext | null>(null);
 export function CacheProvider(props: ICacheProviderProps) {
   const { children } = props;
   const serviceRef = React.useRef<CacheService>(new CacheService());
-  const setItem = async <T,>(key: string, value: ICache<T>): Promise<void> => {
-    await serviceRef.current.setItem(key, value);
-  };
-
-  const getItem = async <T,>(key: string): Promise<T | null> => {
-    return await serviceRef.current.getItem(key);
-  };
-
-  const removeItem = async (key: string): Promise<void> => {
-    await serviceRef.current.removeItem(key);
-  };
 
   const contextValue: ICacheContext = {
-    setItem,
-    getItem,
-    removeItem,
+    setItem: (key, value) => serviceRef.current.setItem(key, value),
+    getItem: (key) => serviceRef.current.getItem(key),
+    removeItem: (key) => serviceRef.current.removeItem(key),
   };
 
   return (
