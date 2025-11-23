@@ -54,6 +54,38 @@ const api: ElectronContextBridge = {
     removeItem: async (key: string): Promise<void> => {
       await ipcRenderer.invoke(IpcActions_Cache.RemoveItem, key);
     },
+  },
+  DatabaseRequests: {
+    getAllSessions: async () => {
+      const result = await ipcRenderer.invoke('DatabaseRequest.GetAllSessions');
+      return result;
+    },
+    generateSession: async () => {
+      const result = await ipcRenderer.invoke('DatabaseRequest.GenerateSession');
+      return result;
+    },
+    close: async (): Promise<void> => {
+      await ipcRenderer.invoke('DatabaseRequest.Close');
+    },
+  },
+  SessionRequests: {
+    addPacket: async (packet: ITelemetryData): Promise<void> => {
+      await ipcRenderer.invoke('SessionRequest.AddPacket', packet);
+    },
+    readPacket: async (offset?: number): Promise<ITelemetryData | null> => {
+      const result = await ipcRenderer.invoke('SessionRequest.ReadPacket', offset);
+      return result;
+    },
+    close: async (): Promise<void> => {
+      await ipcRenderer.invoke('SessionRequest.Close');
+    },
+    delete: async (): Promise<void> => {
+      await ipcRenderer.invoke('SessionRequest.Delete');
+    },
+    open: async (info): Promise<any> => {
+      const result = await ipcRenderer.invoke('SessionRequest.Open', info);
+      return result;
+    },
   }
 }
 contextBridge.exposeInMainWorld('electronAPI', api);

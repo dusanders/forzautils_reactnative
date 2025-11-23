@@ -35,10 +35,14 @@
     // Recommended Options
     "strict": true,
     "jsx": "react-jsx",
-    "isolatedModules": true,
+    "isolatedModules": false,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
+
+    // Additional Checks
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
   },
   "exclude": [
     "./public",

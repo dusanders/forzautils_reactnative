@@ -4,7 +4,7 @@ import { Logger } from '@/hooks/Logger';
 import { DB, QueryResult, open as SqliteOpen } from '@op-engineering/op-sqlite';
 import { ITelemetryData } from "ForzaTelemetryApi";
 import { ISession, SESSION_DB_NAME_PREFIX, DB_FILE_EXT } from '../DatabaseInterfaces';
-import { ISessionInfo } from 'shared';
+import { CreateTableCommands, InsertTelemetryCommands, ISessionInfo } from 'shared';
 
 /**
  * Structure of the packet data in the database
@@ -134,55 +134,55 @@ export class Session implements ISession {
 
   private async updateAllTables(packet: ITelemetryData, id: number): Promise<void> {
     await this.executeQuery(
-      `INSERT INTO packets (id, json) VALUES (?,?)`,
+      InsertTelemetryCommands.packets,
       [id, JSON.stringify(packet)]
     );
     await this.executeQuery(
-      `INSERT INTO rpm_data (id, max, idle, current) VALUES (?,?,?,?)`,
+      InsertTelemetryCommands.rpm_data,
       [id, packet.rpmData.max, packet.rpmData.idle, packet.rpmData.current]
     );
     await this.executeQuery(
-      `INSERT INTO acceleration_data (id, x, y, z) VALUES (?,?,?,?)`,
+      InsertTelemetryCommands.acceleration_data,
       [id, packet.acceleration.x, packet.acceleration.y, packet.acceleration.z]
     );
     await this.executeQuery(
-      `INSERT INTO velocity_data (id, x, y, z) VALUES (?,?,?,?)`,
+      InsertTelemetryCommands.velocity_data,
       [id, packet.velocity.x, packet.velocity.y, packet.velocity.z]
     );
     await this.executeQuery(
-      `INSERT INTO angular_velocity_data (id, x, y, z) VALUES (?,?,?,?)`,
+      InsertTelemetryCommands.angular_velocity_data,
       [id, packet.angularVelocity.x, packet.angularVelocity.y, packet.angularVelocity.z]
     );
     await this.executeQuery(
-      `INSERT INTO orientation_data (id, yaw, pitch, roll) VALUES (?,?,?,?)`,
+      InsertTelemetryCommands.orientation_data,
       [id, packet.yaw, packet.pitch, packet.roll]
     );
     await this.executeQuery(
-      `INSERT INTO normalized_suspension_travel_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      InsertTelemetryCommands.normalized_suspension_travel_data,
       [id, packet.normalizedSuspensionTravel.leftFront, packet.normalizedSuspensionTravel.leftRear, packet.normalizedSuspensionTravel.rightFront, packet.normalizedSuspensionTravel.rightRear]
     );
     await this.executeQuery(
-      `INSERT INTO tire_slip_ratio_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      InsertTelemetryCommands.tire_slip_ratio_data,
       [id, packet.tireSlipRatio.leftFront, packet.tireSlipRatio.leftRear, packet.tireSlipRatio.rightFront, packet.tireSlipRatio.rightRear]
     );
     await this.executeQuery(
-      `INSERT INTO wheel_rotation_speed_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      InsertTelemetryCommands.wheel_rotation_speed_data,
       [id, packet.wheelRotationSpeed.leftFront, packet.wheelRotationSpeed.leftRear, packet.wheelRotationSpeed.rightFront, packet.wheelRotationSpeed.rightRear]
     );
     await this.executeQuery(
-      `INSERT INTO wheel_on_rumble_strip_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      InsertTelemetryCommands.wheel_on_rumble_strip_data,
       [id, packet.wheelOnRumbleStrip.leftFront, packet.wheelOnRumbleStrip.leftRear, packet.wheelOnRumbleStrip.rightFront, packet.wheelOnRumbleStrip.rightRear]
     );
     await this.executeQuery(
-      `INSERT INTO wheel_in_puddle_depth_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      InsertTelemetryCommands.wheel_in_puddle_depth_data,
       [id, packet.wheelInPuddleDepth.leftFront, packet.wheelInPuddleDepth.leftRear, packet.wheelInPuddleDepth.rightFront, packet.wheelInPuddleDepth.rightRear]
     );
     await this.executeQuery(
-      `INSERT INTO surface_rumble_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      InsertTelemetryCommands.surface_rumble_data,
       [id, packet.surfaceRumble.leftFront, packet.surfaceRumble.leftRear, packet.surfaceRumble.rightFront, packet.surfaceRumble.rightRear]
     );
     await this.executeQuery(
-      `INSERT INTO slip_angle_data (id, leftFront, leftRear, rightFront, rightRear) VALUES (?,?,?,?,?)`,
+      InsertTelemetryCommands.slip_angle_data,
       [id, packet.tireSlipAngle.leftFront, packet.tireSlipAngle.leftRear, packet.tireSlipAngle.rightFront, packet.tireSlipAngle.rightRear]
     );
   }
@@ -191,18 +191,18 @@ export class Session implements ISession {
     if (!this.db) {
       throw new Error(`Failed to create tables - session not initialized`);
     }
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS packets (id INT PRIMARY KEY, json VARCHAR)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS rpm_data (id INT PRIMARY KEY, max FLOAT, idle FLOAT, current FLOAT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS acceleration_data (id INT PRIMARY KEY, x FLOAT, y FLOAT, z FLOAT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS velocity_data (id INT PRIMARY KEY, x FLOAT, y FLOAT, z FLOAT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS angular_velocity_data (id INT PRIMARY KEY, x FLOAT, y FLOAT, z FLOAT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS orientation_data (id INT PRIMARY KEY, yaw FLOAT, pitch FLOAT, roll FLOAT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS normalized_suspension_travel_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS tire_slip_ratio_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS wheel_rotation_speed_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS wheel_on_rumble_strip_data (id INT PRIMARY KEY, leftFront INT, leftRear INT, rightFront INT, rightRear INT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS wheel_in_puddle_depth_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS surface_rumble_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
-    await this.executeQuery(`CREATE TABLE IF NOT EXISTS slip_angle_data (id INT PRIMARY KEY, leftFront FLOAT, leftRear FLOAT, rightFront FLOAT, rightRear FLOAT)`);
+    await this.executeQuery(CreateTableCommands.packets);
+    await this.executeQuery(CreateTableCommands.rpm_data);
+    await this.executeQuery(CreateTableCommands.acceleration_data);
+    await this.executeQuery(CreateTableCommands.velocity_data);
+    await this.executeQuery(CreateTableCommands.angular_velocity_data);
+    await this.executeQuery(CreateTableCommands.orientation_data);
+    await this.executeQuery(CreateTableCommands.normalized_suspension_travel_data);
+    await this.executeQuery(CreateTableCommands.tire_slip_ratio_data);
+    await this.executeQuery(CreateTableCommands.wheel_rotation_speed_data);
+    await this.executeQuery(CreateTableCommands.wheel_on_rumble_strip_data);
+    await this.executeQuery(CreateTableCommands.wheel_in_puddle_depth_data);
+    await this.executeQuery(CreateTableCommands.surface_rumble_data);
+    await this.executeQuery(CreateTableCommands.slip_angle_data);
   }
 }

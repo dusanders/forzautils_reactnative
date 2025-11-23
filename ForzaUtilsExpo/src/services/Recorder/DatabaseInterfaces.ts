@@ -13,7 +13,7 @@ export interface QueryResult<T> {
 
 
 export interface IDatabaseService {
-  getAllSessions(): Promise<ISessionInfo[]>;
+  getAllSessions(): Promise<ISession[]>;
   getSessionByName(name: string): Promise<ISession | null>;
   generateSession(): Promise<ISession>;
   close(): void;

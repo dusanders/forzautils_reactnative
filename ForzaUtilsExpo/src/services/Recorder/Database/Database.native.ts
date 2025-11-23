@@ -23,8 +23,9 @@ export class DatabaseService implements IDatabaseService {
     return DatabaseService.instance;
   }
 
-  async getAllSessions(): Promise<ISessionInfo[]> {
-    return (await this.executeQuery<ISessionInfo>('SELECT * FROM sessions')).rows;
+  async getAllSessions(): Promise<ISession[]> {
+    const all = (await this.executeQuery<ISessionInfo>('SELECT * FROM sessions')).rows;
+    return all.map(info => Session.fromInfo(info, this.db));
   }
 
   async getSessionByName(name: string): Promise<ISession | null> {
