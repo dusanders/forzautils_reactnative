@@ -49,6 +49,8 @@ export function Preflight(props: PreflightProps) {
     initializeServices();
     return () => {
       networkServiceRef.current?.closeSocket();
+      recorderServiceRef.current?.shutdown();
+      setServicesReady(false);
     }
   });
 

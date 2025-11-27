@@ -1,4 +1,5 @@
 import { AppBarContainer } from "@/components/AppBar/AppBarContainer";
+import { SlipAngle } from "@/components/Graphs/SlipAngle";
 import { TextCard } from "@/components/TextCard";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { ThemeText } from "@/components/ThemeText";
@@ -11,7 +12,7 @@ import { useThemeContext } from "@/theme/ThemeProvider";
 import { IThemeElements } from "@/theme/Themes";
 import { useNavigation } from "@react-navigation/native";
 import React, { useMemo, useCallback, useEffect } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, View } from "react-native";
 
 export interface DataChooserProps {
 
@@ -111,6 +112,16 @@ export function DataChooser(props: DataChooserProps) {
       <View style={styles.root}>
         <TrackMap
           style={styles.trackMapRoot} />
+        <ScrollView style={{ height: 400 }}>
+          <SlipAngle />
+          <SlipAngle />
+          <SlipAngle />
+          <SlipAngle />
+          <SlipAngle />
+          <SlipAngle />
+          <SlipAngle />
+          <SlipAngle />
+        </ScrollView>
         <FlatList
           style={styles.listRoot}
           data={dataElements}
