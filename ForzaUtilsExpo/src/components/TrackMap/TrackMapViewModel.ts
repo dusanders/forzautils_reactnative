@@ -76,6 +76,7 @@ export function useTrackMapViewModel() {
     });
 
     return () => {
+      Logger.log(TAG, `remove replay listener`);
       replayListener.remove();
     };
   }, [replay]);

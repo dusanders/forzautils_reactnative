@@ -1,4 +1,4 @@
-import { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
+import { EmitterSubscription } from "@/helpers/EventEmitter";
 import { ITelemetryData } from "shared";
 
 

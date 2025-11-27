@@ -1,6 +1,6 @@
 import { IWiFiInfoState } from "shared";
 import { INativeWifiService } from "../WiFiInfo.types";
-import { EmitterSubscription } from "react-native";
+import { EmitterSubscription } from "@/helpers/EventEmitter";
 
 export abstract class BaseWiFiInfoProvider implements INativeWifiService {
   protected static instance: BaseWiFiInfoProvider | null = null;

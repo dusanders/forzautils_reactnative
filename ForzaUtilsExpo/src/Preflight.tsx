@@ -36,7 +36,7 @@ export function Preflight(props: PreflightProps) {
     try {
       await WifiServiceProvider.Initialize();
       networkServiceRef.current = await SocketService.Initialize();
-      recorderServiceRef.current = await RecorderService.Initialize();
+      recorderServiceRef.current = await RecorderService.Initialize(networkServiceRef.current);
       setServicesReady(true);
     } catch (error) {
       console.error("Error initializing services:", error);

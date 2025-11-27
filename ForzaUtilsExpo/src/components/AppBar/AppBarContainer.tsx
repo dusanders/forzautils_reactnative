@@ -18,8 +18,8 @@ export function AppBarContainer(props: AppBarContainerProps) {
   const styles = themeStyles(theme.theme, Boolean(replay.state.replayState));
 
   const shouldShowReplayBar = () => {
-    return replay.state.replayState !== ReplayState.IDLE 
-    && replay.state.replayState !== ReplayState.RECORDING;
+    return replay.state.replayState !== ReplayState.IDLE
+      && replay.state.replayState !== ReplayState.RECORDING;
   }
 
   return (
@@ -31,10 +31,10 @@ export function AppBarContainer(props: AppBarContainerProps) {
       <View style={styles.contentView}>
         {props.children}
       </View>
-      {/* {shouldShowReplayBar() && (
-          <ReplayBar />
-        )
-      } */}
+      {shouldShowReplayBar() && (
+        <ReplayBar />
+      )
+      }
     </Container>
   )
 }

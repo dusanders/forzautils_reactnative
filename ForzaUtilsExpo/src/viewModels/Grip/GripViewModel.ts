@@ -2,11 +2,11 @@ import { Logger } from "@/hooks/Logger";
 import { useNetworkService } from "@/services/Forza/NetworkService";
 import { RecorderServiceProvider, useRecorderService } from "@/services/Recorder/RecorderService";
 import { useRef, useState } from "react";
-import { EmitterSubscription } from "react-native";
 import { ITelemetryData, TireData } from "shared";
 import { AxleData } from "../types";
 import { useOnMount } from "@/hooks/useOnMount";
 import SocketService from "@/services/Forza/Provider/Provider";
+import { EmitterSubscription } from "@/helpers/EventEmitter";
 
 export interface IGripViewModel {
   steering: number;

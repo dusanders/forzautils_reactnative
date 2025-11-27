@@ -1,12 +1,11 @@
-import { EmitterSubscription } from "react-native";
 import { Logger } from "@/hooks/Logger";
 import { ContextBridge_WiFi, ElectronContextBridge, ITelemetryData, IWiFiInfoState } from "shared";
-import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
 import { BaseWiFiInfoProvider } from "./BaseProvider";
+import { EmitterSubscription, EventEmitter } from "@/helpers/EventEmitter";
 
-const TAG = "WifiServiceProvider_web";
 const apiBridge = (window as any).electronAPI as ElectronContextBridge;
 
+const TAG = "WifiServiceProvider_web";
 class WifiServiceProvider extends BaseWiFiInfoProvider {
   static Initialize(): Promise<WifiServiceProvider> {
     return new Promise<WifiServiceProvider>((resolve) => {
@@ -38,7 +37,7 @@ class WifiServiceProvider extends BaseWiFiInfoProvider {
   };
 
   private api!: ContextBridge_WiFi;
-  private eventEmitter: EventEmitter = new EventEmitter();
+  private eventEmitter: EventEmitter = new EventEmitter(TAG);
 
   private constructor() {
     super();

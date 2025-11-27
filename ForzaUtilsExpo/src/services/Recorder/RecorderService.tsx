@@ -3,9 +3,9 @@ import DatabaseService from "./Database/Database";
 import { ISessionInfo, ITelemetryData } from "shared";
 import { useOnMount } from "@/hooks/useOnMount";
 import { ISession } from "./DatabaseInterfaces";
-import { EmitterSubscription } from "react-native";
 import { Semaphore } from "@/helpers/Semaphore";
-import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
+import { INativeUDPService } from "../Forza/Network.types";
+import { EmitterSubscription, EventEmitter } from "@/helpers/EventEmitter";
 
 export enum ReplayState {
   IDLE = 'IDLE',
@@ -18,12 +18,13 @@ export interface IRecorderState {
   replayState: ReplayState;
   replayPosition: number;
   replayLength: number;
+  replayInfo?: ISessionInfo;
 }
 
 export interface IRecorderService {
   state: IRecorderState;
   sessions: ISession[];
-  onPacketEvent: (callback: (packet: ITelemetryData) => void) => EmitterSubscription;
+  onPacketEvent: (callback: (packet: ITelemetryData, position: number) => void) => EmitterSubscription;
   startRecording: () => Promise<void>;
   stopRecording: () => Promise<void>;
   loadReplay: (sessionName: string) => Promise<ISessionInfo | null>;
@@ -49,10 +50,10 @@ export class RecorderService implements IRecorderService {
     STATE_CHANGE: 'state_change',
   }
   static instance: RecorderService | null = null;
-  static async Initialize(): Promise<RecorderService> {
+  static async Initialize(udpService: INativeUDPService): Promise<RecorderService> {
     if (!RecorderService.instance) {
       RecorderService.instance = new RecorderService();
-      await RecorderService.instance.initialize();
+      await RecorderService.instance.initialize(udpService);
     }
     return RecorderService.instance;
   }
@@ -65,7 +66,9 @@ export class RecorderService implements IRecorderService {
 
   private databaseProvider: DatabaseService;
   private playbackSemaphore: Semaphore = new Semaphore(1);
-  private eventEmitter: EventEmitter = new EventEmitter();
+  private eventEmitter: EventEmitter = new EventEmitter(TAG);
+  private udpService: INativeUDPService | null = null;
+  private packetListener: EmitterSubscription | null = null;
   private currentReplaySession: ISession | null = null;
   private currentRecordingSession: ISession | null = null;
   state: IRecorderState;
@@ -83,7 +86,7 @@ export class RecorderService implements IRecorderService {
   onStateChange(callback: (state: IRecorderState) => void): EmitterSubscription {
     return this.eventEmitter.addListener(RecorderService.Events.STATE_CHANGE, callback);
   }
-  onPacketEvent(callback: (packet: ITelemetryData) => void): EmitterSubscription {
+  onPacketEvent(callback: (packet: ITelemetryData, position: number) => void): EmitterSubscription {
     return this.eventEmitter.addListener(RecorderService.Events.PACKET, callback);
   }
   async startRecording(): Promise<void> {
@@ -104,8 +107,10 @@ export class RecorderService implements IRecorderService {
   async loadReplay(sessionName: string): Promise<ISessionInfo | null> {
     this.currentReplaySession = this.sessions.find(s => s.info.name === sessionName) || null;
     if (this.currentReplaySession) {
-      this.state.replayLength = 0;
+      this.state.replayLength = this.currentReplaySession.info.length;
       this.state.replayPosition = 0;
+      this.state.replayState = ReplayState.PAUSED;
+      this.state.replayInfo = this.currentReplaySession.info;
       this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
     }
     return this.currentReplaySession?.info || null;
@@ -155,6 +160,7 @@ export class RecorderService implements IRecorderService {
     this.state.replayState = ReplayState.IDLE;
     this.state.replayPosition = 0;
     this.state.replayLength = 0;
+    this.state.replayInfo = undefined;
     this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
   }
   async seek(position: number): Promise<void> {
@@ -165,9 +171,19 @@ export class RecorderService implements IRecorderService {
     }
     this.playbackSemaphore.release();
   }
-  private async initialize() {
+  shutdown(): void {
+    this.packetListener?.remove();
+  }
+  private async initialize(udpService: INativeUDPService) {
     await this.databaseProvider.initialize();
     this.sessions = await this.databaseProvider.getAllSessions();
+    this.udpService = udpService;
+    this.packetListener = this.udpService.onPacket((packet: ITelemetryData) => {
+      if (this.state.replayState === ReplayState.RECORDING && this.currentRecordingSession) {
+        this.currentRecordingSession.addPacket(packet);
+      }
+      this.eventEmitter.emit(RecorderService.Events.PACKET, packet);
+    });
   }
 }
 

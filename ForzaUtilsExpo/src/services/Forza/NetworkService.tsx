@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { IForzaService, INativeUDPService } from "./Network.types";
 import { ITelemetryData } from "shared";
-import { EmitterSubscription } from "react-native";
 import { useOnMount } from "@/hooks/useOnMount";
 import { useWifiContext } from "../WiFiInfo/WiFiInfoService";
 import { Logger } from "@/hooks/Logger";
 import SocketService from "./Provider/Provider";
+import { EmitterSubscription } from "@/helpers/EventEmitter";
 
 const NetworkContext_React = createContext({} as IForzaService);
 

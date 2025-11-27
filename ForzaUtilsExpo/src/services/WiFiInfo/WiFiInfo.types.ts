@@ -1,4 +1,4 @@
-import { EmitterSubscription } from 'react-native';
+import { EmitterSubscription } from '@/helpers/EventEmitter';
 import { IWiFiInfoState } from 'shared';
 
 export interface IWifiContext {

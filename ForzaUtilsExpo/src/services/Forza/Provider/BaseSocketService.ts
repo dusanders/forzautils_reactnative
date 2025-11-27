@@ -1,6 +1,6 @@
 import { ITelemetryData } from "ForzaTelemetryApi";
-import { EmitterSubscription } from "react-native";
 import { INativeUDPService } from "../Network.types";
+import { EmitterSubscription } from "@/helpers/EventEmitter";
 
 abstract class BaseSocketService implements INativeUDPService {
   protected static instance: BaseSocketService | null = null;

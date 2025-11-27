@@ -1,12 +1,11 @@
 import { ITelemetryData } from "ForzaTelemetryApi";
-import { EmitterSubscription } from "react-native";
 import { INativeUDPService } from "../Network.types";
 import BaseSocketService from "./BaseSocketService";
 import { delay } from "@/helpers/misc";
 import { ContextBridge_UDP, ElectronContextBridge } from "shared";
-import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
 import { Logger } from "@/hooks/Logger";
 import { Semaphore } from "@/helpers/Semaphore";
+import { EmitterSubscription, EventEmitter } from "@/helpers/EventEmitter";
 
 const apiBridge = (window as any).electronAPI as ElectronContextBridge;
 
@@ -31,7 +30,7 @@ class SocketService extends BaseSocketService {
 
   port: number = -1;
   private api: ContextBridge_UDP;
-  private eventEmitter: EventEmitter = new EventEmitter();
+  private eventEmitter: EventEmitter = new EventEmitter(TAG);
   private bindSemaphore: Semaphore = new Semaphore(1);
 
   private constructor() {

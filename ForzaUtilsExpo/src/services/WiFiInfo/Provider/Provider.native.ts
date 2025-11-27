@@ -1,9 +1,8 @@
-import { EmitterSubscription } from "react-native";
 import { Logger } from "@/hooks/Logger";
 import { IWiFiInfoState } from "shared";
 import NetInfo, { NetInfoSubscription } from "@react-native-community/netinfo";
 import { BaseWiFiInfoProvider } from "./BaseProvider";
-import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
+import { EmitterSubscription, EventEmitter } from "@/helpers/EventEmitter";
 
 const TAG = "WifiServiceProvider_native";
 class WifiServiceProvider extends BaseWiFiInfoProvider {
@@ -19,7 +18,7 @@ class WifiServiceProvider extends BaseWiFiInfoProvider {
   private static WIFI_INFO_UPDATED_EVENT = 'WiFiInfoUpdated';
 
   private netInfoSubscription: NetInfoSubscription | undefined
-  private emitter: EventEmitter = new EventEmitter();
+  private emitter: EventEmitter = new EventEmitter(TAG);
 
   state: IWiFiInfoState = {
     ssid: null,

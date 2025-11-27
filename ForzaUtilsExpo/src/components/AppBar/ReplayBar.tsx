@@ -1,30 +1,30 @@
 import React, { useEffect } from "react";
 import Slider from "@react-native-community/slider";
-import { EmitterSubscription, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { ThemeIcon, ThemeIconNames } from "../ThemeIcon";
 import { ThemeText } from "../ThemeText";
 // import { ReplayState, useReplay } from "../../context/Recorder";
 import { ITelemetryData } from "ForzaTelemetryApi";
 import { Logger } from "@/hooks/Logger";
-import { ReplayState } from "@/services/Recorder/RecorderService";
+import { ReplayState, useRecorderService } from "@/services/Recorder/RecorderService";
 import { useThemeContext } from "@/theme/ThemeProvider";
 import { IThemeElements } from "@/theme/Themes";
+import { EmitterSubscription } from "@/helpers/EventEmitter";
 
 export interface ReplayBarProps {
 }
 export function ReplayBar(props: ReplayBarProps) {
   const tag = `ReplayBar.tsx`;
   const theme = useThemeContext();
-  // const replay = useReplay();
-  const replay = {} as any;
+  const replay = useRecorderService();
   const styles = themeStyles(theme.theme);
-  const [position, setPosition] = React.useState<number>(replay.replayPosition);
+  const [position, setPosition] = React.useState<number>(replay.state.replayPosition);
   const isSeekingRef = React.useRef(false);
 
   useEffect(() => {
     let replayListener: EmitterSubscription | undefined = undefined;
     if (replay) {
-      replayListener = replay.onPacket((packet: ITelemetryData, currentPosition: number) => {
+      replayListener = replay.onPacketEvent((packet: ITelemetryData, currentPosition: number) => {
         if (!isSeekingRef.current) {
           setPosition(currentPosition);
         }
@@ -33,28 +33,28 @@ export function ReplayBar(props: ReplayBarProps) {
     return () => {
       replayListener?.remove();
     };
-  }, [replay.replayState]);
+  }, [replay.state.replayState]);
 
   return (
     <View style={styles.root}>
       <View>
         <TouchableOpacity
           onPress={() => {
-            if (replay.replayState === ReplayState.PLAYING) {
+            if (replay.state.replayState === ReplayState.PLAYING) {
               replay.pause();
             } else {
               replay.resume();
             }
           }}>
           <ThemeIcon
-            name={replay.replayState === ReplayState.PLAYING ? ThemeIconNames.PAUSE : ThemeIconNames.PLAY} />
+            name={replay.state.replayState === ReplayState.PLAYING ? ThemeIconNames.PAUSE : ThemeIconNames.PLAY} />
         </TouchableOpacity>
       </View>
       <View style={styles.sliderContainer}>
         <Slider
           style={styles.slider}
           minimumValue={0}
-          maximumValue={replay.replayLength || 0}
+          maximumValue={replay.state.replayLength || 0}
           step={1}
           value={position}
           onSlidingStart={() => {
@@ -82,10 +82,10 @@ export function ReplayBar(props: ReplayBarProps) {
         />
         <View style={styles.replayInfoRow}>
           <ThemeText style={styles.replayProgressText}>
-            {position} / {replay.replayLength}
+            {position} / {replay.state.replayLength}
           </ThemeText>
           <ThemeText>
-            {replay.replayInfo ? replay.replayInfo?.name : 'No Replay'}
+            {replay.state.replayInfo ? replay.state.replayInfo?.name : 'No Replay'}
           </ThemeText>
         </View>
       </View>

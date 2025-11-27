@@ -1,4 +1,3 @@
-import EventEmitter, { EmitterSubscription } from "react-native/Libraries/vendor/emitter/EventEmitter";
 import { INativeUDPService } from "../Network.types";
 import { ForzaTelemetryApi, getRandomTelemetryData, ITelemetryData } from "shared";
 import UdpSockets from "react-native-udp";
@@ -7,6 +6,7 @@ import { delay } from "@/helpers/misc";
 import { Logger } from "@/hooks/Logger";
 import BaseSocketService from "./BaseSocketService";
 import { Semaphore } from "@/helpers/Semaphore";
+import { EmitterSubscription, EventEmitter } from "@/helpers/EventEmitter";
 
 /**
  * Add Type for react-native-udp 'rinfo' object
@@ -34,7 +34,7 @@ class SocketService extends BaseSocketService {
 
   //#endregion
 
-  private eventEmitter: EventEmitter = new EventEmitter();
+  private eventEmitter: EventEmitter = new EventEmitter(TAG);
   private udpSocket?: UdpSocket;
   private doDebug = false;
   private debugInterval?: NodeJS.Timeout;
