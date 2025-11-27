@@ -4,7 +4,7 @@ import { ISession, MASTER_DB_NAME, SESSION_DB_NAME_PREFIX, QueryResult, IDatabas
 import { Session } from './Session.native';
 import { ISessionInfo } from 'shared';
 
-export class DatabaseService implements IDatabaseService {
+class DatabaseService implements IDatabaseService {
   private tag = "DatabaseService.tsx";
   private static instance: DatabaseService | undefined;
   private db: DB; // Replace 'any' with your actual database type
@@ -13,14 +13,11 @@ export class DatabaseService implements IDatabaseService {
     this.db = SqliteOpen({ name: MASTER_DB_NAME });
   }
 
-  static getInstance(): IDatabaseService {
-    if (!DatabaseService.instance) {
-      DatabaseService.instance = new DatabaseService();
-      DatabaseService.instance.executeQuery(
-        `CREATE TABLE IF NOT EXISTS sessions (name VARCHAR(255) PRIMARY KEY, length INT, startTime INT, endTime INT)`
-      )
-    }
-    return DatabaseService.instance;
+  async initialize(): Promise<IDatabaseService> {
+    await this.executeQuery(
+      `CREATE TABLE IF NOT EXISTS sessions (name VARCHAR(255) PRIMARY KEY, length INT, startTime INT, endTime INT)`
+    )
+    return this;
   }
 
   async getAllSessions(): Promise<ISession[]> {
@@ -67,3 +64,5 @@ export class DatabaseService implements IDatabaseService {
     this.db.close();
   }
 }
+
+export default DatabaseService;

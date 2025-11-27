@@ -5,6 +5,7 @@ import { StyleSheet, View } from "react-native";
 import { ReplayBar } from "./ReplayBar";
 import { useThemeContext } from "@/theme/ThemeProvider";
 import { IThemeElements } from "@/theme/Themes";
+import { ReplayState, useRecorderService } from "@/services/Recorder/RecorderService";
 
 export interface AppBarContainerProps extends ContainerProps, AppBarProps {
 
@@ -13,13 +14,12 @@ export interface AppBarContainerProps extends ContainerProps, AppBarProps {
 export function AppBarContainer(props: AppBarContainerProps) {
   const tag = `AppBarContainer.tsx`;
   const theme = useThemeContext();
-  // const replay = useReplay();
-  // const styles = themeStyles(Boolean(replay.replayState));
-  const styles = themeStyles(theme.theme, false);
+  const replay = useRecorderService();
+  const styles = themeStyles(theme.theme, Boolean(replay.state.replayState));
 
   const shouldShowReplayBar = () => {
-    // return replay.replayState !== ReplayState.IDLE 
-    // && replay.replayState !== ReplayState.RECORDING;
+    return replay.state.replayState !== ReplayState.IDLE 
+    && replay.state.replayState !== ReplayState.RECORDING;
   }
 
   return (

@@ -52,6 +52,9 @@ export class Session implements ISupportRendererService {
     const id = this.currentWriteOffset;
     await this.insertPacketValues(id, packet);
     this.currentWriteOffset++;
+    if (this.currentSession) {
+      this.currentSession.length = this.currentWriteOffset;
+    }
   }
 
   private async readPacket(offset?: number): Promise<ITelemetryData | null> {
@@ -73,6 +76,17 @@ export class Session implements ISupportRendererService {
 
   private close(): void {
     if (this.currentSession) {
+      if (!this.currentSession.endTime) {
+        this.currentSession.endTime = Date.now();
+        const updateStmt = this.mainDatabase.prepare(
+          'UPDATE sessions SET length = ? endTime = ? WHERE name = ?'
+        );
+        updateStmt.run(
+          this.currentSession.length,
+          this.currentSession.endTime,
+          this.currentSession.name
+        );
+      }
       this.sessionDb?.close();
       this.currentReadOffset = 0;
       this.currentSession = undefined;

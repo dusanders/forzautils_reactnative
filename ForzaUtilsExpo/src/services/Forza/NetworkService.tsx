@@ -26,7 +26,6 @@ export function NetworkProvider(props: NetworkProviderProps) {
   useOnMount(() => {
     packetListener.current = service.current.onPacket((packet: ITelemetryData) => {
       lastPacket.current = packet;
-      setPort(service.current.port);
     });
     return () => {
       packetListener.current?.remove();
@@ -58,6 +57,7 @@ export function NetworkProvider(props: NetworkProviderProps) {
       isUDPListening: () => service.current.isListening(),
       onPacket: (fn) => service.current.onPacket(fn),
       DEBUG: (interval_ms) => {
+        Logger.log(TAG, `Starting DEBUG with interval ${interval_ms} ms`);
         service.current.DEBUG(interval_ms);
         setIsDEBUG(true);
       },

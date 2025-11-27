@@ -1,8 +1,6 @@
 import { createNativeStackNavigator, NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export enum AppRoutes {
-  HOME = 'HOME',
-  EXPLORE = 'EXPLORE',
   NOT_FOUND = 'NOT_FOUND',
   WIFI_INFO = 'WIFI_INFO',
   WIFI_ERROR = 'WIFI_ERROR',
@@ -23,8 +21,6 @@ export type ReplayRouteParams = {
 };
 
 export type RootStackParamList = {
-  [AppRoutes.HOME]: undefined;
-  [AppRoutes.EXPLORE]: undefined;
   [AppRoutes.NOT_FOUND]: undefined;
   [AppRoutes.WIFI_INFO]: undefined;
   [AppRoutes.WIFI_ERROR]: undefined;

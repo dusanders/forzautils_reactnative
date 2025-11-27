@@ -16,6 +16,12 @@ const api: ElectronContextBridge = {
     }
   },
   UDPRequests: {
+    DEBUG: async (interval_ms: number): Promise<void> => {
+      await ipcRenderer.invoke(IpcActions_UDP.DEBUG, interval_ms);
+    },
+    STOP_DEBUG: async (): Promise<void> => {
+      await ipcRenderer.invoke(IpcActions_UDP.STOP_DEBUG);
+    },
     openUDPSocket: async (port: number): Promise<number> => {
       const result = await ipcRenderer.invoke(IpcActions_UDP.OpenUDPSocket, port);
       return result;

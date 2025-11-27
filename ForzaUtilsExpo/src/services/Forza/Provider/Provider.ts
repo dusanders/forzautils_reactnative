@@ -65,11 +65,11 @@ class SocketService extends BaseSocketService {
   onPacket(fn: (packet: ITelemetryData) => void): EmitterSubscription {
     return this.eventEmitter.addListener(BaseSocketService.SocketEvents.PACKET, fn);
   }
-  DEBUG(): void {
-    throw new Error("Method not implemented.");
+  DEBUG(interval_ms: number): void {
+    this.api.DEBUG(interval_ms);
   }
   STOP_DEBUG(): void {
-    throw new Error("Method not implemented.");
+    this.api.STOP_DEBUG();
   }
   private async initialize() {
     await delay(100);

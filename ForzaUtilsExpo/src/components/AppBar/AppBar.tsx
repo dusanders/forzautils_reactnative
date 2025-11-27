@@ -114,13 +114,9 @@ export function AppBar(props: AppBarProps) {
                   width: '100%'
                 }}>
                   {props.injectElements.map((injected) => (
-                    <AppSettingsButton
-                      key={injected.id}
-                      onPress={() => {
-                        injected.onPress()
-                      }}>
+                    <View key={injected.id}>
                       {injected.renderItem()}
-                    </AppSettingsButton>
+                    </View>
                   ))}
                 </View>
               )}

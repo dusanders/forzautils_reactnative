@@ -13,6 +13,8 @@ import { Semaphore } from "./helpers/Semaphore";
 import { TuningViewModelProvider } from "./viewModels/Tuning/TuningViewModel";
 import App from "./App";
 import { CacheProvider } from "./services/Cache/Cache";
+import { RecorderService, RecorderServiceProvider } from "./services/Recorder/RecorderService";
+import { GripViewModel } from "./viewModels/Grip/GripViewModel";
 const SpaceMono = require('./assets/fonts/SpaceMono-Regular.ttf');
 
 export interface PreflightProps {
@@ -26,6 +28,7 @@ export function Preflight(props: PreflightProps) {
     SpaceMono: SpaceMono,
   });
   const networkServiceRef = useRef<INativeUDPService | null>(null);
+  const recorderServiceRef = useRef<RecorderService | null>(null);
   const [servicesReady, setServicesReady] = React.useState(false);
 
   const initializeServices = async () => {
@@ -33,7 +36,7 @@ export function Preflight(props: PreflightProps) {
     try {
       await WifiServiceProvider.Initialize();
       networkServiceRef.current = await SocketService.Initialize();
-      // Initialize other services here as needed
+      recorderServiceRef.current = await RecorderService.Initialize();
       setServicesReady(true);
     } catch (error) {
       console.error("Error initializing services:", error);
@@ -58,9 +61,12 @@ export function Preflight(props: PreflightProps) {
       <ThemeProvider initialTheme={ThemeType.DARK}>
         <WifiContextProvider>
           <NetworkProvider networkService={networkServiceRef.current!}>
-            <TuningViewModelProvider>
-              <App />
-            </TuningViewModelProvider>
+            <RecorderServiceProvider>
+              <TuningViewModelProvider>
+                <GripViewModel />
+                <App />
+              </TuningViewModelProvider>
+            </RecorderServiceProvider>
           </NetworkProvider>
         </WifiContextProvider>
       </ThemeProvider>

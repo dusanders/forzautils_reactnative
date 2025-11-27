@@ -4,13 +4,16 @@ import Session from "./Session";
 
 const apiBridge = (window as any).electronAPI as ElectronContextBridge;
 
-export default class DatabaseService implements IDatabaseService {
+class DatabaseService implements IDatabaseService {
   private api: ContextBridge_Database;
   constructor() {
     if (!apiBridge || !apiBridge.DatabaseRequests) {
       throw new Error("Electron Context Bridge API is not available.");
     }
     this.api = apiBridge.DatabaseRequests;
+  }
+  async initialize(): Promise<IDatabaseService> {
+    return this;
   }
   async getAllSessions(): Promise<ISession[]> {
     const result = await this.api.getAllSessions();
@@ -30,3 +33,5 @@ export default class DatabaseService implements IDatabaseService {
     this.api.close();
   }
 }
+
+export default DatabaseService;

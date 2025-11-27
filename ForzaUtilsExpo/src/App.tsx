@@ -3,8 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
 import { AppRoutes, MainStack } from './navigation/types';
-import { Home } from './navigation/screens/Home';
-import { Explore } from './navigation/screens/Explore';
 import { NotFound } from './navigation/screens/NotFound';
 import { useOnMount } from './hooks/useOnMount';
 import { Logger } from './hooks/Logger';
@@ -13,6 +11,8 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { SourceChooser } from './navigation/screens/SourceChooser/SourceChooser';
 import { Settings } from './navigation/screens/Settings/Settings';
 import { TuningPage } from './navigation/screens/Tuning/Tuning';
+import { ReplayList } from './navigation/screens/Replay/ReplayList';
+import { DataChooser } from './navigation/screens/DataChooser/DataChooser';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,18 +31,6 @@ function App() {
             initialRouteName={AppRoutes.WIFI_INFO}
             screenOptions={{ headerShown: false }}>
             <MainStack.Screen
-              name={AppRoutes.HOME}
-              component={Home} />
-            <MainStack.Screen
-              name={AppRoutes.EXPLORE}
-              component={Explore} />
-            <MainStack.Screen
-              name={AppRoutes.NOT_FOUND}
-              component={NotFound}
-              options={{
-                title: '404'
-              }} />
-            <MainStack.Screen
               name={AppRoutes.WIFI_INFO}
               component={WiFiInfo} />
             <MainStack.Screen
@@ -57,6 +45,18 @@ function App() {
             <MainStack.Screen
               name={AppRoutes.TUNING_CALCULATOR}
               component={TuningPage} />
+            <MainStack.Screen
+              name={AppRoutes.REPLAY_LIST}
+              component={ReplayList} />
+            <MainStack.Screen
+              name={AppRoutes.DATA}
+              component={DataChooser} />
+            <MainStack.Screen
+              name={AppRoutes.NOT_FOUND}
+              component={NotFound}
+              options={{
+                title: '404'
+              }} />
           </MainStack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

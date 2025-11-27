@@ -93,9 +93,10 @@ class SocketService extends BaseSocketService {
       return;
     }
     this.doDebug = true;
-    Logger.log(TAG, "Started debugging.");
+    Logger.log(TAG, "Started debugging. :: interval_ms=" + interval_ms);
     this.debugInterval = setInterval(() => {
       if (!this.doDebug) {
+        Logger.log(TAG, "Stopped debugging.");
         clearInterval(this.debugInterval);
         return;
       }

@@ -17,6 +17,15 @@ export class DatabaseService implements ISupportRendererService {
     this.mainDb = new Sqlite.DatabaseSync(
       this.getFilePathForDatabase(DatabaseService.MAIN_DB_NAME)
     );
+    const createTableStmt = this.mainDb.prepare(
+      `CREATE TABLE IF NOT EXISTS sessions (
+        name TEXT PRIMARY KEY,
+        length INTEGER,
+        startTime INTEGER,
+        endTime INTEGER
+      )`
+    );
+    createTableStmt.run();
   }
 
   attachHandlers(ipcMain: Electron.IpcMain): void {
@@ -30,6 +39,7 @@ export class DatabaseService implements ISupportRendererService {
       this.mainDb.close();
     });
   }
+  
   private async generateSession(): Promise<ISessionInfo> {
     const session: ISessionInfo = {
       name: `session_${Date.now()}`,

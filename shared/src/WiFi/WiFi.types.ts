@@ -8,6 +8,8 @@ export const IpcActions_WiFi = {
 };
 
 export const IpcActions_UDP = {
+  DEBUG: "UDPRequest.DEBUG",
+  STOP_DEBUG: "UDPRequest.STOP_DEBUG",
   OpenUDPSocket: "UDPRequest.OpenUDPSocket",
   GetPort: "UDPRequest.GetPort",
   CloseUDPSocket: "UDPRequest.CloseUDPSocket",
@@ -17,6 +19,8 @@ export const IpcActions_UDP = {
 }
 
 export interface ContextBridge_UDP {
+  DEBUG: (interval_ms: number) => Promise<void>;
+  STOP_DEBUG: () => Promise<void>;
   openUDPSocket: (port: number) => Promise<number>;
   getPort: () => Promise<number>;
   onSocketData: (callback: (packet: ITelemetryData) => void) => void;

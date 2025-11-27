@@ -15,10 +15,6 @@ export interface AppSettingsButtonProps {
 }
 
 export function AppSettingsButton(props: AppSettingsButtonProps) {
-  const handleClick = useCallback(() => {
-    props.onPress()
-  }, [props.onPress]);
-  
   return (
     <TouchableOpacity
       testID={props.testID}
@@ -31,7 +27,7 @@ export function AppSettingsButton(props: AppSettingsButtonProps) {
         paddingTop: 12,
         paddingBottom: 12
       }}
-      onPress={handleClick}
+      onPress={props.onPress}
     >
       {props.children}
     </TouchableOpacity>

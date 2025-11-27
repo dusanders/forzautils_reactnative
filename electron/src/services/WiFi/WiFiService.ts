@@ -1,5 +1,5 @@
 import { Logger } from "../Logger/Logger.js";
-import { ForzaTelemetryApi, IpcActions_UDP, IpcActions_WiFi, IWiFiInfoState } from 'shared';
+import { ForzaTelemetryApi, IpcActions_UDP, IpcActions_WiFi, IWiFiInfoState, getRandomTelemetryData } from 'shared';
 import * as SysInfo from 'systeminformation';
 import * as dgram from 'dgram';
 import { Semaphore } from "../../helpers/Semaphore.js";
@@ -10,6 +10,7 @@ export class WifiServiceProvider implements ISupportRendererService {
 
   private udpPort: number = -1;
   private socket: dgram.Socket | null = null;
+  private debugInterval: NodeJS.Timeout | null = null;
   private bindSemaphore: Semaphore = new Semaphore(1);
 
   constructor(private window: Electron.BrowserWindow) {
@@ -21,6 +22,25 @@ export class WifiServiceProvider implements ISupportRendererService {
     ipcMain.handle(IpcActions_UDP.OpenUDPSocket, (event, port) => this.openUDPSocket(port));
     ipcMain.handle(IpcActions_UDP.GetPort, () => this.getPort());
     ipcMain.handle(IpcActions_UDP.CloseUDPSocket, () => this.closeUDPSocket());
+    ipcMain.handle(IpcActions_UDP.DEBUG, (ev, interval_ms) => this.debug(interval_ms));
+    ipcMain.handle(IpcActions_UDP.STOP_DEBUG, () => this.stopDebug());
+  }
+
+  private async debug(interval_ms: number): Promise<void> {
+    Logger.log(TAG, `Starting DEBUG with interval ${interval_ms} ms`);
+    this.debugInterval = setInterval(() => {
+      if (this.socket) {
+        const fakePacket = getRandomTelemetryData();
+        this.window.webContents.send(IpcActions_UDP.SocketData, fakePacket);
+      }
+    }, interval_ms);
+  }
+  private async stopDebug(): Promise<void> {
+    Logger.log(TAG, `Stopping DEBUG mode`);
+    if (this.debugInterval) {
+      clearInterval(this.debugInterval);
+      this.debugInterval = null;
+    }
   }
 
   private async openUDPSocket(port: number): Promise<number> {
