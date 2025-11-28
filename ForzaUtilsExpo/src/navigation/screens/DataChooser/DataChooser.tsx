@@ -112,16 +112,6 @@ export function DataChooser(props: DataChooserProps) {
       <View style={styles.root}>
         <TrackMap
           style={styles.trackMapRoot} />
-        <ScrollView style={{ height: 400 }}>
-          <SlipAngle />
-          <SlipAngle />
-          <SlipAngle />
-          <SlipAngle />
-          <SlipAngle />
-          <SlipAngle />
-          <SlipAngle />
-          <SlipAngle />
-        </ScrollView>
         <FlatList
           style={styles.listRoot}
           data={dataElements}

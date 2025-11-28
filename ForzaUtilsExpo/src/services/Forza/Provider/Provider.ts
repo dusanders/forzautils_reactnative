@@ -81,7 +81,6 @@ class SocketService extends BaseSocketService {
       this.eventEmitter.emit(BaseSocketService.SocketEvents.SOCKET_ERROR, error);
     });
     this.api.onSocketData((packet: ITelemetryData) => {
-      Logger.log(TAG, `UDP Socket data event received: ${JSON.stringify(packet)}`);
       this.eventEmitter.emit(BaseSocketService.SocketEvents.PACKET, packet);
     });
   }

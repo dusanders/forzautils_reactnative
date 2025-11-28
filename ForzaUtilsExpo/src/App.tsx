@@ -13,6 +13,9 @@ import { Settings } from './navigation/screens/Settings/Settings';
 import { TuningPage } from './navigation/screens/Tuning/Tuning';
 import { ReplayList } from './navigation/screens/Replay/ReplayList';
 import { DataChooser } from './navigation/screens/DataChooser/DataChooser';
+import { Grip } from './navigation/screens/Grip/Grip';
+import { SuspensionTravel } from './navigation/screens/Suspension/SuspensionTravel';
+import { TireTemps } from './navigation/screens/TireTemps/TireTemps';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -51,6 +54,15 @@ function App() {
             <MainStack.Screen
               name={AppRoutes.DATA}
               component={DataChooser} />
+            <MainStack.Screen
+              name={AppRoutes.GRIP}
+              component={Grip} />
+            <MainStack.Screen
+              name={AppRoutes.SUSPENSION_GRAPH}
+              component={SuspensionTravel} />
+            <MainStack.Screen
+              name={AppRoutes.TIRE_TEMPS}
+              component={TireTemps} />
             <MainStack.Screen
               name={AppRoutes.NOT_FOUND}
               component={NotFound}

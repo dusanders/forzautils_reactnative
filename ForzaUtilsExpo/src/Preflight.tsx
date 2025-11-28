@@ -15,6 +15,8 @@ import App from "./App";
 import { CacheProvider } from "./services/Cache/Cache";
 import { RecorderService, RecorderServiceProvider } from "./services/Recorder/RecorderService";
 import { GripViewModel } from "./viewModels/Grip/GripViewModel";
+import { TireTempsViewModel } from "./viewModels/TireTemps/TireTempsViewModel";
+import { SuspensionViewModel } from "./viewModels/Suspension/SuspensionViewModel";
 const SpaceMono = require('./assets/fonts/SpaceMono-Regular.ttf');
 
 export interface PreflightProps {
@@ -65,7 +67,9 @@ export function Preflight(props: PreflightProps) {
           <NetworkProvider networkService={networkServiceRef.current!}>
             <RecorderServiceProvider>
               <TuningViewModelProvider>
+                <SuspensionViewModel />
                 <GripViewModel />
+                <TireTempsViewModel />
                 <App />
               </TuningViewModelProvider>
             </RecorderServiceProvider>
