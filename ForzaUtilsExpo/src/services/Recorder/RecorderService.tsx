@@ -6,6 +6,7 @@ import { ISession } from "./DatabaseInterfaces";
 import { Semaphore } from "@/helpers/Semaphore";
 import { INativeUDPService } from "../Forza/Network.types";
 import { EmitterSubscription, EventEmitter } from "@/helpers/EventEmitter";
+import { Logger } from "@/hooks/Logger";
 
 export enum ReplayState {
   IDLE = 'IDLE',
@@ -63,6 +64,7 @@ export class RecorderService implements IRecorderService {
     }
     return RecorderService.instance;
   }
+  private static PLAYBACK_INTERVAL_MS = 50;
 
   private databaseProvider: DatabaseService;
   private playbackSemaphore: Semaphore = new Semaphore(1);
@@ -71,6 +73,7 @@ export class RecorderService implements IRecorderService {
   private packetListener: EmitterSubscription | null = null;
   private currentReplaySession: ISession | null = null;
   private currentRecordingSession: ISession | null = null;
+  private playbackInterval: NodeJS.Timeout | null = null;
   state: IRecorderState;
   sessions: ISession[];
 
@@ -138,11 +141,13 @@ export class RecorderService implements IRecorderService {
       this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
     }
     this.playbackSemaphore.release();
+    this.startPlayback();
   }
   async restart(): Promise<void> {
     await this.playbackSemaphore.acquire();
     if (this.currentReplaySession) {
       this.state.replayPosition = 0;
+      this.state.replayState = ReplayState.PLAYING;
       this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
     }
     this.playbackSemaphore.release();
@@ -173,6 +178,38 @@ export class RecorderService implements IRecorderService {
   }
   shutdown(): void {
     this.packetListener?.remove();
+  }
+  private startPlayback() {
+    if (this.playbackInterval) {
+      clearInterval(this.playbackInterval);
+    }
+    this.playbackInterval = setInterval(() => {
+      this.playbackLoop();
+    }, RecorderService.PLAYBACK_INTERVAL_MS);
+  }
+  private async playbackLoop() {
+    await this.playbackSemaphore.acquire();
+    if (this.state.replayState === ReplayState.PLAYING && this.currentReplaySession) {
+      const packet = await this.currentReplaySession.readPacket(this.state.replayPosition);
+      if (packet) {
+        this.eventEmitter.emit(RecorderService.Events.PACKET, packet, this.state.replayPosition);
+        this.state.replayPosition += 1;
+        if (this.state.replayPosition >= this.state.replayLength) {
+          this.state.replayState = ReplayState.PAUSED;
+          this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+        }
+      } else {
+        this.state.replayState = ReplayState.PAUSED;
+        this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+      }
+    } else if (this.state.replayState === ReplayState.IDLE || this.state.replayState === ReplayState.RECORDING) {
+      // Stop playback if not playing
+      if (this.playbackInterval) {
+        clearInterval(this.playbackInterval);
+        this.playbackInterval = null;
+      }
+    }
+    this.playbackSemaphore.release();
   }
   private async initialize(udpService: INativeUDPService) {
     await this.databaseProvider.initialize();

@@ -17,6 +17,7 @@ import { RecorderService, RecorderServiceProvider } from "./services/Recorder/Re
 import { GripViewModel } from "./viewModels/Grip/GripViewModel";
 import { TireTempsViewModel } from "./viewModels/TireTemps/TireTempsViewModel";
 import { SuspensionViewModel } from "./viewModels/Suspension/SuspensionViewModel";
+import { HpTqViewModel } from "./viewModels/HpTq/HpTqViewModel";
 const SpaceMono = require('./assets/fonts/SpaceMono-Regular.ttf');
 
 export interface PreflightProps {
@@ -70,6 +71,7 @@ export function Preflight(props: PreflightProps) {
                 <SuspensionViewModel />
                 <GripViewModel />
                 <TireTempsViewModel />
+                <HpTqViewModel />
                 <App />
               </TuningViewModelProvider>
             </RecorderServiceProvider>

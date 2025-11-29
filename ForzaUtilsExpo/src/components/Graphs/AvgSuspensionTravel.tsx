@@ -16,12 +16,12 @@ export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
   const graphData = useMemo(() => {
     return [
       {
-        data: viewModel.avgTravel.map((point) => point.front),
+        data: viewModel.avgTravel.data.map((point) => point.front),
         label: 'Front Avg Travel',
         color: theme.colors.text.primary.onPrimary
       },
       {
-        data: viewModel.avgTravel.map((point) => point.rear),
+        data: viewModel.avgTravel.data.map((point) => point.rear),
         label: 'Rear Avg Travel',
         color: theme.colors.text.secondary.onPrimary
       }
@@ -34,10 +34,10 @@ export function AvgSuspensionTravel(props: IAvgSuspensionTravelProps) {
       style={styles.card}>
       <MemoBaseLineGraph
         title={'Suspension Travel'}
-        dataLength={viewModel.windowSize}
+        dataLength={viewModel.avgTravel.size}
         data={graphData}
-        minY={viewModel.avgTravelMin}
-        maxY={viewModel.avgTravelMax}
+        minY={viewModel.avgTravel.min}
+        maxY={viewModel.avgTravel.max}
       />
     </CardContainer>
   );

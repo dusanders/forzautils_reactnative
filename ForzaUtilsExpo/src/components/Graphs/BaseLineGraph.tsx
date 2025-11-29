@@ -83,14 +83,15 @@ export function BaseLineGraph(props: BaseLineGraphProps) {
     // Set up viewBox with proper dimensions
     const minX = 0;
     const minY = 0;
-    const width = renderedLayout.width;
+    let width = renderedLayout.width;
     // Don't subtract as much from the height to allow more vertical space
-    const height = renderedLayout.height - 4;
+    let height = renderedLayout.height - 4;
 
     if (!isValidNumber(width) || !isValidNumber(height)) {
       return;
     }
-
+    if (height < 0) height = 0;
+    if (width < 0) width = 0;
     setViewBox({
       minX,
       minY,

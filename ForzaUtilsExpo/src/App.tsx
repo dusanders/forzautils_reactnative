@@ -16,6 +16,7 @@ import { DataChooser } from './navigation/screens/DataChooser/DataChooser';
 import { Grip } from './navigation/screens/Grip/Grip';
 import { SuspensionTravel } from './navigation/screens/Suspension/SuspensionTravel';
 import { TireTemps } from './navigation/screens/TireTemps/TireTemps';
+import { HpTqGraph } from './navigation/screens/HpTqGraph/HpTqGraph';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -63,6 +64,9 @@ function App() {
             <MainStack.Screen
               name={AppRoutes.TIRE_TEMPS}
               component={TireTemps} />
+            <MainStack.Screen
+              name={AppRoutes.HP_TQ_GRAPH}
+              component={HpTqGraph} />
             <MainStack.Screen
               name={AppRoutes.NOT_FOUND}
               component={NotFound}
