@@ -18,6 +18,7 @@ import { GripViewModel } from "./viewModels/Grip/GripViewModel";
 import { TireTempsViewModel } from "./viewModels/TireTemps/TireTempsViewModel";
 import { SuspensionViewModel } from "./viewModels/Suspension/SuspensionViewModel";
 import { HpTqViewModel } from "./viewModels/HpTq/HpTqViewModel";
+import { LLMServiceProvider } from "./services/LLM/LLMService";
 const SpaceMono = require('./assets/fonts/SpaceMono-Regular.ttf');
 
 export interface PreflightProps {
@@ -72,7 +73,9 @@ export function Preflight(props: PreflightProps) {
                 <GripViewModel />
                 <TireTempsViewModel />
                 <HpTqViewModel />
-                <App />
+                <LLMServiceProvider>
+                  <App />
+                </LLMServiceProvider>
               </TuningViewModelProvider>
             </RecorderServiceProvider>
           </NetworkProvider>

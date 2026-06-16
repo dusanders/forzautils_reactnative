@@ -12,8 +12,10 @@ export class WifiServiceProvider implements ISupportRendererService {
   private socket: dgram.Socket | null = null;
   private debugInterval: NodeJS.Timeout | null = null;
   private bindSemaphore: Semaphore = new Semaphore(1);
+  private readonly window: Electron.BrowserWindow;
 
-  constructor(private window: Electron.BrowserWindow) {
+  constructor(window: Electron.BrowserWindow) {
+    this.window = window;
     Logger.log(TAG, "WiFiServiceProvider initialized");
   }
 
@@ -35,6 +37,7 @@ export class WifiServiceProvider implements ISupportRendererService {
       }
     }, interval_ms);
   }
+  
   private async stopDebug(): Promise<void> {
     Logger.log(TAG, `Stopping DEBUG mode`);
     if (this.debugInterval) {
@@ -145,9 +148,9 @@ export class WifiServiceProvider implements ISupportRendererService {
         wifiInfo.isConnected = true;
       }
     }
-    setTimeout(() => {
-      this.window.webContents.send(IpcActions_WiFi.WiFiInfoUpdated, wifiInfo);
-    }, 3000);
+    // setTimeout(() => {
+    //   this.window?.webContents?.send(IpcActions_WiFi.WiFiInfoUpdated, wifiInfo);
+    // }, 3000);
     return wifiInfo;
   }
 }

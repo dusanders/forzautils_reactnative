@@ -108,6 +108,7 @@ function themeStyles(theme: IThemeElements) {
       margin: 10,
       color: theme.colors.text.secondary.onPrimary,
       textAlign: 'center',
+      maxWidth: 600,
     }
   });
 }

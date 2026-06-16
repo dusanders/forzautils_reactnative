@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { ElectronContextBridge, IpcActions_Cache, IpcActions_UDP, IpcActions_WiFi, IWiFiInfoState } from 'shared';
+import { ElectronContextBridge, IpcActions_Cache, IpcActions_LocalLLM, IpcActions_UDP, IpcActions_WiFi, IWiFiInfoState } from 'shared';
 import { ITelemetryData } from 'shared';
 
 const api: ElectronContextBridge = {
@@ -91,6 +91,23 @@ const api: ElectronContextBridge = {
     open: async (info): Promise<any> => {
       const result = await ipcRenderer.invoke('SessionRequest.Open', info);
       return result;
+    },
+  },
+  LocalLLMRequests: {
+    testConnection: async (endpointBaseUrl: string): Promise<any> => {
+      const result = await ipcRenderer.invoke(IpcActions_LocalLLM.TestConnection, endpointBaseUrl);
+      return result;
+    },
+    listModels: async (endpointBaseUrl: string): Promise<any> => {
+      const result = await ipcRenderer.invoke(IpcActions_LocalLLM.GetModels, endpointBaseUrl);
+      return result;
+    },
+    startChatStream: async (request: any): Promise<any> => {
+      const result = await ipcRenderer.invoke(IpcActions_LocalLLM.StartChatStream, request);
+      return result;
+    },
+    stopChatStream: async (streamId: string): Promise<void> => {
+      await ipcRenderer.invoke(IpcActions_LocalLLM.StopChatStream, streamId);
     },
   }
 }

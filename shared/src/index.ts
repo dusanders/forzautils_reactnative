@@ -1,3 +1,4 @@
+import { ContextBridge_LocalLLM } from './LLM/LocalLLM.types.js';
 import { ContextBridge_Cache } from './Storage/Cache.js';
 import { ContextBridge_Database, ContextBridge_Session } from './Storage/Database.js';
 import { ContextBridge_UDP, ContextBridge_WiFi } from './WiFi/WiFi.types.js';
@@ -10,10 +11,13 @@ export * from './Storage/Cache.js';
 
 export * from './Storage/Database.js';
 
+export * from './LLM/LocalLLM.types.js';
+
 export interface ElectronContextBridge {
   WiFiRequests: ContextBridge_WiFi;
   UDPRequests: ContextBridge_UDP;
   CacheRequests: ContextBridge_Cache;
   DatabaseRequests: ContextBridge_Database;
   SessionRequests: ContextBridge_Session;
+  LocalLLMRequests: ContextBridge_LocalLLM;
 }

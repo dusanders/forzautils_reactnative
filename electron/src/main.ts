@@ -8,6 +8,7 @@ import { Session } from './services/Database/Session.js';
 import { DatabaseService } from './services/Database/Database.js';
 import { Logger } from './services/Logger/Logger.js';
 import AppConfig from './config.json' with { type: 'json' };
+import { LocalLlmService } from './services/LLM/LocalLLMService.js';
 const __dirname = import.meta.dirname;
 
 const RendererChannel = ipcMain;
@@ -23,6 +24,7 @@ const attachServices = async (win: Electron.BrowserWindow) => {
     new WifiServiceProvider(win),
     new CacheService(win),
     new Session(win, databaseService.mainDb),
+    new LocalLlmService(),
     databaseService,
   ];
 
@@ -42,7 +44,8 @@ const createWindow = () => {
     }
   });
 
-  win.loadFile(htmlPath);
+  // win.loadFile(htmlPath);
+  win.loadURL("http://localhost:8081");
   win.webContents.openDevTools();
   return win;
 }
