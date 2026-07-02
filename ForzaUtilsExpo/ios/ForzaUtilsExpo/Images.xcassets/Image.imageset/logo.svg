@@ -1,0 +1,51 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-labelledby="title desc" role="img">
+  <title id="title">Forza Utility App Logo</title>
+  <desc id="desc">Simple circular icon with racing checkered pattern and bold accent ring</desc>
+  
+  <!-- Outer dark ring (racing black) -->
+  <circle 
+    cx="100" cy="100" r="94" 
+    fill="#0A0A0A" 
+    stroke="#1F1F1F" 
+    stroke-width="12"/>
+  
+  <!-- Inner accent ring (vibrant Forza-style green) -->
+  <circle 
+    cx="100" cy="100" r="78" 
+    fill="none" 
+    stroke="#00E64D" 
+    stroke-width="8"/>
+  
+  <!-- Checkered racing square (centered) -->
+  <!-- White base square -->
+  <rect 
+    x="52" y="52" width="96" height="96" 
+    rx="8" 
+    fill="#F8F8F8"/>
+  
+  <!-- Black checkered squares (4x4 grid) -->
+  <!-- Row 1 -->
+  <rect x="52" y="52" width="24" height="24" fill="#1C2526"/>
+  <rect x="100" y="52" width="24" height="24" fill="#1C2526"/>
+  <rect x="76" y="76" width="24" height="24" fill="#1C2526"/>
+  <rect x="124" y="76" width="24" height="24" fill="#1C2526"/>
+  
+  <!-- Row 2 -->
+  <rect x="76" y="52" width="24" height="24" fill="#F8F8F8"/>
+  <rect x="124" y="52" width="24" height="24" fill="#F8F8F8"/>
+  <rect x="52" y="76" width="24" height="24" fill="#F8F8F8"/>
+  <rect x="100" y="76" width="24" height="24" fill="#F8F8F8"/>
+  
+  <!-- Row 3 -->
+  <rect x="52" y="100" width="24" height="24" fill="#1C2526"/>
+  <rect x="100" y="100" width="24" height="24" fill="#1C2526"/>
+  <rect x="76" y="124" width="24" height="24" fill="#1C2526"/>
+  <rect x="124" y="124" width="24" height="24" fill="#1C2526"/>
+  
+  <!-- Row 4 -->
+  <rect x="76" y="100" width="24" height="24" fill="#F8F8F8"/>
+  <rect x="124" y="100" width="24" height="24" fill="#F8F8F8"/>
+  <rect x="52" y="124" width="24" height="24" fill="#F8F8F8"/>
+  <rect x="100" y="124" width="24" height="24" fill="#F8F8F8"/>
+
+</svg>

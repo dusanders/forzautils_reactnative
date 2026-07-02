@@ -1,0 +1,270 @@
+import React, { useRef } from "react";
+import DatabaseService from "./Database/Database";
+import { ISessionInfo, ITelemetryData } from "shared";
+import { useOnMount } from "@/hooks/useOnMount";
+import { ISession } from "./DatabaseInterfaces";
+import { Semaphore } from "@/helpers/Semaphore";
+import { INativeUDPService } from "../Forza/Network.types";
+import { EmitterSubscription, EventEmitter } from "@/helpers/EventEmitter";
+import { Logger } from "@/hooks/Logger";
+
+export enum ReplayState {
+  IDLE = 'IDLE',
+  RECORDING = 'RECORDING',
+  PAUSED = 'PAUSED',
+  PLAYING = 'PLAYING',
+}
+
+export interface IRecorderState {
+  replayState: ReplayState;
+  replayPosition: number;
+  replayLength: number;
+  replayInfo?: ISessionInfo;
+}
+
+export interface IRecorderService {
+  state: IRecorderState;
+  sessions: ISession[];
+  onPacketEvent: (callback: (packet: ITelemetryData, position: number) => void) => EmitterSubscription;
+  startRecording: () => Promise<void>;
+  stopRecording: () => Promise<void>;
+  loadReplay: (sessionName: string) => Promise<ISessionInfo | null>;
+  deleteReplay: (sessionName: string) => Promise<void>;
+  closeRecording: () => Promise<void>;
+  resume: () => Promise<void>;
+  restart: () => Promise<void>;
+  pause: () => Promise<void>;
+  closeReplay: () => Promise<void>;
+  seek: (position: number) => Promise<void>;
+}
+
+export interface RecorderServiceProps {
+  children?: React.ReactNode;
+}
+
+const RecorderContext = React.createContext<IRecorderService | null>(null);
+
+const TAG = "RecorderService.tsx";
+export class RecorderService implements IRecorderService {
+  static Events = {
+    PACKET: 'packet',
+    STATE_CHANGE: 'state_change',
+  }
+  static instance: RecorderService | null = null;
+  static async Initialize(udpService: INativeUDPService): Promise<RecorderService> {
+    if (!RecorderService.instance) {
+      RecorderService.instance = new RecorderService();
+      await RecorderService.instance.initialize(udpService);
+    }
+    return RecorderService.instance;
+  }
+  static GetInstance(): RecorderService {
+    if (!RecorderService.instance) {
+      throw new Error("RecorderService is not initialized. Call Initialize() first.");
+    }
+    return RecorderService.instance;
+  }
+  private static PLAYBACK_INTERVAL_MS = 50;
+
+  private databaseProvider: DatabaseService;
+  private playbackSemaphore: Semaphore = new Semaphore(1);
+  private eventEmitter: EventEmitter = new EventEmitter(TAG);
+  private udpService: INativeUDPService | null = null;
+  private packetListener: EmitterSubscription | null = null;
+  private currentReplaySession: ISession | null = null;
+  private currentRecordingSession: ISession | null = null;
+  private playbackInterval: NodeJS.Timeout | null = null;
+  state: IRecorderState;
+  sessions: ISession[];
+
+  private constructor() {
+    this.databaseProvider = new DatabaseService();
+    this.state = {
+      replayState: ReplayState.IDLE,
+      replayPosition: 0,
+      replayLength: 0,
+    };
+    this.sessions = [];
+  }
+  onStateChange(callback: (state: IRecorderState) => void): EmitterSubscription {
+    return this.eventEmitter.addListener(RecorderService.Events.STATE_CHANGE, callback);
+  }
+  onPacketEvent(callback: (packet: ITelemetryData, position: number) => void): EmitterSubscription {
+    return this.eventEmitter.addListener(RecorderService.Events.PACKET, callback);
+  }
+  async startRecording(): Promise<void> {
+    const newSession = await this.databaseProvider.generateSession();
+    this.currentRecordingSession = newSession;
+    this.sessions.push(newSession);
+    this.state.replayState = ReplayState.RECORDING;
+    this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+  }
+  async stopRecording(): Promise<void> {
+    this.currentRecordingSession?.close();
+    this.currentRecordingSession = null;
+    this.state.replayLength = 0;
+    this.state.replayPosition = 0;
+    this.state.replayState = ReplayState.IDLE;
+    this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+  }
+  async loadReplay(sessionName: string): Promise<ISessionInfo | null> {
+    this.currentReplaySession = this.sessions.find(s => s.info.name === sessionName) || null;
+    if (this.currentReplaySession) {
+      this.state.replayLength = this.currentReplaySession.info.length;
+      this.state.replayPosition = 0;
+      this.state.replayState = ReplayState.PAUSED;
+      this.state.replayInfo = this.currentReplaySession.info;
+      this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+    }
+    return this.currentReplaySession?.info || null;
+  }
+  async deleteReplay(sessionName: string): Promise<void> {
+    const session = this.sessions.find(s => s.info.name === sessionName);
+    if (session) {
+      await session.delete();
+      this.sessions = this.sessions.filter(s => s.info.name !== sessionName);
+    }
+    this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+  }
+  async closeRecording(): Promise<void> {
+    if (this.currentRecordingSession) {
+      this.currentRecordingSession.close();
+      this.currentRecordingSession = null;
+    }
+    this.state.replayState = ReplayState.IDLE;
+    this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+  }
+  async resume(): Promise<void> {
+    await this.playbackSemaphore.acquire();
+    if (this.currentReplaySession) {
+      this.state.replayState = ReplayState.PLAYING;
+      this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+    }
+    this.playbackSemaphore.release();
+    this.startPlayback();
+  }
+  async restart(): Promise<void> {
+    await this.playbackSemaphore.acquire();
+    if (this.currentReplaySession) {
+      this.state.replayPosition = 0;
+      this.state.replayState = ReplayState.PLAYING;
+      this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+    }
+    this.playbackSemaphore.release();
+  }
+  async pause(): Promise<void> {
+    await this.playbackSemaphore.acquire();
+    if (this.currentReplaySession) {
+      this.state.replayState = ReplayState.PAUSED;
+      this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+    }
+    this.playbackSemaphore.release();
+  }
+  async closeReplay(): Promise<void> {
+    this.currentReplaySession = null;
+    this.state.replayState = ReplayState.IDLE;
+    this.state.replayPosition = 0;
+    this.state.replayLength = 0;
+    this.state.replayInfo = undefined;
+    this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+  }
+  async seek(position: number): Promise<void> {
+    await this.playbackSemaphore.acquire();
+    if (this.currentReplaySession) {
+      this.state.replayPosition = position;
+      this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+    }
+    this.playbackSemaphore.release();
+  }
+  shutdown(): void {
+    this.packetListener?.remove();
+  }
+  private startPlayback() {
+    if (this.playbackInterval) {
+      clearInterval(this.playbackInterval);
+    }
+    this.playbackInterval = setInterval(() => {
+      this.playbackLoop();
+    }, RecorderService.PLAYBACK_INTERVAL_MS);
+  }
+  private async playbackLoop() {
+    await this.playbackSemaphore.acquire();
+    if (this.state.replayState === ReplayState.PLAYING && this.currentReplaySession) {
+      const packet = await this.currentReplaySession.readPacket(this.state.replayPosition);
+      if (packet) {
+        this.eventEmitter.emit(RecorderService.Events.PACKET, packet, this.state.replayPosition);
+        this.state.replayPosition += 1;
+        if (this.state.replayPosition >= this.state.replayLength) {
+          this.state.replayState = ReplayState.PAUSED;
+          this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+        }
+      } else {
+        this.state.replayState = ReplayState.PAUSED;
+        this.eventEmitter.emit(RecorderService.Events.STATE_CHANGE, this.state);
+      }
+    } else if (this.state.replayState === ReplayState.IDLE || this.state.replayState === ReplayState.RECORDING) {
+      // Stop playback if not playing
+      if (this.playbackInterval) {
+        clearInterval(this.playbackInterval);
+        this.playbackInterval = null;
+      }
+    }
+    this.playbackSemaphore.release();
+  }
+  private async initialize(udpService: INativeUDPService) {
+    await this.databaseProvider.initialize();
+    this.sessions = await this.databaseProvider.getAllSessions();
+    this.udpService = udpService;
+    this.packetListener = this.udpService.onPacket((packet: ITelemetryData) => {
+      if (this.state.replayState === ReplayState.RECORDING && this.currentRecordingSession) {
+        this.currentRecordingSession.addPacket(packet);
+      }
+      this.eventEmitter.emit(RecorderService.Events.PACKET, packet);
+    });
+  }
+}
+
+export function RecorderServiceProvider(props: RecorderServiceProps) {
+  const serviceRef = useRef<RecorderService>(RecorderService.GetInstance());
+  const serviceStateChangeListener = useRef<EmitterSubscription | null>(null);
+  const [state, setState] = React.useState<IRecorderState>(serviceRef.current.state);
+  const [sessions, setSessions] = React.useState<ISession[]>(serviceRef.current.sessions);
+
+  useOnMount(() => {
+    serviceStateChangeListener.current = serviceRef.current.onStateChange((newState) => {
+      setState({ ...newState });
+      setSessions([...serviceRef.current.sessions]);
+    });
+    return () => {
+      serviceStateChangeListener.current?.remove();
+    }
+  });
+
+  return (
+    <RecorderContext.Provider value={{
+      state: state,
+      sessions: sessions,
+      onPacketEvent: (fn) => serviceRef.current.onPacketEvent(fn),
+      startRecording: () => serviceRef.current.startRecording(),
+      stopRecording: () => serviceRef.current.stopRecording(),
+      loadReplay: (sessionName) => serviceRef.current.loadReplay(sessionName),
+      deleteReplay: (sessionName) => serviceRef.current.deleteReplay(sessionName),
+      closeRecording: () => serviceRef.current.closeRecording(),
+      resume: () => serviceRef.current.resume(),
+      restart: () => serviceRef.current.restart(),
+      pause: () => serviceRef.current.pause(),
+      closeReplay: () => serviceRef.current.closeReplay(),
+      seek: (position: number) => serviceRef.current.seek(position),
+    }}>
+      {props.children}
+    </RecorderContext.Provider>
+  );
+}
+
+export function useRecorderService(): IRecorderService {
+  const context = React.useContext(RecorderContext);
+  if (!context) {
+    throw new Error('useRecorderService must be used within a RecorderServiceProvider');
+  }
+  return context;
+}

@@ -1,0 +1,22 @@
+{
+  "name": "ForzaUtilsRenderer",
+  "version": "1.0.0",
+  "main": "./dist/main.js",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "yarn build && npx electron .",
+    "build": "rm -rf dist && npx tsc"
+  },
+  "devDependencies": {
+    "@types/electron": "^1.6.12",
+    "@types/node": "^24.10.1",
+    "electron": "^39.1.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "shared": "../shared",
+    "systeminformation": "^5.27.11"
+  }
+}
