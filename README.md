@@ -5,17 +5,33 @@ Forza Utility written in React Native.
 
 ## React Native Mobile App
 
-Clone: [ForzaTelemetryAPI](https://github.com/dusanders/ForzaTelemetryAPI_typescript) at the project root - it is required by this app at: `../../ForzaTelemetryAPI_typescript`
+Clone: [ForzaTelemetryAPI](https://github.com/dusanders/ForzaTelemetryAPI_typescript) at the project root - it is required by this app at: `../../ForzaTelemetryAPI_typescript` see the `shared` package's package.json for relative location
 
 This is a mobile app for iOS and Android for viewing Forza telemetry data.
 
+Build the `shared` package containing common type definitions
+
+1. `cd shared`
+1. `yarn install`
+2. `yarn build`
+3. `cd ..`
+
 Build and deploy the app per React Native workflow:
 
-1. `yarn install`
+1. `cd ForzaUtilsExpo`
+2. `yarn install`
+3. `yarn build`
+4. `yarn run <ios | android>`
 
-1. `yarn build`
+## (Optional)
 
-1. `yarn run <ios | android>`
+Electron-based desktop app is also available:
+
+Build and deploy the electron app:
+
+1. `cd electron`
+2. `yarn install`
+3. `yarn start`
 
 ### First Screen
 
