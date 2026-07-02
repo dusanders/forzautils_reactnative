@@ -363,7 +363,7 @@
 					"FB_SONARKIT_ENABLED=1",
 				);
 				INFOPLIST_FILE = ForzaUtilsExpo/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.racing-games";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -399,7 +399,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6UHQ8TJ6Z2;
 				INFOPLIST_FILE = ForzaUtilsExpo/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.racing-games";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
