@@ -1,7 +1,7 @@
-import { Logger } from "../Logger/Logger";
 import { DEFAULT_MODEL, DEFAULT_MAX_TOKENS, DEFAULT_CONTEXT_SIZE, DEFAULT_ENDPOINT } from "./constants";
 import { ISupportRendererService } from "../../renderer/renderer.types";
 import { ChatGenerationSettings, ChatMessage, ChatStreamEvent, GetLocalLlmModels_ResponseDto, IpcActions_LocalLLM, StartChatStream_RequestDto, StartChatStream_ResponseDto, TestLocalLlmConnection_ResponseDto } from 'shared'
+import { Logger } from "../Logger/Logger";
 
 export interface LocalLlmStreamTarget {
   send(event: ChatStreamEvent): void;

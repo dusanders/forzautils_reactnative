@@ -1,12 +1,22 @@
 import { INativeUDPService } from "../Network.types";
 import { ForzaTelemetryApi, getRandomTelemetryData, ITelemetryData } from "shared";
-import UdpSockets from "react-native-udp";
-import UdpSocket from "react-native-udp/lib/types/UdpSocket";
+import UdpSockets, { Buffer } from "react-native-udp";
 import { delay } from "@/helpers/misc";
 import { Logger } from "@/hooks/Logger";
 import BaseSocketService from "./BaseSocketService";
 import { Semaphore } from "@/helpers/Semaphore";
 import { EmitterSubscription, EventEmitter } from "@/helpers/EventEmitter";
+import UdpSocket from "react-native-udp/lib/types/UdpSocket";
+
+// Type guard to ensure UdpSocket has EventEmitter methods
+interface UdpSocketWithEmitter extends UdpSocket {
+  once(eventName: string | symbol, listener: (...args: any[]) => void): this;
+  addListener(eventName: string | symbol, listener: (...args: any[]) => void): this;
+  removeAllListeners(event?: string | symbol): this;
+  on(eventName: string | symbol, listener: (...args: any[]) => void): this;
+  emit(eventName: string | symbol, ...args: any[]): boolean;
+  removeListener(eventName: string | symbol, listener: (...args: any[]) => void): this;
+}
 
 /**
  * Add Type for react-native-udp 'rinfo' object
@@ -35,9 +45,9 @@ class SocketService extends BaseSocketService {
   //#endregion
 
   private eventEmitter: EventEmitter = new EventEmitter(TAG);
-  private udpSocket?: UdpSocket;
+  private udpSocket?: UdpSocketWithEmitter;
   private doDebug = false;
-  private debugInterval?: NodeJS.Timeout;
+  private debugInterval?: number;
   private bindSemaphore: Semaphore = new Semaphore(1);
 
   private constructor() {
@@ -124,7 +134,8 @@ class SocketService extends BaseSocketService {
       try {
         this.udpSocket = UdpSockets.createSocket(
           { type: 'udp4', reusePort: true },
-        ).once('error', (error) => {
+        ) as UdpSocketWithEmitter;
+        this.udpSocket.once('error', (error) => {
           errorOccurred = true;
           reject(new Error(`Socket error during bind: ${error?.message}`));
           this.udpSocket?.removeAllListeners();
